@@ -1,0 +1,35 @@
+<core:FragmentDefinition
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core">
+
+    <VBox class="svCard svHow" renderType="Bare">
+        <HBox justifyContent="Center" wrap="Wrap" renderType="Bare" class="svH2Row">
+            <Text text="{i18n>vrHowTitle}"       class="svH2"/>
+            <Text text="{i18n>vrHowTitleAccent}" class="svH2 svAccent"/>
+        </HBox>
+        <Text text="{i18n>vrHowSub}" textAlign="Center" class="svSub"/>
+
+        <HBox class="svFlow" wrap="Wrap" renderType="Bare">
+            <VBox class="svFlowStep" renderType="Bare" alignItems="Center">
+                <Text text="1" textAlign="Center" class="svStepNum"/>
+                <Text text="{i18n>vrHowStep1Title}" textAlign="Center" width="100%" class="svStepTitle"/>
+                <Text text="{i18n>vrHowStep1Desc}" textAlign="Center" width="100%" class="svStepDesc"/>
+            </VBox>
+            <VBox class="svFlowStep" renderType="Bare" alignItems="Center">
+                <Text text="2" textAlign="Center" class="svStepNum"/>
+                <Text text="{i18n>vrHowStep2Title}" textAlign="Center" width="100%" class="svStepTitle"/>
+                <Text text="{i18n>vrHowStep2Desc}" textAlign="Center" width="100%" class="svStepDesc"/>
+            </VBox>
+            <VBox class="svFlowStep" renderType="Bare" alignItems="Center">
+                <Text text="3" textAlign="Center" class="svStepNum"/>
+                <Text text="{i18n>vrHowStep3Title}" textAlign="Center" width="100%" class="svStepTitle"/>
+                <Text text="{i18n>vrHowStep3Desc}" textAlign="Center" width="100%" class="svStepDesc"/>
+            </VBox>
+            <VBox class="svFlowStep" renderType="Bare" alignItems="Center">
+                <Text text="4" textAlign="Center" class="svStepNum"/>
+                <Text text="{i18n>vrHowStep4Title}" textAlign="Center" width="100%" class="svStepTitle"/>
+                <Text text="{i18n>vrHowStep4Desc}" textAlign="Center" width="100%" class="svStepDesc"/>
+            </VBox>
+        </HBox>
+    </VBox>
+</core:FragmentDefinition>

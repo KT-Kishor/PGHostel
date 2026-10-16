@@ -1,0 +1,30 @@
+<core:FragmentDefinition
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core">
+
+    <VBox class="svCard svWhy" renderType="Bare">
+        <HBox justifyContent="Center" wrap="Wrap" renderType="Bare" class="svH2Row">
+            <Text text="{i18n>vrWhyTitle}"       class="svH2"/>
+            <HBox renderType="Bare">
+                <Text text="{i18n>vrWhyTitleAccent}" class="svH2 svAccent"/>
+                <Text text="{i18n>vrWhyTitleSuffix}" class="svH2"/>
+            </HBox>
+        </HBox>
+        <Text text="{i18n>vrWhySub}" textAlign="Center" class="svSub"/>
+
+        <HBox class="svBenefits" renderType="Bare" items="{path:'pt>/benefits', templateShareable:false}">
+            <VBox class="svBenefit" renderType="Bare" alignItems="Center">
+                <Image src="{pt>icon}" width="64px" height="64px" decorative="true" class="svBenefitIcon"/>
+                <Title text="{pt>title}" level="H3" wrapping="true" textAlign="Center" class="svBenefitTitle"/>
+                <Text text="{pt>subtitle}" width="100%" textAlign="Center" class="svBenefitSub"/>
+                <HBox wrap="Wrap" renderType="Bare" justifyContent="Center" class="svPills" items="{path:'pt>items', templateShareable:false}">
+                    <Text text="{pt>}" textAlign="Center" class="svPill"/>
+                </HBox>
+            </VBox>
+        </HBox>
+
+        <HBox justifyContent="Center" renderType="Bare" class="svWhyCta">
+            <Button text="{i18n>vrWhyCta}" class="svBtn" type="Emphasized" press=".onScrollToRegister"/>
+        </HBox>
+    </VBox>
+</core:FragmentDefinition>

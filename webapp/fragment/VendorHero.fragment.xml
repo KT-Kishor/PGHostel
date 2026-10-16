@@ -1,0 +1,23 @@
+<core:FragmentDefinition
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core">
+
+    <VBox class="svHero" renderType="Bare">
+        <VBox class="svHeroInner" renderType="Bare" alignItems="Start">
+            <Text text="{i18n>vrHeroEyebrow}" class="svEyebrow"/>
+            <Title text="{i18n>vrHeroTitle}" level="H1" wrapping="true" class="svHeroTitle"/>
+            <Text text="{i18n>vrHeroLead}" class="svHeroLead"/>
+
+            <HBox wrap="Wrap" renderType="Bare" class="svChips" items="{path:'pt>/types', templateShareable:false}">
+                <Text text="{pt>id}" class="svChip"/>
+            </HBox>
+
+            <Button text="{i18n>vrHeroCta}"
+                    icon="sap-icon://slim-arrow-down"
+                    iconFirst="false"
+                    type="Emphasized"
+                    class="svBtn svBtnLight"
+                    press=".onScrollToRegister"/>
+        </VBox>
+    </VBox>
+</core:FragmentDefinition>

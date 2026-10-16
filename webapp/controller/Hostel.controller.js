@@ -36,6 +36,15 @@ sap.ui.define([
     // const $V = (id) => $C(id)?.getValue()?.trim() || "";
     this._otpResendInterval = null;
     this._otpValidityInterval = null;
+
+    /* ------------------------------------------------------------------ */
+    /*  Vendor registration constants                                      */
+    /* ------------------------------------------------------------------ */
+    var VR_MAX_BYTES     = 400 * 1024,
+        VR_MIN_AGE       = 18,
+        VR_ALLOWED_TYPES = ["image/jpeg", "image/jpg", "image/png", "application/pdf"],
+        VR_ALLOWED_EXT   = /\.(jpe?g|png|pdf)$/i;
+
     return BaseController.extend("sap.ui.com.project1.controller.Hostel", {
         _isProfileRequested: false,
         Formatter: Formatter,
@@ -60,10 +69,35 @@ sap.ui.define([
             });
 
             this.getView().setModel(oDateModel, "controller");
+
+            this._initVendorRegistration();
+        },
+
+        onBeforeRendering: function () {
+            // The signup date picker is calendar-only. The delegate has to be
+            // registered before the control renders, otherwise its
+            // onAfterRendering hook never runs.
+            this._makeAdminDobReadOnly();
+        },
+
+        _makeAdminDobReadOnly: function () {
+            const oView = this.getView();
+            const oDOB = oView.byId("adminDOB");
+
+            // _FragmentDatePickersReadOnly registers a render delegate and a
+            // click handler, so it must run once per picker instance.
+            if (!oDOB || this._vrDobPicker === oDOB) return;
+
+            this._vrDobPicker = oDOB;
+            this._FragmentDatePickersReadOnly([oView.createId("adminDOB")]);
         },
 
         onAfterRendering: function () {
             this._startAllCarouselsAutoSlide(3000);
+            this._initAdminSignupControls();
+            this._makeAdminDobReadOnly();
+            this._hookAdminDropZone();
+            this._vrHookPropertyTabs();
         },
 
         _getBrowserLocation: function () {
@@ -127,7 +161,11 @@ sap.ui.define([
                         this.Country = data.address.country || "";
                         this.CountryCode = data.address.country_code?.toUpperCase() || "";
 
-                        console.log("Location found:", this.City, this.State, this.Country);
+                         console.log("Location found:", this.City, this.State, this.Country);
+                        // The lookup can finish after the country/state/city models
+                        // have loaded. Re-apply the prefill so a late location still
+                        // fills the address in.
+                        this._applyGeoPrefill();
                     }
 
                 } catch (error) { }
@@ -180,6 +218,12 @@ sap.ui.define([
             sessionStorage.removeItem("homePageReturnTab");
 
             this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
+
+            // Refresh vendor labels after route localization without resetting the form.
+            this._initVendorRegistration();
+            this._initAdminSignupControls();
+            if (sStoredTab === "idVendor") this.onAdminLoadLocations();
+
             this.iTop = 4; // records per load
             this.iSkip = 0; // starting index
 
@@ -410,7 +454,7 @@ sap.ui.define([
             }.bind(this), 50);
         },
 
-        /* ── Home image slider pause / resume on input focus ── */
+        /* â”€â”€ Home image slider pause / resume on input focus â”€â”€ */
 
         _stopHomeImageSlider: function () {
             if (this._imageInterval) {
@@ -803,7 +847,7 @@ sap.ui.define([
                     oFacilityModel.setProperty("/Facilities", []);
                 }
             } catch (err) {
-                console.error("❌ Facility load error:", err);
+                console.error("âŒ Facility load error:", err);
             }
             oFacilityModel.setProperty("/loading", false);
         },
@@ -877,15 +921,15 @@ sap.ui.define([
                         this._oRoomDetailFragment = fragment;
                         this.getView().addDependent(fragment);
 
-                        // ✅ Attach models
+                        // âœ… Attach models
                         fragment.setModel(oHostelModel, "HostelModel");
                         fragment.setModel(oView.getModel("FacilityModel"), "FacilityModel");
 
-                        // ✅ THIS WAS THE MISSING LINE
+                        // âœ… THIS WAS THE MISSING LINE
                         const bPhone = sap.ui.Device.system.phone;
                         fragment.setContentWidth(bPhone ? "100%" : "70%");
 
-                        // ✅ Open dialog AFTER models are set
+                        // âœ… Open dialog AFTER models are set
                         fragment.open();
 
                         this._bindCarousel();
@@ -962,7 +1006,7 @@ sap.ui.define([
                     oAmenityModel.setProperty("/Amenities", []);
                 }
             } catch (err) {
-                console.log("❌ Amenity load error:", err);
+                console.log("âŒ Amenity load error:", err);
             }
             oAmenityModel.setProperty("/loading", false);
         },
@@ -1079,11 +1123,27 @@ sap.ui.define([
 },
         onTabSelect: async function (oEvent) {
             const oView = this.getView();
-            const oVisibilityModel = oView.getModel("VisibilityModel");
+            let oVisibilityModel = oView.getModel("VisibilityModel");
+            if (!oVisibilityModel) {
+                oVisibilityModel = new JSONModel({ NoData: false, ShowViewMore: false });
+                oView.setModel(oVisibilityModel, "VisibilityModel");
+            }
             oVisibilityModel.setProperty("/Branches", {})
             oVisibilityModel.setProperty("/ShowViewMore", false);
 
             const sKey = oEvent? oEvent.getParameter("item").getKey() :  this.key;
+
+            // A completed registration is a one-time confirmation. Leaving the
+            // vendor tab clears it, so coming back shows a blank form instead of
+            // the old success panel.
+            if (sKey !== "idVendor") {
+                this._dismissAdminSignupSuccess();
+            }
+
+            // The vendor form's dropdown popups are rendered into the static area
+            // (outside the view), so a class on <body> is what lets the vendor
+            // stylesheet style them without touching the rest of the app.
+            this._setVendorScope(sKey === "idVendor");
             this._navigateTo(sKey);
             const page = this.byId(sKey);
             if (page && page.scrollTo) page.scrollTo(0, 0);
@@ -1147,7 +1207,7 @@ sap.ui.define([
                             oBranchCombo.removeAllItems();
                         }
 
-                        // ✅ Handle No Data
+                        // âœ… Handle No Data
                         if (!aData || aData.length === 0) {
                             oVisibilityModel.setProperty("/NoData", true);
                         } else {
@@ -1167,6 +1227,16 @@ sap.ui.define([
                 if (this._imageInterval) {
                     clearInterval(this._imageInterval);
                 }
+            }
+
+            if (sKey === "idVendor") {
+                if (this._imageInterval) {
+                    clearInterval(this._imageInterval);
+                }
+                this._vrHookPropertyTabs();
+                this._initAdminSignupControls();
+                this.onAdminLoadLocations();
+                this._hookAdminDropZone();
             }
 
             if (sKey === "idHome") {
@@ -1195,6 +1265,46 @@ sap.ui.define([
                 clearTimeout(this._exploreBtnAnimationTimeout);
             }
             this._stopHomeImageSlider();
+
+            this._vrExited = true;
+            // The vendor scope marker must not survive the view.
+            this._setVendorScope(false);
+            // A registration may still be in flight; never leave the shared busy
+            // dialog open on the next view.
+            this.closeBusyDialog();
+            this._adminUploadTask = null;
+            if (this._adminFileReader && this._adminFileReader.readyState === 1) {
+                this._adminFileReader.abort();
+            }
+            this._clearAdminSignupDocuments();
+            this.onClosePreview();
+            this.getView().detachModelContextChange(this._initAdminSignupControls, this);
+            if (this._adminSignupModel) {
+                this._adminSignupModel.detachPropertyChange(this._updateAdminSignupProgress, this);
+                this._adminSignupModel.setProperty("/Submitting", false);
+            }
+            (this._adminGeoBindings || []).forEach(function (oEntry) {
+                if (oEntry.binding) { oEntry.binding.destroy(); }
+            });
+            this._adminGeoBindings = [];
+            if (this._adminDropZone) {
+                this._adminDropZone.detachBrowserEvent("dragenter dragover dragleave drop", this._adminDropHandler, this);
+                this._adminDropZone = null;
+            }
+            if (this._adminSuccessBox) {
+                this._adminSuccessBox.removeEventDelegate(this._adminSuccessDelegate);
+                this._adminSuccessBox = null;
+            }
+            if (this._vrTypeTabs) {
+                this._vrTypeTabs.removeEventDelegate(this._vrTypeDelegate);
+                this._vrTypeTabs = null;
+                this._vrTypeDelegate = null;
+            }
+            if (this._vrSwapTimer) {
+                clearTimeout(this._vrSwapTimer);
+                this._vrSwapTimer = null;
+            }
+            this._vrBundleRequest = null;
         },
 
         onpressFilter: function () {
@@ -1241,7 +1351,7 @@ sap.ui.define([
             this.oViewModel.setProperty("/showOTPField", false);
             this.oViewModel.setProperty("/isOtpEntered", false);
 
-            // 🔥 FIX: You forgot these
+            // ðŸ”¥ FIX: You forgot these
             this.oViewModel.setProperty("/isOtpSelected", false);
             this.oViewModel.setProperty("/isPasswordSelected", true);
 
@@ -1283,9 +1393,9 @@ sap.ui.define([
                 this._oSignDialog.close();   // Close first
                 this._oSignDialog.destroy(); // Destroy
 
-                this._oSignDialog = null;    // 🔥 CRITICAL FIX
+                this._oSignDialog = null;    // ðŸ”¥ CRITICAL FIX
             }
-            // Dialog was destroyed – afterClose won't fire, so resume slider directly
+            // Dialog was destroyed â€“ afterClose won't fire, so resume slider directly
             this._startHomeImageSlider();
         },
 
@@ -1325,7 +1435,7 @@ sap.ui.define([
                     }
                 });
 
-            // 🚫 DISABLE FORGOT FORM
+            // ðŸš« DISABLE FORGOT FORM
             ["fpEmailId", "fpOTP", "newPass", "confPass"]
                 .forEach(id => {
                     const c = $C(id);
@@ -1387,7 +1497,7 @@ sap.ui.define([
             const oSignInPanel = $C("signInPanel");
             const oSignUpPanel = $C("signUpPanel");
 
-            // 🔒 DOB Read-only and Titles
+            // ðŸ”’ DOB Read-only and Titles
             this._FragmentDatePickersReadOnly(["signUpDOB"]);
             this.oViewModel.setProperty("/authFlow", "signup");
             this.oViewModel.setProperty("/dialogTitle", "Sign Up"); // Added back
@@ -1493,7 +1603,7 @@ sap.ui.define([
 
         SM_onCopyPassword: function (oEvent) {
             const oIcon = oEvent.getSource();
-            const oInput = oIcon.getParent(); // 👈 actual input owning the icon
+            const oInput = oIcon.getParent(); // ðŸ‘ˆ actual input owning the icon
             if (!oInput || !oInput.getValue) return;
             const pwd = oInput.getValue();
             if (!pwd) return sap.m.MessageToast.show(this.i18nModel.getText("noPasswordCopy"));
@@ -1539,7 +1649,7 @@ sap.ui.define([
 
         SM_onChnageSetAndConfirm: function (oEvent) {
             const oInput = oEvent.getSource();
-            const sId = oInput.getId(); // 🔥 Sabse pehle ID lein
+            const sId = oInput.getId(); // ðŸ”¥ Sabse pehle ID lein
             let val = oInput.getValue();
 
             // Remove spaces
@@ -1567,7 +1677,7 @@ sap.ui.define([
             var oStrength = $C("fpPasswordStrengthText");
             if (!oPwdInput) return;
 
-            // ✅ Only generate + validate (NO copying here)
+            // âœ… Only generate + validate (NO copying here)
             var pwd = utils._LCgenerateStrongPassword();
             oPwdInput.setValue(pwd);
             this.getView().getModel("LoginMode").setProperty("/password", pwd);
@@ -1650,13 +1760,13 @@ const sSuccessMsg = this.i18nModel.getText("registrationSuccess", [
     sUsername
 ]);
                 const sPassword = data.password;
-                const oCtrl = this; // 👈 REQUIRED
+                const oCtrl = this; // ðŸ‘ˆ REQUIRED
                 MessageBox.success(sSuccessMsg, {
                     title: this.i18nModel.getText("success"),
                     contentWidth: "500px",
                     styleClass: "myUnifiedBtn",
                     onClose: () => {
-                        // ✅ Credentials trigger FIRST
+                        // âœ… Credentials trigger FIRST
                         oCtrl._triggerBrowserSaveCredentials(sUsername, sPassword);
 
                         oCtrl.oViewModel.setProperty("/authFlow", "signin");
@@ -1889,7 +1999,7 @@ const sSuccessMsg = this.i18nModel.getText("registrationSuccess", [
             const hasCountry = !!oCountry.getSelectedItem();
             const hasState = !!oState.getSelectedItem();
 
-            // ❗ User typed a value without valid parents → reset
+            // â— User typed a value without valid parents â†’ reset
             if (!hasCountry || !hasState) {
                 oCity.setValue("");
                 oCity.setSelectedKey("");
@@ -1899,7 +2009,7 @@ const sSuccessMsg = this.i18nModel.getText("registrationSuccess", [
             }
             // Normal mandatory check when parents are valid
             utils._LCvalidateMandatoryField(oEvent);
-            // 🔥 PUSH CITY TO MODEL when valid
+            // ðŸ”¥ PUSH CITY TO MODEL when valid
             const oModel = this.getView().getModel("LoginMode");
             const sCityText = oCity.getSelectedItem()?.getText() || oCity.getValue() || "";
             oModel.setProperty("/City", sCityText);
@@ -1927,7 +2037,7 @@ const sSuccessMsg = this.i18nModel.getText("registrationSuccess", [
                 oInput.setValueStateText(this.i18nModel.getText("selectISDCodeFirst"));
                 return;
             }
-            // 🔥 STRICT validation while typing
+            // ðŸ”¥ STRICT validation while typing
             const isValid = utils._LCvalidateISDmobile(oInput, std);
 
             if (!isValid) {
@@ -2249,7 +2359,7 @@ const sSuccessMsg = this.i18nModel.getText("registrationSuccess", [
                     if (oView.byId("ProfileAvatar")) oView.byId("ProfileAvatar").setVisible(false);
                     if (this._oProfileDialog) this._oProfileDialog.close();
                 } else {
-                    // Update the dialog's section model, not the view’s
+                    // Update the dialog's section model, not the viewâ€™s
                     if (this._oProfileDialog) {
                         var oSectionModel = this._oProfileDialog.getModel("profileSectionModel");
                         if (oSectionModel) {
@@ -2272,12 +2382,12 @@ const sSuccessMsg = this.i18nModel.getText("registrationSuccess", [
             const oAreaTypeCombo = oView.byId("id_Area");
             const oRoomTypeCombo = oView.byId("id_Roomtype");
             const oPropertyTypeCombo = oView.byId("id_PropertyType");
-            // 🔹 Reset all selected keys
+            // ðŸ”¹ Reset all selected keys
             if (oBranchCombo) oBranchCombo.setSelectedKey("");
             if (oAreaTypeCombo) oAreaTypeCombo.setSelectedKey("");
             if (oRoomTypeCombo) oRoomTypeCombo.setSelectedKey("");
             if (oPropertyTypeCombo) oPropertyTypeCombo.setSelectedKeys([]).setValueState("None");
-            // 🔹 Make Area, Room Type and Property Type non-editable
+            // ðŸ”¹ Make Area, Room Type and Property Type non-editable
             if (oAreaTypeCombo) oAreaTypeCombo.setEnabled(false);
             if (oRoomTypeCombo) oRoomTypeCombo.setEnabled(false);
             if (oPropertyTypeCombo) oPropertyTypeCombo.setEnabled(false);
@@ -2400,9 +2510,9 @@ const sSuccessMsg = this.i18nModel.getText("registrationSuccess", [
                         TotalAmount: fTotal,
                         Image: f.Image || f.image || ""
                     });
-                });
-            });
+    });
 
+});
             const totalFacilityPrice = totalFacilityPricePerDay * iDays;
             const grandTotal = totalFacilityPrice + Number(RoomPrice || 0);
 
@@ -2414,7 +2524,7 @@ const sSuccessMsg = this.i18nModel.getText("registrationSuccess", [
             };
         },
 
-        // 🗓️ Helper date parser
+        // ðŸ—“ï¸ Helper date parser
         _parseDate: function (sDate) {
             if (!sDate) return null;
             // If it's already a Date object
@@ -2440,20 +2550,20 @@ const sSuccessMsg = this.i18nModel.getText("registrationSuccess", [
             oPropertyType.setSelectedKeys([]).setValueState("None").setEnabled(false);
             const oSelectedItem = oEvent.getParameter("selectedItem");
             if (!oSelectedItem) return;
-            // 🔹 Selected Branch Name
+            // ðŸ”¹ Selected Branch Name
             const sSelectedBranch = oSelectedItem.getText();
-            // 🔹 Fetch existing Branch model data
+            // ðŸ”¹ Fetch existing Branch model data
             const oModelData = oView.getModel("sBRModel").getData();
-            // 🔹 Filter the data for the selected branch name
+            // ðŸ”¹ Filter the data for the selected branch name
             const aFiltered = oModelData.filter(function (item) {
                 return item.City === sSelectedBranch;
             });
-            // 🔹 Update Area model dynamically
+            // ðŸ”¹ Update Area model dynamically
             const oAreaModel = new JSONModel(aFiltered);
             oView.setModel(oAreaModel, "AreaModel");
             this._populateUniqueFilterValues(aFiltered)
 
-            // 🔹 Enable the Area dropdown now that data is ready
+            // ðŸ”¹ Enable the Area dropdown now that data is ready
             oAreaCombo.setEnabled(true);
             oRoomType.setEnabled(true);
             oPropertyType.setEnabled(true);
@@ -2468,7 +2578,7 @@ const sSuccessMsg = this.i18nModel.getText("registrationSuccess", [
                 return (!aSelectedPropertyTypes.length || aSelectedPropertyTypes.includes(item.PropertyType)) &&
                     item.City === Branch;
             });
-            // 🔹 Update Area model dynamically
+            // ðŸ”¹ Update Area model dynamically
             const oAreaModel = new JSONModel(aFiltered);
             this.getView().setModel(oAreaModel, "AreaModel");
             this._populateUniqueFilterValues(aFiltered)
@@ -2480,7 +2590,7 @@ const sSuccessMsg = this.i18nModel.getText("registrationSuccess", [
                 .filter(Boolean);
         },
 
-        // 🔹 When Area is selected, enable Room Type combo
+        // ðŸ”¹ When Area is selected, enable Room Type combo
         onAreaSelectionChange: function (oEvent) {
             const oRoomType = this.byId("id_Roomtype");
             const oSelectedItem = oEvent.getSource().getSelectedItem();
@@ -2713,7 +2823,7 @@ const sSuccessMsg = this.i18nModel.getText("registrationSuccess", [
                 this.byId("id_Area").setBusy(false);
                 this.byId("id_Roomtype").setBusy(false);
                 this.byId("id_PropertyType").setBusy(false);
-                // ✅ show ROOMS footer after success OR failure
+                // âœ… show ROOMS footer after success OR failure
                 oFooterModel.setProperty("/showRoomsFooter", true);
                 oFooterModel.setProperty("/showGlobalFooter", false);
 
@@ -2863,7 +2973,7 @@ const sSuccessMsg = this.i18nModel.getText("registrationSuccess", [
                     return;
                 }
 
-                // 🔥 Convert Base64 to Image
+                // ðŸ”¥ Convert Base64 to Image
                 const convertBase64ToImage = (base64String, fileType) => {
                     if (!base64String) return "./image/Fallback.png";
 
@@ -2984,17 +3094,17 @@ const sSuccessMsg = this.i18nModel.getText("registrationSuccess", [
             if (!confirm) {
                 oInput.setValueState("Error");
                 oInput.setValueStateText(this.i18nModel.getText("confirmPasswordRequired"));
-                return false; // ✅ EXPLICIT FAIL
+                return false; // âœ… EXPLICIT FAIL
             }
             // Compare
             if (pass !== confirm) {
                 oInput.setValueState("Error");
                 oInput.setValueStateText(this.i18nModel.getText("nopasswordmatch"));
-                return false; // ✅ EXPLICIT FAIL
+                return false; // âœ… EXPLICIT FAIL
             }
             // Success
             oInput.setValueState("None");
-            return true; // ✅ EXPLICIT PASS
+            return true; // âœ… EXPLICIT PASS
         },
 
         Forget_onConfirm: function (oEvent) {
@@ -3052,22 +3162,22 @@ const sSuccessMsg = this.i18nModel.getText("registrationSuccess", [
 
             this.oViewModel.setProperty("/loginMode", mode);
 
-            // 🔥 Always reset OTP field visibility when switching modes
+            // ðŸ”¥ Always reset OTP field visibility when switching modes
             this.oViewModel.setProperty("/showOTPField", false);
             this.oViewModel.setProperty("/isOtpEntered", false);
-            // 🔥 Clean OTP input field and disable it
+            // ðŸ”¥ Clean OTP input field and disable it
             const otpCtrl = $C("signInOTP");
             if (otpCtrl) {
                 otpCtrl.setValue("");
                 otpCtrl.setEnabled(false);
             }
-            // 🔥 Reset password field too (fresh mode)
+            // ðŸ”¥ Reset password field too (fresh mode)
             const passCtrl = $C("signinPassword");
             if (passCtrl) {
                 passCtrl.setValue("");
                 passCtrl.setValueState("None");
             }
-            // 🔥 Hide Send OTP button unless user is in OTP mode
+            // ðŸ”¥ Hide Send OTP button unless user is in OTP mode
             const btnSendOtp = $C("btnSignInSendOTP");
             if (btnSendOtp) {
                 btnSendOtp.setVisible(mode === "otp");
@@ -3195,7 +3305,7 @@ const sSuccessMsg = this.i18nModel.getText("registrationSuccess", [
                 return MessageToast.show(this.i18nModel.getText("nopasswordmatch"));
             }
 
-            // 🔥 PASSED ALL VALIDATIONS → SUCCESS STATE
+            // ðŸ”¥ PASSED ALL VALIDATIONS â†’ SUCCESS STATE
             oConf.setValueState("None");
             // oConf.setValueStateText("Passwords matched");
             this.getBusyDialog();
@@ -3363,13 +3473,13 @@ const sSuccessMsg = this.i18nModel.getText("registrationSuccess", [
             }
             if (!isValid) return MessageToast.show(this.i18nModel.getText("incorrectOTP"));
 
-            // 🔥 OTP VERIFIED SUCCESSFULLY → DESTROY EXPIRY STATE (INLINE)
+            // ðŸ”¥ OTP VERIFIED SUCCESSFULLY â†’ DESTROY EXPIRY STATE (INLINE)
             this._clearOtpValidityTimer();
             this._clearOtpResendTimer();
             this.oViewModel.setProperty("/otpExpiryTs", null);
             this.oViewModel.setProperty("/otpValidityText", "");
 
-            // 📌 Forgot Password Flow
+            // ðŸ“Œ Forgot Password Flow
             if (flow === "forgot") return this.oViewModel.setProperty("/forgotStep", 3);
 
             try {
@@ -3421,7 +3531,7 @@ const sSuccessMsg = this.i18nModel.getText("registrationSuccess", [
             oLoginModel.setProperty("/MobileNo", user.MobileNo || "");
             oLoginModel.setProperty("/DateofBirth", user.DateOfBirth || "");
 
-            // 🔥 CRITICAL: Set the photo from backend
+            // ðŸ”¥ CRITICAL: Set the photo from backend
             if (user.FileContent) {
                 oLoginModel.setProperty("/Photo", "data:image/png;base64," + user.FileContent);
             } else {
@@ -3590,7 +3700,7 @@ const sSuccessMsg = this.i18nModel.getText("registrationSuccess", [
                 uploader.setValue("");
                 oInput.value = "";
                 oInput.accept = "image/*";
-                oInput.capture = ""; // remove camera request → gallery
+                oInput.capture = ""; // remove camera request â†’ gallery
                 oInput.click();
             }, 200);
         },
@@ -3851,7 +3961,7 @@ const sSuccessMsg = this.i18nModel.getText("registrationSuccess", [
                     this._oSignDialog.close(), this._oSignDialog.destroy();
                     this._oSignDialog = null;
                 }
-                // Dialog was destroyed – afterClose won't fire, so resume slider directly
+                // Dialog was destroyed â€“ afterClose won't fire, so resume slider directly
                 this._startHomeImageSlider();
             } catch (err) {
                 MessageToast.show(err.message || "Invalid credentials, please try again");
@@ -3912,7 +4022,7 @@ const sSuccessMsg = this.i18nModel.getText("registrationSuccess", [
             if (oCountryData?.stdCode) {
                 oModel.setProperty("/STDCode", oCountryData.stdCode);
                 oSTD.setValue(oCountryData.stdCode);
-                this._onProfileSTDChange(); // ⬅ same behavior
+                this._onProfileSTDChange(); // â¬… same behavior
             }
 
             /* ---------------- Filter States ---------------- */
@@ -3941,7 +4051,7 @@ const sSuccessMsg = this.i18nModel.getText("registrationSuccess", [
             const std = stdRaw.replace(/\s+/g, "").startsWith("+") ?
                 stdRaw.replace(/\s+/g, "") :
                 "+" + stdRaw.replace(/\s+/g, "");
-            // Untouched empty field → no error
+            // Untouched empty field â†’ no error
             if (val.length === 0) return oInput.setValueState("None");
 
             if (!std) {
@@ -3973,7 +4083,7 @@ const sSuccessMsg = this.i18nModel.getText("registrationSuccess", [
             oCityCB?.setSelectedKey("");
             oCityCB?.setValue("");
             oCityCB?.getBinding("items")?.filter([]);
-            // No state selected → clear state in model and exit
+            // No state selected â†’ clear state in model and exit
             if (!oItem) return oModel.setProperty("/State", "");
 
             const sStateName = oItem.getKey(); // or getText(), depending on your binding
@@ -4147,215 +4257,283 @@ const sSuccessMsg = this.i18nModel.getText("registrationSuccess", [
         },
         ///
         onAdminSIGNUP: function () {
-            if (!this._oAdminSignup) {
-                this._oAdminSignup = sap.ui.xmlfragment("sap.ui.com.project1.fragment.AdminSignup", this);
-                this.getView().addDependent(this._oAdminSignup);
-                this._FragmentDatePickersReadOnly(["adminDOB"]);
-                const oDocType = $C("adminDocType");
-                this._adminDocTypeBackup = oDocType.getItems().map(i => ({
-                    key: i.getKey(),
-                    text: i.getText()
-                }));
-                this._oAdminSignup.attachAfterClose(() => {
-                    this.getView().removeStyleClass("blur-background");
-                    this._resetAdminSignupForm();
-                    this._startHomeImageSlider();
+            const oHeader = this.byId("mainTabHeader");
+            const oItem = oHeader && oHeader.getItems().find(item => item.getKey() === "idVendor");
+            if (!oItem) return;
+
+            const oNav = this.byId("pageContainer");
+            const oPage = this.byId("idVendor");
+            if (oNav && oNav.getCurrentPage() !== oPage) {
+                oNav.attachEventOnce("afterNavigate", function (oEvent) {
+                    if (!this._vrExited && oEvent.getParameter("to") === oPage) {
+                        this._vrScrollTo("register");
+                    }
+                }, this);
+            }
+            oHeader.setSelectedKey("idVendor");
+            this.onTabSelect({ getParameter: function () { return oItem; } });
+            this._initAdminSignupControls();
+            this._vrScrollTo("register");
+        },
+
+        onAdminLoadLocations: function () {
+            const oComponent = this.getOwnerComponent();
+            const oModel = this.getView().getModel("AdminSignupModel");
+            const aMissing = [["Country", "CountryModel"], ["State", "StateModel"], ["City", "CityModel"]]
+                .filter(entry => !oComponent.getModel(entry[1]));
+            if (!aMissing.length) {
+                this._initAdminSignupControls();
+                return;
+            }
+            if (this._adminGeoRequest) return this._adminGeoRequest;
+            oModel.setProperty("/LocationsLoading", true);
+            oModel.setProperty("/LocationsError", "");
+            this._adminGeoRequest = Promise.all(aMissing.map(entry => oComponent._fetchCommonData(entry[0], entry[1])))
+                .then(() => {
+                    if (this._vrExited) return;
+                    this._initAdminSignupControls();
+                    if (aMissing.some(entry => !oComponent.getModel(entry[1]))) {
+                        oModel.setProperty("/LocationsError", this._vrT("vrErrLocations"));
+                    }
+                })
+                .catch(() => {
+                    if (!this._vrExited) oModel.setProperty("/LocationsError", this._vrT("vrErrLocations"));
+                })
+                .finally(() => {
+                    this._adminGeoRequest = null;
+                    if (!this._vrExited) oModel.setProperty("/LocationsLoading", false);
                 });
-            }
-
-            // DOB Limits
-            const oDate = $C("adminDOB");
-            if (oDate) {
-                const now = new Date();
-                oDate.setMaxDate(now);
-                // oDate.setMinDate(new Date(2000, 0, 1));
-            }
-
-            this._stopHomeImageSlider();
-            this.getView().addStyleClass("blur-background");
-            this._oAdminSignup.open();
-
-
-            // 2. Control level Busy Indicator logic
-            const oCountryCB = $C("adminsignUpCountry"); // Ya "signUpCountry" customer ke liye
-            const oCountryModel = this.getOwnerComponent().getModel("CountryModel");
-
-            // Agar model/data abhi tak nahi aaya
-            if (!oCountryModel || !oCountryModel.getData() || oCountryModel.getData().length === 0) {
-                oCountryCB.setBusy(true); // Sirf is field par spinner dikhega
-                $C("adminsignUpState").setEnabled(false);
-                $C("adminsignUpCity").setEnabled(false);
-                $C("adminsignUpSTD").setEnabled(false);
-                $C("adminMobileNo").setEnabled(false);
-
-
-                // Background check (Fuzzy logic aur auto-populate ke liye)
-                const nInterval = setInterval(() => {
-                    const oLatestModel = this.getOwnerComponent().getModel("CountryModel");
-                    if (oLatestModel && oLatestModel.getData() && oLatestModel.getData().length > 0) {
-                        clearInterval(nInterval);
-                        $C("adminsignUpState").setEnabled(true);
-                        $C("adminsignUpCity").setEnabled(true);
-                        $C("adminsignUpSTD").setEnabled(true);
-                        $C("adminMobileNo").setEnabled(true);
-                        oCountryCB.setBusy(false); // Spinner hatao
-
-                        // Ab auto-populate start karo
-                          this._setDefaultCountryIndia();
-                        this._triggerAutoPopulation();
-                    }
-                }, 300);
-            } else {
-                // Data pehle se hai, toh seedha trigger karo
-                  this._setDefaultCountryIndia();
-                this._triggerAutoPopulation();
-            }
-
-
-
+            return this._adminGeoRequest;
         },
+
+        _initAdminSignupControls: function () {
+            if (this._vrExited || this._adminGeoSyncing) return;
+            const oView = this.getView();
+            const oModel = oView.getModel("AdminSignupModel");
+            if (!oModel) return;
+
+            const oSuccess = this.byId("successBox");
+            if (oSuccess && this._adminSuccessBox !== oSuccess) {
+                if (this._adminSuccessBox) {
+                    this._adminSuccessBox.removeEventDelegate(this._adminSuccessDelegate);
+                }
+                this._adminSuccessBox = oSuccess;
+                this._adminSuccessDelegate = {
+                    onAfterRendering: function () {
+                        const oDom = oSuccess.getDomRef();
+                        if (oDom && oModel.getProperty("/Submitted")) {
+                            oDom.setAttribute("tabindex", "-1");
+                            oDom.focus();
+                            this._vrScrollTo("register");
+                        }
+                    }
+                };
+                oSuccess.addEventDelegate(this._adminSuccessDelegate, this);
+            }
+
+            // The component installs these models independently after their requests finish.
+            this._adminGeoBindings = this._adminGeoBindings || [];
+            let bChanged = false;
+            ["CountryModel", "StateModel", "CityModel"].forEach((sName, i) => {
+                const oSource = oView.getModel(sName) || this.getOwnerComponent().getModel(sName);
+                let oEntry = this._adminGeoBindings[i];
+                if (!oEntry || oEntry.model !== oSource) {
+                    if (oEntry && oEntry.binding) oEntry.binding.destroy();
+                    oEntry = { model: oSource, data: null, binding: null };
+                    this._adminGeoBindings[i] = oEntry;
+                    if (oSource) {
+                        oEntry.binding = oSource.bindList("/");
+                        oEntry.binding.attachChange(this._initAdminSignupControls, this);
+                    }
+                    bChanged = true;
+                }
+                const oData = oSource && oSource.getData();
+                if (oEntry.data !== oData) bChanged = true;
+                oEntry.data = oData;
+            });
+
+            // The country is the first model to arrive; the state and city models
+            // follow in their own requests. Requiring all three before doing any
+            // work left the state list empty (and the STD code unset) for as long
+            // as the slowest request took, even though the country was already
+            // prefilled. Each model is now initialised as it appears, and the
+            // setup is only treated as complete once every one has arrived.
+            if (!Array.isArray(this._adminGeoBindings[0].data) ||
+                !this._adminGeoBindings[0].data.length || !this.byId("adminsignUpCountry")) return;
+            const bAllGeoLoaded = this._adminGeoBindings.every(entry => Array.isArray(entry.data));
+            if (this._adminGeoInitialized && !bChanged) return;
+
+            this._adminGeoSyncing = true;
+            try {
+                if (!this._adminGeoInitialized && !this._adminGeoEdited) {
+                    // Country + country code defaults. The address itself is filled
+                    // by _applyGeoPrefill below, once the syncing lock is released.
+                    this._setDefaultCountryIndia();
+                } else {
+                    this.ADMIN_onChangeCountry();
+                    this.ADMIN_onChangeState();
+                    this.ADMIN_onChangeCity();
+                }
+                // Stay "uninitialised" until the last model arrives, so the later
+                // arrivals still filter their own list.
+                this._adminGeoInitialized = bAllGeoLoaded;
+            } finally {
+                this._adminGeoSyncing = false;
+            }
+            // Runs on every model arrival, so whichever finishes last (the location
+            // lookup or the models) still fills the address in.
+            this._applyGeoPrefill();
+            this._updateAdminSignupProgress();
+        },
+
+        // Fills the address from the browser location, but only while the visitor
+        // has not entered anything themselves. Safe to call repeatedly: it is
+        // invoked both when the country/state/city models arrive and when the
+        // location lookup finishes, so the two orders behave the same. Each step
+        // runs in order because the country filters the states and the state
+        // filters the cities.
+        _applyGeoPrefill: function () {
+            if (this._vrExited || this._adminGeoEdited || this._adminGeoSyncing || !this.Country) return;
+
+            const oModel = this.getView().getModel("AdminSignupModel");
+            const oCountryModel = this.getView().getModel("CountryModel") || this.getOwnerComponent().getModel("CountryModel");
+            if (!oModel || !oCountryModel || !Array.isArray(oCountryModel.getData()) || !this.byId("adminsignUpCountry")) return;
+
+            const oMatch = this._findBestMatch(this.Country, oCountryModel.getData(), "countryName");
+            if (!oMatch) return;
+
+            this._adminGeoSyncing = true;
+            try {
+                oModel.setProperty("/Country", oMatch.countryName);
+                this.ADMIN_onChangeCountry();
+                if (this.State) {
+                    oModel.setProperty("/State", this.State);
+                    this.ADMIN_onChangeState();
+                }
+                if (this.City) {
+                    oModel.setProperty("/City", this.City);
+                    this.ADMIN_onChangeCity();
+                }
+            } finally {
+                this._adminGeoSyncing = false;
+            }
+            this._updateAdminSignupProgress();
+        },
+
         _triggerAutoPopulation: function () {
-            const oModel = this.getView().getModel("AdminSignupModel"); // Ya "LoginMode"
-
-            if (this.Country) {
-                // Country set karo aur fuzzy match trigger karo
-                oModel.setProperty("/Country", this.Country);
-                this.ADMIN_onChangeCountry(null);
-
-                // State ke liye thoda wait (taaki filtering complete ho jaye)
-                setTimeout(() => {
-                    if (this.State) {
-                        oModel.setProperty("/State", this.State);
-                        this.ADMIN_onChangeState(null);
-
-                        // City ke liye thoda aur wait
-                        setTimeout(() => {
-                            if (this.City) {
-                                oModel.setProperty("/City", this.City);
-                                this.ADMIN_onChangeCity(null);
-                            }
-                        }, 400);
-                    }
-                }, 400);
-            }
-        },
-
-        onCloseAdminSignup: function () {
-            if (this._oAdminSignup) {
-                this._resetAdminSignupForm();
-                this._oAdminSignup.close();
-            }
+            // Kept as a thin alias so any external caller still works.
+            this._applyGeoPrefill();
         },
 
         ADMIN_onChangeCountry: function (oEvent) {
-            const oCountry = oEvent ? oEvent.getSource() : $C("adminsignUpCountry");
+            const oCountry = oEvent ? oEvent.getSource() : this.byId("adminsignUpCountry");
             if (!oCountry) return;
-
             const oModel = this.getView().getModel("AdminSignupModel");
             const oStateModel = this.getView().getModel("StateModel");
             const oCountryModel = this.getView().getModel("CountryModel") || this.getOwnerComponent().getModel("CountryModel");
             const oCityModel = this.getView().getModel("CityModel");
 
-            if (!oCountryModel) return;
-
-            // 2. Sanitize typing only if user is interacting
-            // if (oEvent) {
-            //     const val = oCountry.getValue().replace(/[^a-zA-Z\s]/g, "");
-            //     oCountry.setValue(val);
-            // }
-
             if (oEvent) {
-                utils._LCvalidateMandatoryField(oEvent);
+                this._adminGeoEdited = true;
+                const oItem = oEvent.getParameter("selectedItem");
+                oModel.setProperty("/Country", oItem ? oItem.getKey() : oCountry.getValue().trim());
                 oModel.setProperty("/State", "");
                 oModel.setProperty("/City", "");
-                oStateModel.setProperty("/filtered", []);
-                oCityModel.setProperty("/filtered", []);
+                oModel.setProperty("/STDCode", "");
+                if (oStateModel) oStateModel.setProperty("/filtered", []);
+                if (oCityModel) oCityModel.setProperty("/filtered", []);
+                ["adminsignUpState", "adminsignUpCity"].forEach(id => {
+                    const oControl = this.byId(id);
+                    if (oControl) oControl.setSelectedKey("").setValue("").setValueState("None");
+                });
             }
 
-            const aCountries = oCountryModel.getData() || [];
+            const aCountries = oCountryModel ? oCountryModel.getData() : [];
             const sSearch = oModel.getProperty("/Country");
-
-            // --- FUZZY LOGIC INTEGRATION ---
             const oMatch = this._findBestMatch(sSearch, aCountries, "countryName");
-
             if (oMatch) {
                 oCountry.setSelectedKey(oMatch.countryName);
+                oCountry.setValueState("None");
+                oModel.setProperty("/Country", oMatch.countryName);
                 const sCountryCode = oMatch.code;
-
-                // Filter States
-                const allStates = oStateModel.getData() || [];
-                const filteredStates = allStates.filter(s => s.countryCode === sCountryCode);
-                oStateModel.setProperty("/filtered", filteredStates);
-
-                // Mobile & STD
-                const oMobile = $C("adminMobileNo");
+                if (oStateModel) {
+                    const allStates = oStateModel.getData() || [];
+                    oStateModel.setProperty("/filtered", Array.isArray(allStates) ? allStates.filter(s => s.countryCode === sCountryCode) : []);
+                }
+                const oMobile = this.byId("adminMobileNo");
                 if (oMobile) oMobile.setMaxLength(sCountryCode === "IN" ? 10 : 18);
-                this._autoSelectSTD(sCountryCode);
+                if (oEvent || this._adminCountryCode !== sCountryCode || !oModel.getProperty("/STDCode")) {
+                    this._autoSelectSTD(sCountryCode);
+                }
+                this._adminCountryCode = sCountryCode;
+            } else if (oEvent) {
+                oCountry.setValueState("Error");
+                this._adminCountryCode = "";
             }
+            this._updateAdminSignupProgress();
         },
 
         ADMIN_onChangeState: function (oEvent) {
-            const oState = oEvent ? oEvent.getSource() : $C("adminsignUpState");
+            const oState = oEvent ? oEvent.getSource() : this.byId("adminsignUpState");
+            if (!oState) return;
             const oModel = this.getView().getModel("AdminSignupModel");
             const oStateModel = this.getView().getModel("StateModel");
             const oCityModel = this.getView().getModel("CityModel");
 
             if (oEvent) {
-                utils._LCvalidateMandatoryField(oEvent);
+                this._adminGeoEdited = true;
+                const oItem = oEvent.getParameter("selectedItem");
+                oModel.setProperty("/State", oItem ? oItem.getKey() : oState.getValue().trim());
                 oModel.setProperty("/City", "");
-                oCityModel.setProperty("/filtered", []);
-
-
+                const oCity = this.byId("adminsignUpCity");
+                if (oCity) oCity.setSelectedKey("").setValue("").setValueState("None");
             }
 
-            const aFilteredStates = oStateModel.getProperty("/filtered") || [];
+            const aFilteredStates = oStateModel ? oStateModel.getProperty("/filtered") || [] : [];
             const sStateSearch = oModel.getProperty("/State");
-
-            // --- FUZZY LOGIC INTEGRATION ---
             const oMatch = this._findBestMatch(sStateSearch, aFilteredStates, "stateName");
-
             if (oMatch) {
                 oState.setSelectedKey(oMatch.stateName);
-                const sStateName = oMatch.stateName;
-
-                // Country Code nikalne ke liye Country control se check karein
-                const oCountry = $C("adminsignUpCountry");
-                const sCountryCode = oCountry.getSelectedItem()?.getAdditionalText()?.trim() || "IN";
-
-                // Filter Cities
-                const allCities = oCityModel.getData() || [];
-                const filteredCities = allCities.filter(c =>
-                    c.countryCode === sCountryCode && c.stateName === sStateName
-                );
-                oCityModel.setProperty("/filtered", filteredCities);
+                oState.setValueState("None");
+                oModel.setProperty("/State", oMatch.stateName);
+            } else if (oEvent) {
+                oState.setValueState("Error");
             }
+            if (oCityModel) {
+                const allCities = oCityModel.getData() || [];
+                oCityModel.setProperty("/filtered", oMatch && Array.isArray(allCities) ? allCities.filter(c =>
+                    c.countryCode === oMatch.countryCode && c.stateName === oMatch.stateName
+                ) : []);
+            }
+            this._updateAdminSignupProgress();
         },
 
         ADMIN_onChangeCity: function (oEvent) {
-            const oCityCtrl = oEvent ? oEvent.getSource() : $C("adminsignUpCity");
+            const oCityCtrl = oEvent ? oEvent.getSource() : this.byId("adminsignUpCity");
+            if (!oCityCtrl) return;
             const oModel = this.getView().getModel("AdminSignupModel");
             const oCityModel = this.getView().getModel("CityModel");
 
-            if (oEvent) utils._LCvalidateMandatoryField(oEvent);
-
-            const aFilteredCities = oCityModel.getProperty("/filtered") || [];
+            if (oEvent) {
+                this._adminGeoEdited = true;
+                const oItem = oEvent.getParameter("selectedItem");
+                oModel.setProperty("/City", oItem ? oItem.getKey() : oCityCtrl.getValue().trim());
+                utils._LCvalidateMandatoryField(oEvent);
+            }
+            const aFilteredCities = oCityModel ? oCityModel.getProperty("/filtered") || [] : [];
             const sCitySearch = oModel.getProperty("/City");
-
-            // --- FUZZY LOGIC INTEGRATION ---
             const oMatch = this._findBestMatch(sCitySearch, aFilteredCities, "cityName");
-
             if (oMatch) {
                 oCityCtrl.setSelectedKey(oMatch.cityName);
                 oModel.setProperty("/City", oMatch.cityName);
                 oCityCtrl.setValueState("None");
-            } else {
-                // Agar match nahi mila toh jo type kiya wahi rehne dein
-                oModel.setProperty("/City", sCitySearch);
             }
+            this._updateAdminSignupProgress();
         },
         _findBestMatch: function (sInput, aItems, sPropertyName) {
-            if (!sInput || !aItems || aItems.length === 0) return null;
+            if (!sInput || !Array.isArray(aItems) || aItems.length === 0) return null;
             const sNormInput = sInput.toLowerCase().trim().replace(/[^a-z0-9]/g, "");
+            if (!sNormInput) return null;
 
             // 1. Exact Match try karein
             let oMatch = aItems.find(item => item[sPropertyName].toLowerCase().trim() === sInput.toLowerCase().trim());
@@ -4374,7 +4552,8 @@ const sSuccessMsg = this.i18nModel.getText("registrationSuccess", [
 
 
         _autoSelectSTD: function (sCode) {
-            const oSTD = $C("adminsignUpSTD");
+            const oSTD = this.byId("adminsignUpSTD");
+            if (!oSTD) return;
             const oModel = this.getView().getModel("AdminSignupModel");
             const oItem = oSTD.getItems().find(i => i.getAdditionalText() === sCode);
             if (oItem) {
@@ -4386,7 +4565,7 @@ const sSuccessMsg = this.i18nModel.getText("registrationSuccess", [
             const oSTD = oEvent.getSource();
             let sValue = oSTD.getValue() || "";
             sValue = sValue.trim();
-            const oMobile = $C("adminMobileNo");
+            const oMobile = this.byId("adminMobileNo");
             const oModel = this.getView().getModel("AdminSignupModel");
             if (!sValue) {
                 oSTD.setValueState("Error");
@@ -4406,68 +4585,61 @@ const sSuccessMsg = this.i18nModel.getText("registrationSuccess", [
                 }
                 oModel.setProperty("/STDCode", sValue);
             }
+            this._updateAdminSignupProgress();
         },
 
         ADMIN_onMobileLiveChange: function (oEvent) {
-            const isValid = utils._LCvalidateMandatoryField(oEvent);
-            if (!isValid) return;
             const oInput = oEvent.getSource();
-            let val = oInput.getValue().replace(/\D/g, "");
+            const oModel = this.getView().getModel("AdminSignupModel");
+            const std = oModel.getProperty("/STDCode") || "";
+            const val = oInput.getValue().replace(/\D/g, "");
             oInput.setValue(val);
-
-            const oSTD = $C("adminsignUpSTD");
-            const stdRaw = oSTD?.getValue() || "";
-            const std = stdRaw.startsWith("+") ? stdRaw : "+" + stdRaw;
-
-            if (!val) return oInput.setValueState("None");
-
-            if (!std || std === "+") {
+            oModel.setProperty("/Mobile", val);
+            // Same rules as the original dialog: empty clears, a missing STD code asks
+            // for one first, otherwise the shared ISD-aware mobile validator decides.
+            if (!val) {
+                oInput.setValueState("None");
+            } else if (!std) {
                 oInput.setValueState("Error");
-                oInput.setValueStateText(this.i18nModel.getText("selectISDCodeFirst"));
-                return;
+                oInput.setValueStateText(this._vrT("selectISDCodeFirst"));
+            } else {
+                utils._LCvalidateISDmobile(oInput, std);
             }
-            const valid = utils._LCvalidateISDmobile(oInput, std);
-            oInput.setValueState(valid ? "None" : "Error");
-            if (!valid) {
-                oInput.setValueStateText(
-                    std === "+91" ?
-                        this.i18nModel.getText("MSmobileNoValueStateIN") :
-                        this.i18nModel.getText("MSmobileNoValueStateINT")
-                );
-            }
+            this._updateAdminSignupProgress();
         },
 
         onAdminLiveValidate: function (oEvent) {
-            const id = oEvent.getSource().getId();
-            // Vendor name
-            if (id.includes("adminVendorName")) return utils._LCvalidateName(oEvent);
-            // Email
-            if (id.includes("adminEmail")) return utils._LCvalidateEmail(oEvent);
-            // Address
-            if (id.includes("adminAddress")) return utils._LCvalidateMandatoryField(oEvent);
+            const oInput = oEvent.getSource();
+            const id = oInput.getId();
+            const oModel = this.getView().getModel("AdminSignupModel");
+            if (id.endsWith("--adminVendorName")) {
+                oModel.setProperty("/VendorName", oInput.getValue());
+                utils._LCvalidateName(oEvent);
+            } else if (id.endsWith("--adminEmail")) {
+                oModel.setProperty("/Email", oInput.getValue());
+                utils._LCvalidateEmail(oEvent);
+            }
+            this._updateAdminSignupProgress();
         },
 
         ADMIN_onChangeDOB: function (oEvent) {
             const oDatePicker = oEvent.getSource();
             const oModel = this.getView().getModel("AdminSignupModel");
             const raw = oDatePicker.getDateValue();
-            if (!raw) {
+            if (!raw || oEvent.getParameter("valid") === false || Number.isNaN(raw.getTime())) {
                 oDatePicker.setValueState("Error");
-                oDatePicker.setValueStateText("Date of birth is required");
-                oModel.setProperty("/DOB", "");
+                this._invalidateDOB(oModel);
                 return;
             }
+            // Same sanity range as the original dialog (0-100 years); the picker
+            // itself already blocks dates outside min/max.
             const today = new Date();
             let age = today.getFullYear() - raw.getFullYear();
             const m = today.getMonth() - raw.getMonth();
-            if (m < 0 || (m === 0 && today.getDate() < raw.getDate())) {
-                age--;
-            }
-
+            if (m < 0 || (m === 0 && today.getDate() < raw.getDate())) age--;
             if (age < 0 || age > 100) {
                 oDatePicker.setValueState("Error");
-                oDatePicker.setValueStateText("Age must be between 0 and 100");
-                oModel.setProperty("/DOB", "");
+                this._invalidateDOB(oModel);
                 return;
             }
             oDatePicker.setValueState("None");
@@ -4475,11 +4647,18 @@ const sSuccessMsg = this.i18nModel.getText("registrationSuccess", [
             const mm = String(raw.getMonth() + 1).padStart(2, "0");
             const dd = String(raw.getDate()).padStart(2, "0");
             oModel.setProperty("/DOB", `${yyyy}-${mm}-${dd}`);
+            this._updateAdminSignupProgress();
+        },
+
+        _invalidateDOB: function (oModel) {
+            oModel.setProperty("/DOB", "");
+            this._updateAdminSignupProgress();
         },
 
         onSubmitAdminSignup: async function () {
-            if (!this._validateAdminSignupFields()) return;
             const oModel = this.getView().getModel("AdminSignupModel");
+            if (oModel.getProperty("/Submitting") || oModel.getProperty("/ProcessingActive") || oModel.getProperty("/Submitted")) return;
+            if (!this._validateAdminSignupFields()) return;
             const data = oModel.getData();
             const oAdmin = data;
 
@@ -4507,36 +4686,33 @@ const sSuccessMsg = this.i18nModel.getText("registrationSuccess", [
                     }))
                 }
             };
+            oModel.setProperty("/Submitting", true);
+            // The button keeps its label; progress is shown with the shared busy
+            // dialog from BaseController for the duration of the backend call.
             this.getBusyDialog();
             try {
+                // getBusyDialog opens the dialog from a promise, so a fast response
+                // could otherwise reach the finally block before the dialog exists,
+                // leaving it open forever. Waiting for that promise makes the
+                // open/close order deterministic. A failure here is cosmetic and
+                // must not fail the registration itself.
+                try {
+                    if (this._pBusyDialog) { await this._pBusyDialog; }
+                } catch (oBusyError) {
+                    console.warn("Busy dialog could not be shown:", oBusyError);
+                }
                 await this.ajaxCreateWithJQuery("HM_Login", payload);
-
-                const sUsername = oAdmin.VendorName.trim();
-                const sSalutation = $C("adminSalutation")?.getSelectedItem()?.getText() || "";
-                // console.log(sUsername, sSalutation);
-
-
-const sSuccessMsg = this.i18nModel.getText("registrationSubmittedMessage", [
-    sSalutation,
-    sUsername
-]);
-
-MessageBox.success(
-    sSuccessMsg,
-    {
-        title: oBundle.getText("registrationSubmittedTitle"),
-        contentWidth: "500px",
-        emphasizedAction: MessageBox.Action.OK,
-        styleClass: "myUnifiedBtn",
-        onClose: () => {
-            this._oAdminSignup.close();
-        }
-    }
-);
-
+                if (this._vrExited) return;
+                const sUsername = (oAdmin.VendorName || "").trim();
+                const sSalutation = this.byId("adminSalutation")?.getSelectedItem()?.getText() || oAdmin.Salutation || "";
+                oModel.setProperty("/SuccessMessage", this._vrT("registrationSubmittedMessage", [sSalutation, sUsername]));
+                oModel.setProperty("/Submitted", true);
+                oModel.setProperty("/Progress", 100);
+                this._vrScrollTo("register");
             } catch (err) {
                 console.error("Admin signup error:", err);
-                let sErrorMessage = this.i18nModel.getText("RegistrationfailedPleasetryagainlater");
+                if (this._vrExited) return;
+                let sErrorMessage = this._vrT("RegistrationfailedPleasetryagainlater");
 
                 if (err?.responseJSON?.message) {
                     sErrorMessage = err.responseJSON.message;
@@ -4560,14 +4736,98 @@ MessageBox.success(
                 }
 
                 MessageBox.error(sErrorMessage, {
-                    title:this.i18nModel.getText("RegistrationFailed")
+                    title: this._vrT("RegistrationFailed"),
+                    // Matches the app's other dialogs: the style class lands on the
+                    // dialog, and .myUnifiedBtn .sapMBtnInner themes its buttons.
+                    styleClass: "myUnifiedBtn"
                 });
 
             } finally {
                 this.closeBusyDialog();
+                oModel.setProperty("/Submitting", false);
+                this._updateAdminSignupProgress();
             }
         },
 
+
+        _hookAdminDropZone: function () {
+            const oZone = this.byId("adminDropZone");
+            if (!oZone || this._vrExited || this._adminDropZone === oZone) return;
+            if (this._adminDropZone) {
+                this._adminDropZone.detachBrowserEvent("dragenter dragover dragleave drop", this._adminDropHandler, this);
+            }
+            this._adminDropZone = oZone;
+            this._adminDropHandler = function (oEvent) {
+                const oNative = oEvent.originalEvent || oEvent;
+                const oModel = this.getView().getModel("AdminSignupModel");
+                const bEnabled = !!oModel.getProperty("/CurrentDocType") &&
+                    !oModel.getProperty("/ProcessingActive") && !oModel.getProperty("/Submitting");
+                oEvent.preventDefault();
+                if (oEvent.type === "dragleave") {
+                    if (!oZone.getDomRef()?.contains(oNative.relatedTarget)) oZone.removeStyleClass("svDropOver");
+                    return;
+                }
+                if (oEvent.type !== "drop") {
+                    if (bEnabled) oZone.addStyleClass("svDropOver");
+                    return;
+                }
+                oZone.removeStyleClass("svDropOver");
+                if (!bEnabled) {
+                    if (!oModel.getProperty("/CurrentDocType")) {
+                        oModel.setProperty("/DocumentError", this._vrT("vrDocStepBlocked"));
+                    }
+                    return;
+                }
+                const aFiles = oNative.dataTransfer && oNative.dataTransfer.files;
+                if (aFiles && aFiles.length) {
+                    this.onAdminFileSelect({ getParameter: function (sName) { return sName === "files" ? aFiles : undefined; } });
+                }
+            };
+            oZone.attachBrowserEvent("dragenter dragover dragleave drop", this._adminDropHandler, this);
+        },
+
+        _updateAdminSignupProgress: function () {
+            const oModel = this.getView().getModel("AdminSignupModel");
+            if (!oModel || this._vrExited) return;
+            const d = oModel.getData();
+            const oDOB = d.DOB ? new Date(d.DOB + "T00:00:00") : null;
+            const aChecks = [
+                !!d.Salutation,
+                (d.VendorName || "").trim().length > 0,
+                oDOB && oDOB >= d.DOBMin && oDOB <= d.DOBMax,
+                !!d.Gender,
+                /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test((d.Email || "").trim()),
+                !!d.Country, !!d.State, !!d.City,
+                /^\+[1-9]\d*$/.test(d.STDCode || ""),
+                (d.STDCode === "+91" ? /^[1-9]\d{9}$/ : /^\d{4,18}$/).test(d.Mobile || ""),
+                (d.Address || "").trim().length > 0,
+                (d.Documents || []).some(doc => !doc.isProcessing && doc.File),
+                !!d.Consent
+            ];
+            // Prefilled values count as complete: the country and its code are
+            // always set, and the country/state/city may also be seeded from the
+            // browser location.
+            const iProgress = d.Submitted ? 100 : Math.round(aChecks.filter(Boolean).length / aChecks.length * 100);
+            if (d.Progress !== iProgress) oModel.setProperty("/Progress", iProgress);
+
+            // Drives the "no documents uploaded yet" hint. The XML expression that
+            // used to compute this from the Documents array never re-evaluated to
+            // false once a file was added, so the hint stayed visible next to the
+            // uploaded file. A plain flag maintained here is reliable.
+            const bHasDocuments = (d.Documents || []).some(doc => !doc.isProcessing && doc.File);
+            if (d.HasDocuments !== bHasDocuments) {
+                oModel.setProperty("/HasDocuments", bHasDocuments);
+            }
+        },
+
+        _clearAdminSignupDocuments: function () {
+            const oModel = this.getView().getModel("AdminSignupModel");
+            if (!oModel) return;
+            (oModel.getProperty("/Documents") || []).forEach(doc => {
+                if (doc.PreviewUrl) URL.revokeObjectURL(doc.PreviewUrl);
+            });
+            oModel.setProperty("/Documents", []);
+        },
 
         _addBusyProcessingRow: function () {
             const oModel = this.getView().getModel("AdminSignupModel");
@@ -4593,30 +4853,39 @@ MessageBox.success(
         },
         onAdminFileSelect: async function (oEvent) {
             const oModel = this.getView().getModel("AdminSignupModel");
-            // Disable register button immediately
-            oModel.setProperty("/ProcessingActive", true);
-
-            const oUploader = $C("adminFileUploader");
-            const oDocType = $C("adminDocType");
-            // const oModel = this.getView().getModel("AdminSignupModel");
-
+            if (this._vrExited || oModel.getProperty("/ProcessingActive") || oModel.getProperty("/Submitting")) return;
+            const oUploader = this.byId("adminFileUploader");
+            const oDocType = this.byId("adminDocType");
             const file = oEvent.getParameter("files")?.[0];
             if (!file) return;
 
             const selectedDocType = oDocType ? oDocType.getSelectedKey() : null;
             if (!selectedDocType) {
-                MessageToast.show(this.i18nModel.getText("pleaseSelectDocumentTypeFirst") || "Select document type first");
+                oModel.setProperty("/DocumentError", this._vrT("vrDocStepBlocked"));
                 if (oUploader) oUploader.clear();
                 return;
             }
-
+            if (!VR_ALLOWED_EXT.test(file.name) || (file.type && !VR_ALLOWED_TYPES.includes(file.type))) {
+                this.onAdminFileTypeMismatch();
+                return;
+            }
+            if (!file.size) {
+                oModel.setProperty("/DocumentError", this._vrT("vrErrEmptyFile"));
+                if (oUploader) oUploader.clear();
+                return;
+            }
             if (this._isDuplicateFile(file.name)) {
-                MessageToast.show(this.i18nModel.getText("thisfilealreadyuploaded") || "File already uploaded");
+                oModel.setProperty("/DocumentError", this._vrT("thisfilealreadyuploaded"));
                 if (oUploader) oUploader.clear();
                 return;
             }
 
-            // 🔥 Add temporary busy row
+            const oTask = {};
+            this._adminUploadTask = oTask;
+            oModel.setProperty("/ProcessingActive", true);
+            oModel.setProperty("/DocumentError", "");
+
+            // ðŸ”¥ Add temporary busy row
             const sTempId = this._addBusyProcessingRow();
 
             // Disable uploader & doc type during processing
@@ -4625,7 +4894,7 @@ MessageBox.success(
 
             let processedFile = file;
             const MAX_SIZE_KB = 400;
-            const iMaxSizeBytes = MAX_SIZE_KB * 1024;
+            const iMaxSizeBytes = VR_MAX_BYTES;
             const isImage = ["image/jpeg", "image/jpg", "image/png"].includes(file.type);
 
             try {
@@ -4651,15 +4920,27 @@ MessageBox.success(
                 // Convert to Base64
                 const base64 = await new Promise((resolve, reject) => {
                     const reader = new FileReader();
+                    this._adminFileReader = reader;
                     reader.onload = () => resolve(reader.result.split(",")[1]);
-                    reader.onerror = reject;
+                    reader.onerror = () => reject(new Error(this._vrT("vrErrReadFile")));
+                    reader.onabort = () => reject(new Error(this._vrT("vrErrReadFile")));
                     reader.readAsDataURL(processedFile);
                 });
 
+                if (this._vrExited || this._adminUploadTask !== oTask) return;
+                const sMimeType = processedFile.type || (/\.pdf$/i.test(file.name) ? "application/pdf" : /\.png$/i.test(file.name) ? "image/png" : "image/jpeg");
+                // The uploaded file is renamed to the document type that was picked
+                // for it, keeping the original extension (e.g. "Aadhaar Card.pdf").
+                const sExtension = (file.name.match(/\.[^.]+$/) || [""])[0].toLowerCase();
+                const sDocumentName = selectedDocType + sExtension;
+                processedFile = new File([processedFile], sDocumentName, {
+                    type: sMimeType,
+                    lastModified: file.lastModified || Date.now()
+                });
                 const previewUrl = URL.createObjectURL(processedFile);
                 const newDoc = {
-                    FileName: selectedDocType,
-                    DocumentType: processedFile.type,
+                    FileName: sDocumentName,
+                    DocumentType: sMimeType,
                     VdocType: selectedDocType,
                     File: base64,
                     Base64: base64,
@@ -4675,22 +4956,32 @@ MessageBox.success(
                 oModel.setProperty("/Documents", aDocs);
 
                 // Clear error highlight
-                const table = $C("adminAttachmentTable");
+                const table = this.byId("adminAttachmentTable");
                 if (table) table.removeStyleClass("fileErrorHighlight");
 
             } catch (err) {
-                // On error, remove the busy row and show error
-                this._removeProcessingRow(sTempId);
-                console.error(err);
-                MessageBox.error(err.message || "Compression failed. Please try a smaller file.");
+                if (!this._vrExited) {
+                    this._removeProcessingRow(sTempId);
+                    oModel.setProperty("/DocumentError", err.message || this._vrT("vrErrReadFile"));
+                }
             } finally {
-                // Re-enable UI
-                oModel.setProperty("/CurrentDocType", "");
-                if (oUploader) oUploader.clear();
-                oModel.setProperty("/DocTypeEnabled", true);
-                oModel.setProperty("/UploadEnabled", false);
-                oModel.setProperty("/ProcessingActive", false);
+                this._adminFileReader = null;
+                if (!this._vrExited && this._adminUploadTask === oTask) {
+                    this._adminUploadTask = null;
+                    oModel.setProperty("/CurrentDocType", "");
+                    if (oUploader) oUploader.clear();
+                    if (oDocType) oDocType.setSelectedKey("").setValue("");
+                    oModel.setProperty("/DocTypeEnabled", true);
+                    oModel.setProperty("/UploadEnabled", false);
+                    oModel.setProperty("/ProcessingActive", false);
+                    this._updateAdminSignupProgress();
+                }
             }
+        },
+
+        onAdminFileTypeMismatch: function () {
+            this.getView().getModel("AdminSignupModel").setProperty("/DocumentError", this._vrT("vrErrDocType"));
+            this.byId("adminFileUploader")?.clear();
         },
     
         // Helper to show/hide busy indicator on the uploader button (optional)
@@ -4705,11 +4996,15 @@ MessageBox.success(
             const key = oSelect.getSelectedKey();
             this.getView().getModel("AdminSignupModel").setProperty("/Gender", key);
             oSelect.setValueState(key ? "None" : "Error");
+            this._updateAdminSignupProgress();
         },
 
         _resetAdminSignupForm: function () {
-            const C = sap.ui.getCore().byId.bind(sap.ui.getCore());
+            const C = this.byId.bind(this);
             const oModel = this.getView().getModel("AdminSignupModel");
+            if (oModel.getProperty("/Submitting") || oModel.getProperty("/ProcessingActive")) return;
+            this.onClosePreview();
+            this._clearAdminSignupDocuments();
 
             // -------- MODEL RESET (SAFE WAY) --------
             ["/Salutation", "/VendorName", "/DOB", "/Gender", "/Email", "/Country", "/State", "/City", "/STDCode", "/Mobile", "/Address", "/CurrentDocType"].forEach(p => oModel.setProperty(p, ""));
@@ -4729,7 +5024,7 @@ MessageBox.success(
                 c.setValueState?.("None");
             });
             // -------- RESTORE DOCUMENT TYPE DROPDOWN --------
-            const oDocType = $C("adminDocType");
+            const oDocType = C("adminDocType");
             if (oDocType && this._adminDocTypeBackup) {
                 oDocType.removeAllItems();
                 this._adminDocTypeBackup.forEach(d => {
@@ -4744,54 +5039,106 @@ MessageBox.success(
             // Reset flags
             oModel.setProperty("/CurrentDocType", "");
             oModel.setProperty("/DocTypeEnabled", true);
+            oModel.setProperty("/Country", "India");
+            oModel.setProperty("/STDCode", "+91");
+            oModel.setProperty("/Consent", false);
+            oModel.setProperty("/ConsentError", "");
+            oModel.setProperty("/DocumentError", "");
+            oModel.setProperty("/Submitted", false);
+            oModel.setProperty("/SuccessMessage", "");
+            oModel.setProperty("/Submitting", false);
+            oModel.setProperty("/ProcessingActive", false);
+            oModel.setProperty("/UploadEnabled", false);
+            C("adminGender")?.setEnabled(true);
+            C("adminFileUploader")?.clear();
+            C("adminDropZone")?.removeStyleClass("svDropOver");
+            this._adminGeoEdited = true;
+            this._adminGeoInitialized = false;
+            this._initAdminSignupControls();
+            this._updateAdminSignupProgress();
+        },
+
+        onClearAdminSignup: function () {
+            this._resetAdminSignupForm();
+        },
+
+        // Only acts after a successful submission; a normal "Clear" keeps the
+        // form's current (invalid) state untouched.
+        _dismissAdminSignupSuccess: function () {
+            const oModel = this.getView().getModel("AdminSignupModel");
+
+            if (!oModel || !oModel.getProperty("/Submitted")) return;
+            this._resetAdminSignupForm();
+        },
+
+        // Toggles the body marker that scopes the vendor stylesheet to the vendor
+        // tab, so the dropdown popups rendered into the static area can be themed
+        // without affecting the rest of the app.
+        _setVendorScope: function (bActive) {
+            if (typeof document === "undefined" || !document.body) return;
+            document.body.classList.toggle("svVendorScope", !!bActive);
+        },
+
+        onAdminConsentChange: function (oEvent) {
+            const oModel = this.getView().getModel("AdminSignupModel");
+            const bSelected = oEvent.getSource().getSelected();
+            oModel.setProperty("/Consent", bSelected);
+            oModel.setProperty("/ConsentError", bSelected ? "" : this._vrT("vrErrConsent"));
+            this._updateAdminSignupProgress();
         },
 
         _validateAdminSignupFields: function () {
-            const C = sap.ui.getCore().byId.bind(sap.ui.getCore());
+            const C = this.byId.bind(this);
             const M = this.getView().getModel("AdminSignupModel");
             const std = (C("adminsignUpSTD").getValue() || "").trim();
-            // Pick actual UI5 controls
-            const oName = C("adminVendorName");
-            const oDOB = C("adminDOB");
-            const oGender = C("adminGender");
-            const oEmail = C("adminEmail");
-            const oCountry = C("adminsignUpCountry");
-            const oState = C("adminsignUpState");
-            const oCity = C("adminsignUpCity");
-            const oSTD = C("adminsignUpSTD");
-            const oMobile = C("adminMobileNo");
-            const oAddress = C("adminAddress");
-            const isValid =
-                utils._LCstrictValidationSelect($C("adminSalutation")) &&
-                utils._LCvalidateName(oName, "ID") &&
-                utils._LCvalidateMandatoryField(oDOB, "ID") &&
-                utils._LCstrictValidationSelect(oGender) &&
-
-                utils._LCvalidateEmail(oEmail, "ID") &&
-
-                utils._LCvalidateMandatoryField(oCountry, "ID") &&
-                utils._LCvalidateMandatoryField(oState, "ID") &&
-                utils._LCvalidateMandatoryField(oCity, "ID") &&
-                utils._LCvalidateMandatoryField(oSTD, "ID") &&
-
-                utils._LCvalidateISDmobile(oMobile, std) &&
-                utils._LCvalidateAddress(oAddress);
-
-            if (!isValid) {
-                sap.m.MessageToast.show(this.i18nModel.getText("MSfillallfields"));
-                return false;
+            const aFields = [
+                ["adminSalutation", oField => utils._LCstrictValidationSelect(oField)],
+                ["adminVendorName", oField => utils._LCvalidateName(oField, "ID")],
+                ["adminDOB", oField => utils._LCvalidateMandatoryField(oField, "ID")],
+                ["adminGender", oField => utils._LCstrictValidationSelect(oField)],
+                ["adminEmail", oField => utils._LCvalidateEmail(oField, "ID")],
+                ["adminsignUpCountry", oField => utils._LCvalidateMandatoryField(oField, "ID")],
+                ["adminsignUpState", oField => utils._LCvalidateMandatoryField(oField, "ID")],
+                ["adminsignUpCity", oField => utils._LCvalidateMandatoryField(oField, "ID")],
+                ["adminsignUpSTD", oField => utils._LCvalidateMandatoryField(oField, "ID")],
+                ["adminMobileNo", oField => utils._LCvalidateISDmobile(oField, std)],
+                ["adminAddress", oField => utils._LCvalidateAddress(oField)]
+            ];
+            let oFirstBad = null;
+            // Run validators lazily so later fields keep their current state.
+            for (const [sId, fnValidate] of aFields) {
+                const oField = C(sId);
+                const bValid = fnValidate(oField);
+                oField.setValueState(bValid ? "None" : "Error");
+                if (!bValid) {
+                    oFirstBad = oField;
+                    break;
+                }
             }
-            const docs = M.getProperty("/Documents");
-            if (!docs || docs.length === 0) {
-                MessageToast.show(this.i18nModel.getText("pleaseuploadatleastonedocument"));
-                const table = C("adminAttachmentTable");
-                table?.addStyleClass("fileErrorHighlight");
+            if (!oFirstBad) {
+                const bDocuments = (M.getProperty("/Documents") || []).some(doc => !doc.isProcessing && doc.File);
+                M.setProperty("/DocumentError", bDocuments ? "" : this._vrT("vrErrDocRequired"));
+                if (!bDocuments) oFirstBad = C("adminDocType");
+            }
+            if (!oFirstBad) {
+                const bConsent = !!M.getProperty("/Consent");
+                M.setProperty("/ConsentError", bConsent ? "" : this._vrT("vrErrConsent"));
+                if (!bConsent) oFirstBad = C("adminConsent");
+            }
+            this._updateAdminSignupProgress();
+            if (oFirstBad) {
+                oFirstBad.getDomRef()?.scrollIntoView({ block: "center", behavior: "smooth" });
+                oFirstBad.focus();
+                MessageToast.show(this._vrT("vrErrFixFields"));
                 return false;
             }
             return true;
         },
 
         _initAdminSignupModel: function () {
+            const oNow = new Date();
+            const iYear = oNow.getFullYear() - VR_MIN_AGE;
+            const iDay = Math.min(oNow.getDate(), new Date(iYear, oNow.getMonth() + 1, 0).getDate());
             const oModel = new JSONModel({
                 Salutation: "",
                 VendorName: "",
@@ -4806,11 +5153,27 @@ MessageBox.success(
                 Address: "",
                 CurrentDocType: "",
                 Documents: [],
+                HasDocuments: false,
+                DOBMin: new Date(1930, 0, 1),
+                DOBMax: new Date(iYear, oNow.getMonth(), iDay),
+                Consent: false,
+                ConsentError: "",
+                DocumentError: "",
+                Submitting: false,
+                Submitted: false,
+                SuccessMessage: "",
+                Progress: 0,
+                LocationsLoading: false,
+                LocationsError: "",
                 UploadEnabled: false,
                 DocTypeEnabled: true,
-                ProcessingActive: false,   // ← add this
+                ProcessingActive: false,   // â† add this
             });
             this.getView().setModel(oModel, "AdminSignupModel");
+            this._adminSignupModel = oModel;
+            oModel.attachPropertyChange(this._updateAdminSignupProgress, this);
+            this.getView().attachModelContextChange(this._initAdminSignupControls, this);
+            this._updateAdminSignupProgress();
         },
 
         _setDefaultCountryIndia: function () {
@@ -4818,7 +5181,9 @@ MessageBox.success(
     const oCountryModel = this.getView().getModel("CountryModel") || this.getOwnerComponent().getModel("CountryModel");
     const oStateModel = this.getView().getModel("StateModel");
 
-    if (!oCountryModel || !oStateModel) return;
+    // Only the country model is required here; the state model may still be in
+    // flight, in which case its list is filtered when it arrives.
+    if (!oCountryModel) return;
 
     const aCountries = oCountryModel.getData() || [];
     const oIndia = aCountries.find(c => c.code === "IN") || aCountries.find(c => (c.countryName || "").toLowerCase() === "india");
@@ -4826,21 +5191,26 @@ MessageBox.success(
 
     // Set Country
     oModel.setProperty("/Country", oIndia.countryName);
-    $C("adminsignUpCountry")?.setSelectedKey(oIndia.countryName);
+    this.byId("adminsignUpCountry")?.setSelectedKey(oIndia.countryName);
 
     // Filter States for India only
-    const allStates = oStateModel.getData() || [];
-    const filteredStates = allStates.filter(s => s.countryCode === "IN");
-    oStateModel.setProperty("/filtered", filteredStates);
+    if (oStateModel) {
+        const allStates = oStateModel.getData() || [];
+        if (Array.isArray(allStates)) {
+            oStateModel.setProperty("/filtered", allStates.filter(s => s.countryCode === "IN"));
+        }
+    }
 
     // Mobile/STD defaults for India
-    const oMobile = $C("adminMobileNo");
+    const oMobile = this.byId("adminMobileNo");
     if (oMobile) oMobile.setMaxLength(10);
     this._autoSelectSTD("IN");
 },
         onAdminDocTypeChange: function (oEvent) {
             const oModel = this.getView().getModel("AdminSignupModel");
             const key = oEvent.getSource().getSelectedKey();
+            oModel.setProperty("/CurrentDocType", key);
+            oModel.setProperty("/DocumentError", "");
             oModel.setProperty("/UploadEnabled", !!key);
         },
 
@@ -4865,10 +5235,10 @@ MessageBox.success(
         },
 
         onAdminDeleteDoc: function (oEvent) {
-
             const oView = this.getView();
             const oModel = oView.getModel("AdminSignupModel");
-            const table = $C("adminAttachmentTable");
+            if (oModel.getProperty("/Submitting") || oModel.getProperty("/ProcessingActive")) return;
+            const table = this.byId("adminAttachmentTable");
 
             // Get button
             const oButton = oEvent.getSource();
@@ -4884,6 +5254,7 @@ MessageBox.success(
             }
 
             const doc = oCtx.getObject();
+            this.onClosePreview();
 
             // Cleanup preview blob
             if (doc.PreviewUrl) {
@@ -4911,10 +5282,12 @@ MessageBox.success(
             if (docs.length === 0) {
                 table?.addStyleClass("fileErrorHighlight");
             }
+            oModel.setProperty("/DocumentError", "");
+            this._updateAdminSignupProgress();
         },
 
         onAdminDocTypeSelected: function () {
-            const uploader = $C("hiddenAdminUploader");
+            const uploader = this.byId("adminFileUploader");
             if (uploader && uploader.openFileDialog) uploader.openFileDialog(); // <--- THIS opens Browse dialog
         },
 
@@ -4974,14 +5347,14 @@ MessageBox.success(
             this._sPreviewBase64 = sBase64;
 
             // Destroy old dialog
-            if (this._oPreviewDialog) {
-                this._oPreviewDialog.destroy();
-                this._oPreviewDialog = null;
+            if (this._oAdminDocPreview) {
+                this._oAdminDocPreview.destroy();
+                this._oAdminDocPreview = null;
             }
 
             // Load Fragment
-            if (!this._oPreviewDialog) {
-                this._oPreviewDialog = await sap.ui.core.Fragment.load({
+            if (!this._oAdminDocPreview) {
+                this._oAdminDocPreview = await sap.ui.core.Fragment.load({
                     id: this.getView().getId(),
 
                     name: "sap.ui.com.project1.fragment.DocumentPreview",
@@ -4989,7 +5362,12 @@ MessageBox.success(
                     controller: this,
                 });
 
-                this.getView().addDependent(this._oPreviewDialog);
+                if (this._vrExited) {
+                    this._oAdminDocPreview.destroy();
+                    this._oAdminDocPreview = null;
+                    return;
+                }
+                this.getView().addDependent(this._oAdminDocPreview);
             }
 
             const oDialog = sap.ui.core.Fragment.byId(
@@ -5172,10 +5550,10 @@ MessageBox.success(
             this._sPreviewMimeType = null;
             this._sPreviewFileName = null;
 
-            if (this._oPreviewDialog) {
-                this._oPreviewDialog.close();
-                this._oPreviewDialog.destroy();
-                this._oPreviewDialog = null;
+            if (this._oAdminDocPreview) {
+                this._oAdminDocPreview.close();
+                this._oAdminDocPreview.destroy();
+                this._oAdminDocPreview = null;
             }
         },
 
@@ -5183,8 +5561,8 @@ MessageBox.success(
         onAdminChangeSalutation: function (oEvent) {
             const oSalutation = oEvent.getSource();
             const sKey = oSalutation.getSelectedKey();
-            const oGender = $C("adminGender");
-            // 🔥 Clear salutation error immediately
+            const oGender = this.byId("adminGender");
+            // ðŸ”¥ Clear salutation error immediately
             oSalutation.setValueState("None");
             if (!oGender) return;
             // Reset gender first
@@ -5198,13 +5576,22 @@ MessageBox.success(
                 oGender.setSelectedKey("Female");
                 oGender.setEnabled(false);
             }
-            // Dr. → manual gender selection
+            // Dr. â†’ manual gender selection
 
-            // ✅ Strict validation (CONTROL, not event)
+            // âœ… Strict validation (CONTROL, not event)
             utils._LCstrictValidationSelect(oSalutation);
+            const oModel = this.getView().getModel("AdminSignupModel");
+            oModel.setProperty("/Salutation", sKey);
+            oModel.setProperty("/Gender", oGender.getSelectedKey());
+            this._updateAdminSignupProgress();
         },
         ADMIN_onAddressChange: function (oEvent) {
-            utils._LCvalidateAddress(oEvent.getSource())
+            const oInput = oEvent.getSource();
+            const sAddress = oInput.getValue();
+            this.getView().getModel("AdminSignupModel").setProperty("/Address", sAddress);
+            oInput.setValueState(sAddress.trim().length >= 10 ? "None" : "Error");
+            oInput.setValueStateText(this._vrT("vrErrAddress"));
+            this._updateAdminSignupProgress();
         },
 
         MPonAddressChange: function (oEvent) {
@@ -5268,7 +5655,7 @@ MessageBox.success(
 
             const oView = this.getView();
 
-            // 1️⃣ Clear model data
+            // 1ï¸âƒ£ Clear model data
             const oSupportModel = oView.getModel("SupportModel");
             if (oSupportModel) {
                 oSupportModel.setData({
@@ -5280,19 +5667,19 @@ MessageBox.success(
                 });
             }
 
-            // 2️⃣ Clear uploaded images
+            // 2ï¸âƒ£ Clear uploaded images
             const oUploaderData = oView.getModel("UploaderData");
             if (oUploaderData) {
                 oUploaderData.setProperty("/attachments", []);
             }
 
-            // 3️⃣ Clear tokens
+            // 3ï¸âƒ£ Clear tokens
             const oTokenModel = oView.getModel("tokenModel");
             if (oTokenModel) {
                 oTokenModel.setProperty("/tokens", []);
             }
 
-            // 4️⃣ Reset ValueState
+            // 4ï¸âƒ£ Reset ValueState
             const aFields = [
                 "SR_id_IssueName",
                 "SR_id_IssueType",
@@ -5308,13 +5695,13 @@ MessageBox.success(
                 }
             });
 
-            // 5️⃣ Clear file uploader
+            // 5ï¸âƒ£ Clear file uploader
             const oUploader = sap.ui.getCore().byId(oView.createId("HFF_id_FileUploader1"));
             if (oUploader) {
                 oUploader.clear();
             }
 
-            // 6️⃣ Close dialog
+            // 6ï¸âƒ£ Close dialog
             this._supportRequestDialog.close();
 
         },
@@ -5734,6 +6121,7 @@ onLanguagePress: function (oEvent) {
 
     // Update the resource bundle used in controller methods
     this.i18nModel = oResourceModel.getResourceBundle();
+    this._vrRefreshTexts();
 
     // Refresh UI bindings
 },
@@ -5750,7 +6138,317 @@ onBuyTravelInsurance:function() {
                 sPath:"Travel"
             });
     
-}
+},
+
+        /* ==================================================================
+         *  VENDOR REGISTRATION ("List your property")
+         *
+         *  Rendered by the five Vendor*.fragment.xml fragments from a Page
+         *  inside Hostel.view.xml. The explorer uses pt/ptState; the inline
+         *  signup uses the existing AdminSignupModel and HM_Login contract.
+         * ================================================================== */
+
+        /* ---------------------------------------------------------------- */
+        /*  LIFECYCLE                                                       */
+        /* ---------------------------------------------------------------- */
+
+        _initVendorRegistration: function () {
+            if (this._vrInitialized) {
+                this._vrRefreshTexts();
+                return;
+            }
+            this._vrInitialized = true;
+            this._vrExited = false;
+
+            this._vrInitPropertyTypes();
+            this._vrHookPropertyTabs();
+        },
+
+        // Form models must not wait for translations or the property-type request.
+        _vrT: function (sKey, aArgs) {
+            var oComponent = this.getOwnerComponent(),
+                oModel = this.getView().getModel("i18n") || (oComponent && oComponent.getModel("i18n")),
+                oBundle = oModel && oModel.getResourceBundle();
+
+            if (!oBundle) {
+                return sKey;
+            }
+            if (typeof oBundle.getText === "function") {
+                return oBundle.getText(sKey, aArgs);
+            }
+
+            var sLanguage = sap.ui.getCore().getConfiguration().getLanguage(),
+                oRequest = this._vrBundleRequest;
+
+            if (!oRequest || oRequest.model !== oModel || oRequest.language !== sLanguage) {
+                oRequest = { model: oModel, language: sLanguage, bundle: null };
+                this._vrBundleRequest = oRequest;
+                Promise.resolve(oBundle).then(function (oResolved) {
+                    if (!this._vrExited && this._vrBundleRequest === oRequest && oResolved && typeof oResolved.getText === "function") {
+                        oRequest.bundle = oResolved;
+                        this._vrRefreshTexts();
+                    }
+                }.bind(this)).catch(function () {
+                    // Missing translations must not prevent the page models from initializing.
+                });
+            }
+            return oRequest.bundle ? oRequest.bundle.getText(sKey, aArgs) : sKey;
+        },
+
+        _vrRefreshTexts: function () {
+            var oState = this.getView().getModel("ptState");
+
+            if (this._vrExited || !oState) { return; }
+
+            var sId = oState.getProperty("/selectedId");
+            oState.setProperty("/ctaText", sId ? this._vrT("vrPtCta", [sId]) : "");
+            this.getView().getModel("pt").setProperty("/loadError", this._vrTypesLoadFailed ? this._vrT("vrErrLoadTypes") : "");
+        },
+
+        /* ---------------------------------------------------------------- */
+        /*  MODEL INIT                                                      */
+        /* ---------------------------------------------------------------- */
+
+        _vrInitPropertyTypes: function () {
+            var oView = this.getView(),
+                oPt   = new JSONModel({ types: [], benefits: [], loadError: "" });
+
+            oView.setModel(oPt, "pt");
+            oView.setModel(new JSONModel({
+                selectedId: "",
+                name:       "",
+                who:        "",
+                blurb:      "",
+                mode:       "multi",
+                isSingle:   false,
+                path:       [],
+                points:     [],
+                nodes:      [],
+                more:       "",
+                ctaText:    ""
+            }), "ptState");
+
+            oPt.attachRequestCompleted(function (oEvent) {
+                if (this._vrExited) { return; }
+
+                var aTypes = oPt.getProperty("/types"),
+                    aBenefits = oPt.getProperty("/benefits") || [];
+
+                this._vrTypesLoadFailed = oEvent.getParameter("success") === false || !Array.isArray(aTypes) || !aTypes.length;
+                if (this._vrTypesLoadFailed) {
+                    oPt.setData({ types: [], benefits: [] });
+                    this._vrRefreshTexts();
+                    return;
+                }
+
+                aTypes.concat(aBenefits).forEach(function (oItem) {
+                    // SAP icon-font URIs (sap-icon://...) are used as they are;
+                    // anything else is a path relative to the app root.
+                    if (String(oItem.icon).indexOf("sap-icon://") !== 0) {
+                        oItem.icon = sap.ui.require.toUrl("sap/ui/com/project1/" + oItem.icon);
+                    }
+                });
+                oPt.refresh(true);
+                this._vrShowPropertyType(0);
+                this._vrRefreshTexts();
+            }.bind(this));
+
+            oPt.loadData(sap.ui.require.toUrl("sap/ui/com/project1/model/vendorPropertyTypes.json"));
+        },
+
+        /* ---------------------------------------------------------------- */
+        /*  PROPERTY TYPE EXPLORER                                          */
+        /* ---------------------------------------------------------------- */
+
+        _vrShowPropertyType: function (iIndex, sMode) {
+            var oPt    = this.getView().getModel("pt"),
+                oState = this.getView().getModel("ptState"),
+                aTypes = oPt.getProperty("/types") || [];
+
+            var oType = aTypes[iIndex];
+            if (!oType) { return; }
+
+            // Each type opens on its own default mode; the toggle can override it.
+            var sActiveMode = sMode || oType.defaultMode || "multi",
+                bSingle     = sActiveMode === "single",
+                oMore       = oType.more || {},
+                // Only the tree differs between the two modes; name, description,
+                // path and points are the same for both. Knowing whether the type
+                // really changed lets the mode toggle leave the detail column
+                // alone instead of rebuilding and re-animating it.
+                bTypeChanged = oState.getProperty("/selectedId") !== oType.id;
+
+            this._vrPtIndex = iIndex;
+
+            // Set the detail properties only when the type changed. Writing the
+            // same values back would still replace the path/points arrays and make
+            // the bound lists on the right re-render.
+            if (bTypeChanged) {
+                oState.setProperty("/selectedId", oType.id);
+                oState.setProperty("/name", oType.id);
+                oState.setProperty("/who", oType.who);
+                oState.setProperty("/blurb", oType.blurb);
+                oState.setProperty("/path", oType.path);
+                oState.setProperty("/points", oType.points);
+                oState.setProperty("/ctaText", this._vrT("vrPtCta", [oType.id]));
+            }
+
+            oState.setProperty("/mode", sActiveMode);
+            oState.setProperty("/isSingle", bSingle);
+            oState.setProperty("/nodes", (bSingle ? oType.single : oType.multi) || []);
+            oState.setProperty("/more", bSingle ? oMore.single : oMore.multi);
+
+            this._vrSyncPropertyTabs();
+            this._vrSyncModeToggle();
+            this._vrAnimateExplorer(bTypeChanged);
+        },
+
+        // Fades in whatever the swap actually replaced. A type change replaces the
+        // tree and the detail column, so both are faded; a mode toggle only
+        // replaces the tree, so the detail column is left untouched.
+        _vrAnimateExplorer: function (bDetailChanged) {
+            var oPanel = this.byId("vendorTypePanel"),
+                oDom   = oPanel && oPanel.getDomRef();
+
+            if (!oDom) { return; }
+
+            // The class has to be dropped and the style recalculated, otherwise a
+            // repeat toggle keeps the finished animation and shows no transition.
+            oDom.classList.remove("svSwapping", "svSwappingTree");
+            void oDom.offsetWidth;
+            oDom.classList.add(bDetailChanged ? "svSwapping" : "svSwappingTree");
+
+            clearTimeout(this._vrSwapTimer);
+            this._vrSwapTimer = setTimeout(function () {
+                oDom.classList.remove("svSwapping", "svSwappingTree");
+            }, 470);
+        },
+
+        onModeSingle: function () {
+            this._vrShowPropertyType(this._vrPtIndex, "single");
+        },
+
+        onModeMulti: function () {
+            this._vrShowPropertyType(this._vrPtIndex, "multi");
+        },
+
+        onSelectPropertyType: function (oEvent) {
+            var oCtx = oEvent.getSource().getBindingContext("pt");
+            if (oCtx) {
+                this._vrShowPropertyType(parseInt(oCtx.getPath().split("/").pop(), 10));
+            }
+        },
+
+        _vrHookPropertyTabs: function () {
+            var oTabs = this.byId("vendorTypeTabs");
+            if (!oTabs || this._vrExited || this._vrTypeTabs === oTabs) { return; }
+
+            if (this._vrTypeTabs) {
+                this._vrTypeTabs.removeEventDelegate(this._vrTypeDelegate);
+            }
+            this._vrTypeTabs = oTabs;
+            this._vrTypeDelegate = {
+                onAfterRendering: function () {
+                    this._vrSyncPropertyTabs();
+                    this._vrSyncModeToggle();
+                },
+                onkeydown: function (oEvent) {
+                    if (["ArrowLeft", "ArrowRight", "Home", "End"].indexOf(oEvent.key) === -1 || oEvent.altKey || oEvent.ctrlKey || oEvent.metaKey) {
+                        return;
+                    }
+
+                    var aButtons = oTabs.getItems(),
+                        iCurrent = aButtons.findIndex(function (oButton) {
+                            var oDom = oButton.getDomRef();
+                            return oDom && oDom.contains(oEvent.target);
+                        });
+                    if (iCurrent < 0) { return; }
+
+                    var iNext = oEvent.key === "Home" ? 0 : oEvent.key === "End" ? aButtons.length - 1 :
+                        (iCurrent + (oEvent.key === "ArrowRight" ? 1 : -1) + aButtons.length) % aButtons.length,
+                        oNext = aButtons[iNext],
+                        oCtx = oNext.getBindingContext("pt");
+
+                    if (!oCtx) { return; }
+                    oEvent.preventDefault();
+                    oEvent.stopPropagation();
+                    this._vrShowPropertyType(parseInt(oCtx.getPath().split("/").pop(), 10));
+                    oNext.focus();
+                }
+            };
+            oTabs.addEventDelegate(this._vrTypeDelegate, this);
+            this._vrSyncPropertyTabs();
+        },
+
+        _vrSyncPropertyTabs: function () {
+            var oTabs = this._vrTypeTabs,
+                oState = this.getView().getModel("ptState");
+            if (!oTabs || !oState) { return; }
+
+            var sId = oState.getProperty("/selectedId");
+            oTabs.getItems().forEach(function (oButton) {
+                var oCtx = oButton.getBindingContext("pt"),
+                    bSelected = !!oCtx && oCtx.getProperty("id") === sId;
+
+                // A ToggleButton toggles itself off even when the active type is pressed again.
+                oButton.setPressed(bSelected);
+                var oDom = oButton.getFocusDomRef();
+                if (oDom) { oDom.setAttribute("tabindex", bSelected ? "0" : "-1"); }
+            });
+        },
+
+        _vrSyncModeToggle: function () {
+            var oToggle = this.byId("vendorModeToggle"),
+                oState  = this.getView().getModel("ptState");
+            if (!oToggle || !oState) { return; }
+
+            // The buttons are declared single-first and toggle themselves off when
+            // the already active one is pressed, so the pressed state is re-asserted
+            // from the model instead of relying on the click.
+            var bSingle  = oState.getProperty("/mode") === "single",
+                aButtons = oToggle.getItems();
+
+            if (aButtons[0]) { aButtons[0].setPressed(bSingle); }
+            if (aButtons[1]) { aButtons[1].setPressed(!bSingle); }
+        },
+
+        onPtCtaPress: function () {
+            // The explorer keeps the type and mode the visitor chose; the CTA only
+            // takes them to the registration form.
+            this._vrScrollTo("register");
+        },
+
+        onBackHome: function () {
+            var oTabHeader = this.byId("mainTabHeader");
+            if (!oTabHeader) { return; }
+
+            var oItem = oTabHeader.getItems().filter(function (i) {
+                return i.getKey() === "idHome";
+            })[0];
+
+            if (!oItem) { return; }
+
+            oTabHeader.setSelectedKey("idHome");
+            this.onTabSelect({
+                getParameter: function () { return oItem; }
+            });
+        },
+
+        /* ---------------------------------------------------------------- */
+        /*  HELPERS                                                         */
+        /* ---------------------------------------------------------------- */
+
+        onScrollToRegister: function () {
+            this._vrScrollTo("register");
+        },
+
+        _vrScrollTo: function (sId) {
+            var oCtrl = this.byId(sId);
+
+            if (oCtrl && oCtrl.getDomRef()) {
+                oCtrl.getDomRef().scrollIntoView({ behavior: "smooth", block: "start" });
+            }
+        }
 
     });
 });

@@ -1,0 +1,171 @@
+{
+  "types": [
+    {
+      "id": "Hotels",
+      "icon": "sap-icon://bed",
+      "who": "For hotel owners and hotel groups",
+      "defaultMode": "multi",
+      "blurb": "List a single hotel or a whole chain. Each hotel gets its own rooms, facilities and amenities.",
+      "path": ["Admin panel", "Hotel", "Rooms", "Facilities & amenities"],
+      "single": [
+        { "name": "Your hotel", "leaves": ["Deluxe Room", "Suite", "Family Room"] }
+      ],
+      "multi": [
+        { "name": "Hotel / Branch 1", "leaves": ["Deluxe Room", "Suite"] },
+        { "name": "Hotel / Branch 2", "leaves": ["Standard Room", "Family Room"] },
+        { "name": "Hotel / Branch 3", "leaves": ["Executive Room", "Suite"] }
+      ],
+      "more": {
+        "single": "+ Add another hotel anytime",
+        "multi": "+ Add more hotels"
+      },
+      "points": [
+        "Add one hotel, or every branch under one account",
+        "Set up rooms for each hotel",
+        "Configure facilities and amenities per hotel",
+        "Manage bookings, invoices and coupons"
+      ],
+      "selected": false
+    },
+    {
+      "id": "Hostels",
+      "icon": "sap-icon://home-share",
+      "who": "For single hostels and hostel chains",
+      "defaultMode": "multi",
+      "blurb": "Create one hostel or many, and organise each into rooms and individual beds.",
+      "path": ["Admin panel", "Hostel", "Rooms", "Beds"],
+      "single": [
+        { "name": "Your hostel", "leaves": ["Dorm A Â· Bed 1", "Dorm A Â· Bed 2", "Room 1 Â· Bed 1"] }
+      ],
+      "multi": [
+        { "name": "Hostel / Branch 1", "leaves": ["Dorm A Â· Bed 1", "Dorm A Â· Bed 2"] },
+        { "name": "Hostel / Branch 2", "leaves": ["Room 1 Â· Bed 1", "Room 1 Â· Bed 2"] },
+        { "name": "Hostel / Branch 3", "leaves": ["Dorm B Â· Bed 1", "Dorm B Â· Bed 2"] }
+      ],
+      "more": {
+        "single": "+ Add another hostel anytime",
+        "multi": "+ Add more hostels"
+      },
+      "points": [
+        "Add one hostel or several branches",
+        "Set up rooms and beds in each hostel",
+        "Add facilities and amenities guests look for",
+        "Manage bookings, deposits and coupons"
+      ],
+      "selected": false
+    },
+    {
+      "id": "PG",
+      "icon": "sap-icon://home",
+      "who": "For owners of one PG or many",
+      "defaultMode": "multi",
+      "blurb": "Run a single PG or several, each with its own rooms, beds and deposits.",
+      "path": ["Admin panel", "PG", "Rooms", "Beds"],
+      "single": [
+        { "name": "Your PG", "leaves": ["Room 101 Â· Bed A", "Room 101 Â· Bed B", "Room 102 Â· Bed A"] }
+      ],
+      "multi": [
+        { "name": "PG / Branch 1", "leaves": ["Room 101 Â· Bed A", "Room 101 Â· Bed B"] },
+        { "name": "PG / Branch 2", "leaves": ["Room 12 Â· Bed A", "Room 12 Â· Bed B"] },
+        { "name": "PG / Branch 3", "leaves": ["Room 3 Â· Bed A", "Room 3 Â· Bed B"] }
+      ],
+      "more": {
+        "single": "+ Add another PG anytime",
+        "multi": "+ Add more PGs"
+      },
+      "points": [
+        "Add one PG, or each PG as a separate property",
+        "Set up rooms and beds",
+        "Track deposits and invoices",
+        "Handle staff and support requests"
+      ],
+      "selected": false
+    },
+    {
+      "id": "Service Apartments",
+      "icon": "sap-icon://building",
+      "who": "For individual owners and operators alike",
+      "defaultMode": "multi",
+      "blurb": "Offer one serviced apartment or many, in one building or across locations, each with its own amenities.",
+      "path": ["Admin panel", "Property", "Apartments", "Amenities"],
+      "single": [
+        { "name": "Your apartment building", "leaves": ["1 BHK Apartment", "2 BHK Apartment"] }
+      ],
+      "multi": [
+        { "name": "Property 1", "leaves": ["1 BHK Apartment", "2 BHK Apartment"] },
+        { "name": "Property 2", "leaves": ["Studio", "1 BHK Apartment"] },
+        { "name": "Property 3", "leaves": ["2 BHK Apartment", "3 BHK Apartment"] }
+      ],
+      "more": {
+        "single": "+ Add another property anytime",
+        "multi": "+ Add more properties"
+      },
+      "points": [
+        "Add a single apartment or several buildings",
+        "Set up the apartments you offer",
+        "Configure facilities and amenities",
+        "Manage bookings, invoices and coupons"
+      ],
+      "selected": false
+    },
+    {
+      "id": "Rented Apartments",
+      "icon": "sap-icon://key",
+      "who": "For homeowners and landlords, no business needed",
+      "defaultMode": "single",
+      "blurb": "Own a house, villa, flat or building? List what you have for rent, whether it is one property or many, and manage tenants, deposits and rent in one place.",
+      "path": ["Admin panel", "Property", "Units", "Tenant & deposit"],
+      "single": [
+        { "name": "Your house", "leaves": ["Ground floor", "First floor"] }
+      ],
+      "multi": [
+        { "name": "Independent house", "leaves": ["Whole house"] },
+        { "name": "Villa", "leaves": ["Whole villa"] },
+        { "name": "Apartment building", "leaves": ["Flat 101", "Flat 102"] }
+      ],
+      "more": {
+        "single": "+ Add another property anytime",
+        "multi": "+ Add more properties"
+      },
+      "points": [
+        "Add your house, villa, flat or building",
+        "Rent the whole property or individual flats and floors",
+        "Set rent and deposit, and manage invoices",
+        "Review complaints, damages and reviews"
+      ],
+      "selected": false
+    }
+  ],
+  "benefits": [
+    {
+      "title": "Infrastructure",
+      "subtitle": "Manage your property setup",
+      "icon": "image/vendor/infrastructure.svg",
+      "items": ["Branches", "Rooms", "Beds", "Facilities", "Amenities"]
+    },
+    {
+      "title": "Operations",
+      "subtitle": "Full control of daily business",
+      "icon": "image/vendor/operations.svg",
+      "items": ["Bookings", "Invoices", "Deposits", "Coupons"]
+    },
+    {
+      "title": "User Management",
+      "subtitle": "Your team and your guests",
+      "icon": "image/vendor/users.svg",
+      "items": ["Staff members", "Support requests"]
+    },
+    {
+      "title": "Feedback & Issues",
+      "subtitle": "Keep guests happy",
+      "icon": "image/vendor/feedback.svg",
+      "items": ["Complaints", "Damages", "Reviews"]
+    },
+    {
+      "title": "Analytics",
+      "subtitle": "Real-time insights",
+      "icon": "image/vendor/analytics.svg",
+      "items": ["Across all dashboards"]
+    }
+  ]
+}

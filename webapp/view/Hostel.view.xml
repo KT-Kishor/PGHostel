@@ -64,6 +64,11 @@
                             tooltip="{i18n>rooms}"
                             text="{i18n>rooms}"
                         />
+                        <IconTabFilter
+                            key="idVendor"
+                            tooltip="{i18n>vrTabTitle}"
+                            text="{i18n>vrTabTitle}"
+                        />
                         <!-- <IconTabFilter key="idFacilities" text="Facilities" /> -->
                         <IconTabFilter
                             key="idContact"
@@ -781,7 +786,47 @@
                                     </ScrollContainer>
                                 </VBox>
                             </Page>
-                           
+
+                            <ScrollContainer
+                                id="idVendor"
+                                horizontal="false"
+                                vertical="true"
+                                height="100%"
+                                class="svPage"
+                            >
+                                <VBox class="svWrap" width="100%" renderType="Bare">
+                                    <core:Fragment
+                                        fragmentName="sap.ui.com.project1.fragment.VendorHero"
+                                        type="XML"
+                                    />
+                                    <core:Fragment
+                                        fragmentName="sap.ui.com.project1.fragment.VendorPropertyTypes"
+                                        type="XML"
+                                    />
+                                    <core:Fragment
+                                        fragmentName="sap.ui.com.project1.fragment.VendorAdminModules"
+                                        type="XML"
+                                    />
+                                    <core:Fragment
+                                        fragmentName="sap.ui.com.project1.fragment.VendorHowItWorks"
+                                        type="XML"
+                                    />
+                                    <core:Fragment
+                                        fragmentName="sap.ui.com.project1.fragment.VendorRegistration"
+                                        type="XML"
+                                    />
+                                </VBox>
+                                <VBox
+                                    visible="{FooterModel>/showGlobalFooter}"
+                                    class="sapUiMediumMarginTop"
+                                >
+                                    <core:Fragment
+                                        fragmentName="sap.ui.com.project1.fragment.quicklinks"
+                                        type="XML"
+                                    />
+                                </VBox>
+                            </ScrollContainer>
+
                             <ScrollContainer
                                 id="idContact"
                                 horizontal="false"

@@ -1,0 +1,66 @@
+<core:FragmentDefinition xmlns="sap.m" xmlns:core="sap.ui.core">
+    <VBox id="register" class="svReg" renderType="Bare">
+        <HBox justifyContent="Center" wrap="Wrap" renderType="Bare" class="svH2Row">
+            <Text text="{i18n>vrRegTitle}" class="svH2"/>
+            <Text text="{i18n>vrRegTitleAccent}" class="svH2 svAccent"/>
+        </HBox>
+        <Text text="{i18n>vrRegSub}" textAlign="Center" class="svSub"/>
+        <HBox class="svRegCard" renderType="Bare">
+            <VBox class="svSide" renderType="Bare">
+                <VBox class="svSideInner" renderType="Bare">
+                    <Title text="{i18n>vrSideTitle}" level="H3" wrapping="true" class="svSideTitle"/>
+                    <Text text="{i18n>vrSideSub}" class="svSideSub"/>
+                    <VBox class="svProgress" renderType="Bare">
+                        <HBox justifyContent="SpaceBetween" renderType="Bare">
+                            <Text text="{i18n>vrSideProgressLabel}" class="svProgressLabel"/>
+                            <Text text="{= (${AdminSignupModel>/Progress} || 0) + '%' }" class="svProgressLabel"/>
+                        </HBox>
+                        <ProgressIndicator percentValue="{AdminSignupModel>/Progress}" showValue="false"
+                                           height="8px" displayValue="{= (${AdminSignupModel>/Progress} || 0) + '%' }"
+                                           class="svBar"/>
+                    </VBox>
+                    <VBox class="svSteps" renderType="Bare">
+                        <HBox class="svStep" renderType="Bare">
+                            <Text text="1" textAlign="Center" class="svStepN"/>
+                            <VBox renderType="Bare">
+                                <Text text="{i18n>vrSideStep1Title}" class="svStepT"/>
+                                <Text text="{i18n>vrSideStep1Desc}" class="svStepD"/>
+                            </VBox>
+                        </HBox>
+                        <HBox class="svStep" renderType="Bare">
+                            <Text text="2" textAlign="Center" class="svStepN"/>
+                            <VBox renderType="Bare">
+                                <Text text="{i18n>vrSideStep2Title}" class="svStepT"/>
+                                <Text text="{i18n>vrSideStep2Desc}" class="svStepD"/>
+                            </VBox>
+                        </HBox>
+                        <HBox class="svStep" renderType="Bare">
+                            <Text text="3" textAlign="Center" class="svStepN"/>
+                            <VBox renderType="Bare">
+                                <Text text="{i18n>vrSideStep3Title}" class="svStepT"/>
+                                <Text text="{i18n>vrSideStep3Desc}" class="svStepD"/>
+                            </VBox>
+                        </HBox>
+                    </VBox>
+                    <VBox class="svHelp" renderType="Bare">
+                        <Text text="{i18n>vrSideHelp}"/>
+                        <Link text="admin@stayvriksha.in" href="mailto:admin@stayvriksha.in"
+                              class="tealTextLink"/>
+                    </VBox>
+                </VBox>
+            </VBox>
+            <VBox class="svFormWrap" renderType="Bare">
+                <VBox id="formBox" renderType="Bare" visible="{= !${AdminSignupModel>/Submitted} }">
+                    <core:Fragment fragmentName="sap.ui.com.project1.fragment.AdminSignup" type="XML"/>
+                </VBox>
+                <VBox id="successBox" class="svSuccess" renderType="Bare"
+                      visible="{AdminSignupModel>/Submitted}" alignItems="Center">
+                    <core:Icon src="sap-icon://accept" class="svSuccessIcon"/>
+                    <Title text="{i18n>vrSuccessTitle}" level="H3" wrapping="true" class="svSuccessTitle"/>
+                    <Text text="{AdminSignupModel>/SuccessMessage}" textAlign="Center" class="svSuccessText"/>
+                    <Button text="{i18n>vrSuccessBack}" class="svBtn" type="Emphasized" press=".onBackHome"/>
+                </VBox>
+            </VBox>
+        </HBox>
+    </VBox>
+</core:FragmentDefinition>

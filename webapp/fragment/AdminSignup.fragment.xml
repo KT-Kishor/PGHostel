@@ -1,464 +1,251 @@
 <core:FragmentDefinition
     xmlns="sap.m"
     xmlns:core="sap.ui.core"
-    xmlns:l="sap.ui.layout"
-    xmlns:f="sap.ui.layout.form"
-    xmlns:u="sap.ui.unified"
->
-    <Dialog
-        class="sapUiContentPadding sapUiSmallMargin"
-        id="adminSignupDialog"
-        initialFocus="adminSalutation"
-        contentWidth="60%"
-        stretch="{= ${device>/system/phone} }"
-        draggable="true"
-        resizable="true"
-    >
-        <customHeader>
-            <Bar class="barheader">
-                <contentMiddle>
-                    <Title text="{i18n>adminVendorRegistration}" />
-                </contentMiddle>
-                <contentRight>
-                    <Button
-                        class="myUnifiedBtn"
-                        icon="sap-icon://decline"
-                        tooltip="{i18n>close}"
-                        press="onCloseAdminSignup"
-                        enabled="{= !${AdminSignupModel>/ProcessingActive} }"
-                    />
-                </contentRight>
-            </Bar>
-        </customHeader>
-        <f:SimpleForm
-            editable="true"
-            layout="ResponsiveGridLayout"
-            labelSpanXL="3"
-            labelSpanL="3"
-            labelSpanM="3"
-            labelSpanS="12"
-            adjustLabelSpan="false"
-            emptySpanXL="0"
-            emptySpanL="0"
-            emptySpanM="0"
-            emptySpanS="0"
-            columnsXL="2"
-            columnsL="2"
-            columnsM="2"
-            singleContainerFullSize="false"
-        >
-            <f:content>
-                <core:Title text="{i18n>adminBookingNCPersonalDetails}" />
+    xmlns:u="sap.ui.unified">
 
-                <Label
-                    required="true"
-                    text="{i18n>fullname}"
-                />
-                <HBox
-                    width="100%"
-                    justifyContent="Start"
-                    alignItems="Center"
-                >
-                    <VBox width="35%">
-                        <ComboBox
-                            id="adminSalutation"
-                            selectedKey="{AdminSignupModel>/Salutation}"
-                            change="onAdminChangeSalutation"
-                            placeholder="Mr."
-                            valueStateText="{i18n>MVDsalutation}"
-                        >
-                            <core:ListItem
-                                key="Mr."
-                                text="Mr."
-                            />
-                            <core:ListItem
-                                key="Ms."
-                                text="Ms."
-                            />
-                            <core:ListItem
-                                key="Mrs."
-                                text="Mrs."
-                            />
-                            <core:ListItem
-                                key="Dr."
-                                text="Dr."
-                            />
-                        </ComboBox>
-                    </VBox>
-                    <VBox
-                        width="65%"
-                        class="sapUiTinyMarginBegin"
-                    >
-                        <Input
-                            id="adminVendorName"
-                            value="{AdminSignupModel>/VendorName}"
-                            placeholder="{i18n>enteryourname}"
-                            liveChange="onAdminLiveValidate"
-                            valueStateText="{i18n>MSenterValidName}"
-                            maxLength="50"
-                        />
-                    </VBox>
-                </HBox>
-
-                <Label
-                    text="{i18n>asMVDDOB}"
-                    required="true"
-                />
-                <!-- <DatePicker
-                    id="adminDOB"
-                    value="{AdminSignupModel>/DOB}"
-                    displayFormat="dd/MM/yyyy"
-                    valueFormat="yyyy-MM-dd"
-                    change="ADMIN_onChangeDOB"
-                /> -->
-
-<DatePicker
-    id="adminDOB"
-    placeholder="DD/MM/YYYY"
-    displayFormat="dd/MM/yyyy"
-    valueFormat="yyyy-MM-dd"
-    value="{AdminSignupModel>/DOB}"
-    initialFocusedDateValue="{controller>/focusedDate}"
-   
-    maxDate="{controller>/maxDate}"
-    change="ADMIN_onChangeDOB"
-                    valueStateText="{i18n>agediff}"
-
-/>
-
-
-                <Label
-                    text="{i18n>MVgender}"
-                    required="true"
-                />
-                <Select
-                    id="adminGender"
-                    selectedKey="{AdminSignupModel>/Gender}"
-                    forceSelection="false"
-                    change="ADMIN_onChangeGender"
-                    valueStateText="{i18n>pleaseselectGender}"
-                >
-                    <core:Item
-                        key="Male"
-                        text="Male"
-                    />
-                    <core:Item
-                        key="Female"
-                        text="Female"
-                    />
-                    <core:Item
-                        key="Other"
-                        text="Other"
-                    />
-                </Select>
-
-                <Label
-                    text="{i18n>email}"
-                    required="true"
-                />
-                <Input
-                    maxLength="50"
-                    placeholder="{i18n>enteryourEmail}"
-                    value="{AdminSignupModel>/Email}"
-                    id="adminEmail"
-                    type="Email"
-                    liveChange="onAdminLiveValidate"
-                    valueStateText="{i18n>MSenterValidEmail}"
-                />
-
-                <core:Title text="{i18n>adminBookingNCContactDetails}" />
-                <Label
-                    text="{i18n>MVDcountry}"
-                    required="true"
-                />
-                <ComboBox
-                    id="adminsignUpCountry"
-                    selectedKey="{AdminSignupModel>/Country}"
-                    selectionChange="ADMIN_onChangeCountry"
-                    placeholder="{i18n>selectCountry}"
-                    valueStateText="{i18n>MVDselectcountry}"
-                    items="{path:'CountryModel>/', length:1000}"
-                    showSecondaryValues="true"
-                    value="{AdminSignupModel>/Country}"
-                >
-                    <core:ListItem
-                        key="{CountryModel>countryName}"
-                        text="{CountryModel>countryName}"
-                        additionalText="{CountryModel>code}"
-                    />
-                </ComboBox>
-                <!-- State -->
-                <Label
-                    text="{i18n>MVDstate}"
-                    required="true"
-                />
-                <ComboBox
-                    id="adminsignUpState"
-                    selectedKey="{AdminSignupModel>/State}"
-                    change="ADMIN_onChangeState"
-                    selectionChange="ADMIN_onChangeState"
-                    placeholder="{i18n>selectState}"
-                    valueStateText="{i18n>MSselectState}"
-                    items="{path: 'StateModel>/filtered', length: 1000}"
-                    showSecondaryValues="true"
-                    value="{AdminSignupModel>/State}"
-                >
-                    <core:ListItem
-                        key="{StateModel>stateName}"
-                        text="{StateModel>stateName}"
-                    />
-                </ComboBox>
-                <!-- City -->
-                <Label
-                    text="{i18n>city}"
-                    required="true"
-                />
-                <ComboBox
-                    id="adminsignUpCity"
-                    selectedKey="{AdminSignupModel>/City}"
-                    change="ADMIN_onChangeCity"
-                    selectionChange="ADMIN_onChangeCity"
-                    placeholder="{i18n>cityValueText}"
-                    valueStateText="{i18n>MSselectCity}"
-                    items="{path:'CityModel>/filtered', length:1000}"
-                    showSecondaryValues="true"
-                    value="{AdminSignupModel>/City}"
-                >
-                    <core:ListItem
-                        key="{CityModel>cityName}"
-                        text="{CityModel>cityName}"
-                        additionalText="{CityModel>branchCode}"
-                    />
-                </ComboBox>
-
-                <Label
-                    text="{i18n>mobileNo}"
-                    required="true"
-                />
-                <HBox width="100%">
-                    <VBox width="35%">
-<ComboBox 
-id="adminsignUpSTD" 
-value="{AdminSignupModel>/STDCode}" 
-change="ADMIN_onChangeSTD" 
-placeholder="{i18n>iSD}" 
-showSecondaryValues="true" 
-width="100%" 
-items="{path:'CountryModel>/', length:1000}" 
-filterSecondaryValues="true"
->
-	<core:ListItem 
-        key="{CountryModel>stdCode}" 
-        text="{CountryModel>stdCode}" 
-        additionalText="{CountryModel>code}" 
-        />
-</ComboBox>
-                    </VBox>
-                    <VBox
-                        width="65%"
-                        class="sapUiTinyMarginBegin"
-                    >
-                        <Input
-                            id="adminMobileNo"
-                            value="{AdminSignupModel>/Mobile}"
-                            liveChange="ADMIN_onMobileLiveChange"
-                            maxLength="18"
-                            placeholder="Enter mobile number"
-                            width="100%"
-                            valueStateText="Enter valid mobile number"
-                             autocomplete="false"
-                             
-                        >
-                        <!-- <customData>
-        <core:CustomData 
-            key="autocomplete" 
-            writeToDom="true" />
-    </customData> -->
-</Input>
-                    </VBox>
-                </HBox>
-
-                <Label
-                    text="{i18n>address}"
-                    required="true"
-                />
-
-                <TextArea
-                    id="adminAddress"
-                    value="{AdminSignupModel>/Address}"
-                    rows="3"
-                    width="100%"
-                    placeholder="Enter your full address"
-                    maxLength="120"
-                    liveChange="ADMIN_onAddressChange"
-                />
-            </f:content>
-        </f:SimpleForm>
-
-        <!-- ===== DOCUMENT UPLOAD SECTION (NEW) ===== -->
-        <VBox
-            class="sapUiSmallMarginBegin sapUiSmallMarginEnd sapUiSmallMarginTop "
-        >
-            <!-- Informational Message Strip -->
-            <MessageStrip
-                text="{i18n>messageStrip}"
-                showIcon="true"
-                type="Warning"
-                class="sapUiTinyMarginBottom"
-            />
-        </VBox>
-        <Table
-            id="adminAttachmentTable"
-            items="{AdminSignupModel>/Documents}"
-            sticky="ColumnHeaders,HeaderToolbar"
-            width="100%"
-        >
-            <headerToolbar>
-                <OverflowToolbar>
-                    <Title text="{i18n>MVDdocument}" />
-                    <Text
-                        text="*"
-                        class="requiredStar"
-                    />
-                    <ToolbarSpacer />
-                    <!-- Dropdown for choosing type -->
-                    <ComboBox
-                        change="onAdminDocTypeChange"
-                        id="adminDocType"
-                        selectedKey="{AdminSignupModel>/CurrentDocType}"
-                        enabled="{AdminSignupModel>/DocTypeEnabled}"
-                        placeholder="{i18n>selectDocument}"
-                       width="180px"
-                    >
-                        <core:ListItem
-                            key="Government-issued Identity Proof"
-                            text="Government-issued Identity Proof"
-                        />
-                        <core:ListItem
-                            key="Property Ownership Authorisation Proof"
-                            text="Property Ownership Authorisation Proof"
-                        />
-                        <core:ListItem
-                            key="Company Registration Certificate"
-                            text="Company Registration Certificate"
-                        />
-                        <core:ListItem
-                            key="Trade Licence"
-                            text="Trade Licence"
-                        />
-                        <!-- <core:ListItem key="Resume" text="Resume"/> -->
-                        <core:ListItem
-                            key="PG Registration"
-                            text="PG Registration"
-                        />
-                        <core:ListItem
-                            key="GST Registration Certificate"
-                            text="GST Registration Certificate"
-                        />
-                        <core:ListItem
-                            key="Bank Account Details"
-                            text="Bank Account Details" />
-                        <core:ListItem
-                            key="Organization PAN "
-                            text="Organization PAN " />
-                        <core:ListItem
-                            key="Others"
-                            text="Others" />
-                    </ComboBox>
-                    <!-- Upload button -->
-                    <VBox id="adminUploaderWrapper">
-                        <u:FileUploader
-                            enabled="{= ${AdminSignupModel>/CurrentDocType} !== '' }"
-                            id="adminFileUploader"
-                            buttonOnly="true"
-                            buttonText="Upload"
-                            uploadOnChange="false"
-                            change="onAdminFileSelect"
-                            fileType="jpg,jpeg,png,pdf"
-                              class="myUnifiedBtn"
-                        />
-                    </VBox>
-                </OverflowToolbar>
-            </headerToolbar>
-            <columns>
-                <Column>
-                    <Text text="{i18n>filename}" />
-                </Column>
-                <Column
-                    minScreenWidth="Tablet"
-                    demandPopin="true"
-                    popinDisplay="Inline"
-                >
-                    <Text text="{i18n>document}" />
-                </Column>
-                <!-- <Column><Text text="File Type" /></Column> -->
-                <Column
-                    minScreenWidth="Tablet"
-                    demandPopin="true"
-                    popinDisplay="Inline"
-                >
-                    <Text text="{i18n>size}" />
-                </Column>
-                <Column
-                    minScreenWidth="Tablet"
-                    demandPopin="true"
-                    popinDisplay="Inline"
-                >
-                    <Text text="Action" />
-                </Column>
-            </columns>
-          <items>
-    <ColumnListItem>
-        <cells>
-            <!-- 🔄 Show BusyIndicator while processing, otherwise show Link -->
-            <HBox
-                justifyContent="Start"
-                alignItems="Center"
-            >
-                <BusyIndicator
-                    size="1.2rem"
-                    visible="{= ${AdminSignupModel>isProcessing} === true }"
-                />
-                <Link
-                    class="tealTextLink"
-                    visible="{= !${AdminSignupModel>isProcessing} }"
-                    wrapping="true"
-                    text="{AdminSignupModel>FileName}"
-                    press="onAdminPreviewDoc"
-                    tooltip="{path:'AdminSignupModel>', formatter:'.Formatter.fileTooltip'}"
-                />
+    <VBox id="adminSignupForm" class="svForm" renderType="Bare"
+          busy="{AdminSignupModel>/Submitting}" busyIndicatorDelay="0">
+        <VBox class="svSec" renderType="Bare">
+            <HBox class="svSecTitle" renderType="Bare" alignItems="Center">
+                <core:Icon src="sap-icon://employee" class="svSecIcon"/>
+                <Title text="{i18n>vrSecPersonal}" level="H3" wrapping="true"/>
             </HBox>
+            <HBox class="svFormGrid" renderType="Bare">
+                <VBox class="svFld svSpan2" renderType="Bare">
+                    <Label text="{i18n>vrFullName}" required="true" labelFor="adminVendorName"/>
+                    <HBox class="svPair" renderType="Bare">
+                        <ComboBox id="adminSalutation" selectedKey="{AdminSignupModel>/Salutation}"
+                                  width="100%" placeholder="Mr." tooltip="{i18n>vrTitleLabel}"
+                                  change="onAdminChangeSalutation" valueStateText="{i18n>MVDsalutation}">
+                            <core:ListItem key="Mr." text="Mr."/>
+                            <core:ListItem key="Ms." text="Ms."/>
+                            <core:ListItem key="Mrs." text="Mrs."/>
+                            <core:ListItem key="Dr." text="Dr."/>
+                        </ComboBox>
+                        <HBox class="svInputShell" renderType="Bare">
+                            <core:Icon src="sap-icon://employee" class="svFieldIcon"/>
+                            <Input id="adminVendorName" value="{AdminSignupModel>/VendorName}"
+                                   width="100%" valueLiveUpdate="true" maxLength="50"
+                                   placeholder="{i18n>vrFullNamePlaceholder}"
+                                   liveChange="onAdminLiveValidate" change="onAdminLiveValidate"
+                                   valueStateText="{i18n>MSenterValidName}"/>
+                        </HBox>
+                    </HBox>
+                </VBox>
+                <VBox class="svFld" renderType="Bare">
+                    <Label text="{i18n>vrDob}" required="true" labelFor="adminDOB"/>
+                    <HBox class="svInputShell" renderType="Bare">
+                        <core:Icon src="sap-icon://calendar" class="svFieldIcon"/>
+                        <DatePicker id="adminDOB" value="{AdminSignupModel>/DOB}" width="100%"
+                                    placeholder="DD/MM/YYYY" displayFormat="dd/MM/yyyy" valueFormat="yyyy-MM-dd"
+                                    initialFocusedDateValue="{controller>/focusedDate}"
+                                    minDate="{AdminSignupModel>/DOBMin}" maxDate="{AdminSignupModel>/DOBMax}"
+                                    change="ADMIN_onChangeDOB"
+                                    valueStateText="{i18n>agediff}"/>
+                    </HBox>
+                </VBox>
+                <VBox class="svFld" renderType="Bare">
+                    <Label text="{i18n>vrGender}" required="true" labelFor="adminGender"/>
+                    <HBox class="svInputShell" renderType="Bare">
+                        <core:Icon src="sap-icon://group" class="svFieldIcon"/>
+                        <Select id="adminGender" selectedKey="{AdminSignupModel>/Gender}" width="100%"
+                                forceSelection="true" change="ADMIN_onChangeGender"
+                                valueStateText="{i18n>pleaseselectGender}">
+                            <core:Item key="" text="{i18n>vrGenderPlaceholder}"/>
+                            <core:Item key="Male" text="{i18n>vrGenderMale}"/>
+                            <core:Item key="Female" text="{i18n>vrGenderFemale}"/>
+                            <core:Item key="Other" text="{i18n>vrGenderOther}"/>
+                        </Select>
+                    </HBox>
+                </VBox>
+                <VBox class="svFld svSpan2" renderType="Bare">
+                    <Label text="{i18n>vrEmail}" required="true" labelFor="adminEmail"/>
+                    <HBox class="svInputShell" renderType="Bare">
+                        <core:Icon src="sap-icon://email" class="svFieldIcon"/>
+                        <Input id="adminEmail" value="{AdminSignupModel>/Email}" width="100%" type="Email"
+                               valueLiveUpdate="true" maxLength="50" placeholder="{i18n>vrEmailPlaceholder}"
+                               liveChange="onAdminLiveValidate" change="onAdminLiveValidate"
+                               valueStateText="{i18n>MSenterValidEmail}"/>
+                    </HBox>
+                </VBox>
+            </HBox>
+        </VBox>
 
-            <!-- Document type -->
-            <Text text="{AdminSignupModel>VdocType}" />
+        <VBox class="svSec" renderType="Bare">
+            <HBox class="svSecTitle" renderType="Bare" alignItems="Center">
+                <core:Icon src="sap-icon://map" class="svSecIcon"/>
+                <Title text="{i18n>vrSecContact}" level="H3" wrapping="true"/>
+            </HBox>
+            <VBox renderType="Bare" visible="{= !!${AdminSignupModel>/LocationsError} }" class="sapUiSmallMarginBottom">
+                <MessageStrip text="{AdminSignupModel>/LocationsError}" type="Warning" showIcon="true"/>
+                <Link text="{i18n>vrRetryLocations}" press="onAdminLoadLocations" class="sapUiTinyMarginTop"/>
+            </VBox>
+            <HBox class="svFormGrid" renderType="Bare">
+                <VBox class="svFld" renderType="Bare">
+                    <Label text="{i18n>vrCountry}" required="true" labelFor="adminsignUpCountry"/>
+                    <HBox class="svInputShell" renderType="Bare">
+                        <core:Icon src="sap-icon://world" class="svFieldIcon"/>
+                        <ComboBox id="adminsignUpCountry" width="100%"
+                                  busy="{AdminSignupModel>/LocationsLoading}" busyIndicatorDelay="0"
+                                  selectedKey="{AdminSignupModel>/Country}" value="{AdminSignupModel>/Country}"
+                                  selectionChange="ADMIN_onChangeCountry" change="ADMIN_onChangeCountry"
+                                  placeholder="{i18n>selectCountry}" valueStateText="{i18n>MVDselectcountry}"
+                                  items="{path:'CountryModel>/', length:1000}" showSecondaryValues="true">
+                            <core:ListItem key="{CountryModel>countryName}" text="{CountryModel>countryName}"
+                                           additionalText="{CountryModel>code}"/>
+                        </ComboBox>
+                    </HBox>
+                </VBox>
+                <VBox class="svFld" renderType="Bare">
+                    <Label text="{i18n>vrState}" required="true" labelFor="adminsignUpState"/>
+                    <HBox class="svInputShell" renderType="Bare">
+                        <core:Icon src="sap-icon://map" class="svFieldIcon"/>
+                        <ComboBox id="adminsignUpState" width="100%"
+                                  busy="{AdminSignupModel>/LocationsLoading}" busyIndicatorDelay="0"
+                                  selectedKey="{AdminSignupModel>/State}" value="{AdminSignupModel>/State}"
+                                  change="ADMIN_onChangeState" selectionChange="ADMIN_onChangeState"
+                                  placeholder="{i18n>vrStatePlaceholder}" valueStateText="{i18n>MSselectState}"
+                                  items="{path:'StateModel>/filtered', length:1000}">
+                            <core:ListItem key="{StateModel>stateName}" text="{StateModel>stateName}"/>
+                        </ComboBox>
+                    </HBox>
+                </VBox>
+                <VBox class="svFld" renderType="Bare">
+                    <Label text="{i18n>vrCity}" required="true" labelFor="adminsignUpCity"/>
+                    <HBox class="svInputShell" renderType="Bare">
+                        <core:Icon src="sap-icon://building" class="svFieldIcon"/>
+                        <ComboBox id="adminsignUpCity" width="100%"
+                                  busy="{AdminSignupModel>/LocationsLoading}" busyIndicatorDelay="0"
+                                  selectedKey="{AdminSignupModel>/City}" value="{AdminSignupModel>/City}"
+                                  change="ADMIN_onChangeCity" selectionChange="ADMIN_onChangeCity"
+                                  placeholder="{i18n>vrCityPlaceholder}" valueStateText="{i18n>MSselectCity}"
+                                  items="{path:'CityModel>/filtered', length:1000}" showSecondaryValues="true">
+                            <core:ListItem key="{CityModel>cityName}" text="{CityModel>cityName}"
+                                           additionalText="{CityModel>branchCode}"/>
+                        </ComboBox>
+                    </HBox>
+                </VBox>
+                <VBox class="svFld" renderType="Bare">
+                    <Label text="{i18n>vrMobile}" required="true" labelFor="adminMobileNo"/>
+                    <HBox class="svPairWide" renderType="Bare">
+                        <ComboBox id="adminsignUpSTD" value="{AdminSignupModel>/STDCode}"
+                                  width="100%" change="ADMIN_onChangeSTD" placeholder="{i18n>iSD}"
+                                  tooltip="{i18n>vrCountryCode}" showSecondaryValues="true"
+                                  items="{path:'CountryModel>/', length:1000}" filterSecondaryValues="true">
+                            <core:ListItem key="{CountryModel>stdCode}" text="{CountryModel>stdCode}"
+                                           additionalText="{CountryModel>code}"/>
+                        </ComboBox>
+                        <HBox class="svInputShell" renderType="Bare">
+                            <core:Icon src="sap-icon://phone" class="svFieldIcon"/>
+                            <Input id="adminMobileNo" value="{AdminSignupModel>/Mobile}" width="100%"
+                                   type="Tel" valueLiveUpdate="true" maxLength="18" autocomplete="false"
+                                   placeholder="{i18n>enterMobileNumber}" liveChange="ADMIN_onMobileLiveChange"
+                                   change="ADMIN_onMobileLiveChange" valueStateText="{i18n>vrErrMobile}"/>
+                        </HBox>
+                    </HBox>
+                </VBox>
+                <VBox class="svFld svSpan2" renderType="Bare">
+                    <Label text="{i18n>vrAddress}" required="true" labelFor="adminAddress"/>
+                    <HBox class="svInputShell svAddressShell" renderType="Bare">
+                        <core:Icon src="sap-icon://home" class="svFieldIcon"/>
+                        <TextArea id="adminAddress" value="{AdminSignupModel>/Address}" width="100%"
+                                  rows="3" valueLiveUpdate="true" maxLength="120"
+                                  placeholder="{i18n>vrAddressPlaceholder}" liveChange="ADMIN_onAddressChange"
+                                  change="ADMIN_onAddressChange"/>
+                    </HBox>
+                </VBox>
+            </HBox>
+        </VBox>
 
-            <!-- File size (formatted) -->
-            <Text
-                text="{path:'AdminSignupModel>size', formatter:'.Formatter.formatFileSize'}"
-            />
+        <VBox class="svSec" renderType="Bare">
+            <HBox class="svSecTitle" renderType="Bare" alignItems="Center">
+                <core:Icon src="sap-icon://document" class="svSecIcon"/>
+                <Title text="{i18n>vrSecDocuments}" level="H3" wrapping="true"/>
+                <Text text="*" class="svReqMark"/>
+            </HBox>
+            <HBox class="svNotice" renderType="Bare" alignItems="Center">
+                <core:Icon src="sap-icon://warning" class="svNoticeIcon"/>
+                <Text text="{i18n>vrDocNotice}"/>
+            </HBox>
+            <VBox class="svFld" renderType="Bare">
+                <Label text="{i18n>vrDocStep1}" labelFor="adminDocType"/>
+                <HBox class="svInputShell" renderType="Bare">
+                    <core:Icon src="sap-icon://document-text" class="svFieldIcon"/>
+                    <ComboBox id="adminDocType" width="100%" selectedKey="{AdminSignupModel>/CurrentDocType}"
+                              enabled="{AdminSignupModel>/DocTypeEnabled}" change="onAdminDocTypeChange"
+                              selectionChange="onAdminDocTypeChange" placeholder="{i18n>vrDocPlaceholder}">
+                        <core:ListItem key="Government-issued Identity Proof" text="Government-issued Identity Proof"/>
+                        <core:ListItem key="Property Ownership Authorisation Proof" text="Property Ownership Authorisation Proof"/>
+                        <core:ListItem key="Company Registration Certificate" text="Company Registration Certificate"/>
+                        <core:ListItem key="Trade Licence" text="Trade Licence"/>
+                        <core:ListItem key="PG Registration" text="PG Registration"/>
+                        <core:ListItem key="GST Registration Certificate" text="GST Registration Certificate"/>
+                        <core:ListItem key="Bank Account Details" text="Bank Account Details"/>
+                        <core:ListItem key="Organization PAN " text="Organization PAN"/>
+                        <core:ListItem key="Others" text="Others"/>
+                    </ComboBox>
+                </HBox>
+            </VBox>
+            <VBox id="adminDropZone" class="svDrop" renderType="Bare" alignItems="Center">
+                <customData>
+                    <core:CustomData key="vendor-disabled" writeToDom="true"
+                                     value="{= !${AdminSignupModel>/CurrentDocType} || ${AdminSignupModel>/ProcessingActive} || ${AdminSignupModel>/Submitting} ? 'true' : 'false' }"/>
+                </customData>
+                <core:Icon src="sap-icon://upload" class="svDropIcon"/>
+                <Text text="{= ${AdminSignupModel>/CurrentDocType} ? ${i18n>vrDocStep2}.replace('{0}', ${AdminSignupModel>/CurrentDocType}) : ${i18n>vrDocStepBlocked} }"
+                      textAlign="Center" class="svDropTitle"/>
+                <Text text="{= ${AdminSignupModel>/CurrentDocType} ? ${i18n>vrDocStep2Hint} : ${i18n>vrDocStepBlockedHint} }"
+                      textAlign="Center" class="svDropSub"/>
+                <u:FileUploader id="adminFileUploader" class="svUploader" buttonOnly="true"
+                                buttonText="{i18n>vrDocBrowse}" tooltip="{i18n>vrDocBrowse}"
+                                width="100%" uploadOnChange="false" multiple="false"
+                                enabled="{= !!${AdminSignupModel>/CurrentDocType} &amp;&amp; !${AdminSignupModel>/ProcessingActive} &amp;&amp; !${AdminSignupModel>/Submitting} }"
+                                change="onAdminFileSelect" typeMissmatch="onAdminFileTypeMismatch"
+                                fileType="jpg,jpeg,png,pdf"/>
+            </VBox>
+            <Text text="{AdminSignupModel>/DocumentError}" class="svErrText"
+                  visible="{= !!${AdminSignupModel>/DocumentError} }"/>
+            <List id="adminAttachmentTable" items="{AdminSignupModel>/Documents}" class="svFiles"
+                  showSeparators="None" showNoData="false" width="100%">
+                <CustomListItem>
+                    <HBox class="svFileRow" renderType="Bare" alignItems="Center">
+                        <BusyIndicator size="1.5rem" visible="{= !!${AdminSignupModel>isProcessing} }"/>
+                        <core:Icon src="sap-icon://document-text" class="svFileIcon"
+                                   visible="{= !${AdminSignupModel>isProcessing} }"/>
+                        <VBox class="svFileMeta" renderType="Bare">
+                            <Text text="{AdminSignupModel>FileName}" tooltip="{AdminSignupModel>FileName}"
+                                  wrapping="false" class="svFileName"/>
+                            <Text text="{path:'AdminSignupModel>size', formatter:'.Formatter.formatFileSize'}"
+                                  class="svFileSub" visible="{= !${AdminSignupModel>isProcessing} }"/>
+                        </VBox>
+                        <Link text="{i18n>vrDocView}" tooltip="{i18n>vrDocView}"
+                              class="tealTextLink svDocView"
+                              press="onAdminPreviewDoc" visible="{= !${AdminSignupModel>isProcessing} }"/>
+                        <Button icon="sap-icon://delete" tooltip="{i18n>vrDocRemove}"
+                                type="Transparent" class="svDocAction svRemoveBtn myUnifiedBtn"
+                                press="onAdminDeleteDoc" visible="{= !${AdminSignupModel>isProcessing} }"
+                                enabled="{= !${AdminSignupModel>/ProcessingActive} &amp;&amp; !${AdminSignupModel>/Submitting} }"/>
+                    </HBox>
+                </CustomListItem>
+            </List>
+            <Text text="{i18n>vrDocEmpty}" textAlign="Center" class="svEmpty"
+                  visible="{= !${AdminSignupModel>/HasDocuments} }"/>
+        </VBox>
 
-            <!-- Delete button – optionally disabled during processing -->
-            <Button
-                icon="sap-icon://delete"
-                press="onAdminDeleteDoc"
-                enabled="{= !${AdminSignupModel>isProcessing} }"
-                class="myUnifiedBtn"
-            />
-        </cells>
-    </ColumnListItem>
-</items>
-
-        </Table>
-        <!-- ACTIONS -->
-        <beginButton>
-            <Button
-                text="{i18n>register}"
-                tooltip="{i18n>register}"
-                press="onSubmitAdminSignup"
-                class="myUnifiedBtn sapUiSmallMargin"
-                width="120px"
-                enabled="{= !${AdminSignupModel>/ProcessingActive} }"
-            />
-        </beginButton>
-    </Dialog>
+        <HBox class="svConsent" renderType="Bare" alignItems="Start">
+            <CheckBox id="adminConsent" selected="{AdminSignupModel>/Consent}" select="onAdminConsentChange"
+                      valueState="{= ${AdminSignupModel>/ConsentError} ? 'Error' : 'None' }"
+                      ariaLabelledBy="vendorConsentText" tooltip="{i18n>vrConsentLabel}"/>
+            <FormattedText id="vendorConsentText" htmlText="{i18n>vrConsentHtml}" class="svConsentText"/>
+        </HBox>
+        <Text text="{AdminSignupModel>/ConsentError}" class="svErrText"
+              visible="{= !!${AdminSignupModel>/ConsentError} }"/>
+        <HBox class="svActions" renderType="Bare" justifyContent="End" wrap="Wrap">
+            <Button text="{i18n>vrBtnClear}" class="svBtn svBtnGhost" press="onClearAdminSignup"
+                    enabled="{= !${AdminSignupModel>/ProcessingActive} &amp;&amp; !${AdminSignupModel>/Submitting} }"/>
+            <Button id="adminRegisterButton" class="svBtn" type="Emphasized" press="onSubmitAdminSignup"
+                    text="{i18n>vrBtnRegister}"
+                    enabled="{= !${AdminSignupModel>/ProcessingActive} &amp;&amp; !${AdminSignupModel>/Submitting} }"/>
+        </HBox>
+    </VBox>
 </core:FragmentDefinition>

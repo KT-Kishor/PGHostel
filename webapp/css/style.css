@@ -11896,3 +11896,2054 @@ text-transform: none !important;
         text-align: center !important;
     }
 }
+
+/* ==================================================================
+   StayVriksha - Vendor registration (Hostel.view.xml "idVendor" page)
+   Keep tokens and control overrides inside the vendor body, not the
+   ScrollContainer that also contains the shared quicklinks footer.
+   ================================================================== */
+
+.svPage .svWrap {
+    --sv-teal-1: #00a7b5;
+    --sv-teal-2: #0092a0;
+    --sv-teal-dark: #007a86;
+    --sv-cyan: #12d3e8;
+    --sv-cyan-soft: #e3f8fb;
+    --sv-ink: #10252a;
+    --sv-muted: #4a6469;
+    --sv-paper: #fff;
+    --sv-page: #f2fafb;
+    --sv-line: #cfe9ee;
+    --sv-field: #f7fcfd;
+    --sv-field-line: #b4d0d6;
+    --sv-req: #c2185b;
+    --sv-error: #b3261e;
+    --sv-ok: #1b7f3b;
+    --sv-warn-bg: #fff6d6;
+    --sv-warn-line: #f1d575;
+    --sv-warn-ink: #5c4400;
+    --sv-grad: linear-gradient(180deg, var(--sv-teal-1), var(--sv-teal-2));
+    --sv-shadow: 0 4px 14px rgba(0, 110, 125, .18);
+    --sv-shadow-lg: 0 12px 40px rgba(0, 110, 125, .22);
+    --sv-font: Roboto, "Segoe UI", Arial, sans-serif;
+
+    /* Property type card geometry. Shared by the card and its fill overlay so the
+       two stay in step: an absolutely positioned overlay with inset:0 spans the
+       padding box, so its radius must be the border-box radius minus the border
+       width. Inheriting the border-box radius cut the corners in too far and let
+       the card's white background show through at the corners. */
+    --sv-tab-radius: 16px;
+    --sv-tab-border: 2px;
+
+    /* Single source of truth for the space around the vendor page. The same
+       value drives the horizontal gutter and the gap between sections, so the
+       outer margin always matches the vertical rhythm. It scales with the
+       viewport (clamped) rather than being a fixed value, so a small screen
+       does not end up with a 36px gutter. */
+    --sv-gutter: clamp(16px, 2.5vw, 36px);
+
+    width: 100%;
+    /* Full width: no max-width cap, so the page uses the whole viewport on a
+       wide desktop instead of leaving empty space at the sides. */
+    min-width: 0;
+    margin: 0 auto;
+    padding: 0 var(--sv-gutter) 40px;
+    gap: var(--sv-gutter);
+    background: var(--sv-page);
+    color: var(--sv-ink);
+    font-family: var(--sv-font);
+    font-size: 16px;
+    line-height: 1.6;
+}
+
+.svPage .svWrap,
+.svPage .svWrap *,
+.svPage .svWrap *::before,
+.svPage .svWrap *::after {
+    box-sizing: border-box;
+}
+
+.svPage .svWrap .sapMText,
+.svPage .svWrap .sapMTitle,
+.svPage .svWrap .sapMLabel,
+.svPage .svWrap .sapMLnk,
+.svPage .svWrap .sapMFormattedText {
+    color: inherit;
+    font-family: var(--sv-font);
+    font-size: inherit;
+    line-height: inherit;
+}
+
+.svPage .svWrap .sapMTitle {
+    height: auto;
+    margin: 0;
+    white-space: normal;
+    overflow-wrap: anywhere;
+}
+
+.svPage .svWrap .sapMFlexBox {
+    min-width: 0;
+}
+
+/* Bare HBoxes expose controls as grid items; inline flex sizing is ignored. */
+.svPage .svWrap .svFlow > *,
+.svPage .svWrap .svTabs > *,
+.svPage .svWrap .svPanel > *,
+.svPage .svWrap .svBranches > *,
+.svPage .svWrap .svBenefits > *,
+.svPage .svWrap .svRegCard > *,
+.svPage .svWrap .svSteps > *,
+.svPage .svWrap .svFormGrid > *,
+.svPage .svWrap .svPair > *,
+.svPage .svWrap .svPairWide > *,
+.svPage .svWrap .svNotice > *,
+.svPage .svWrap .svFileRow > *,
+.svPage .svWrap .svConsent > * {
+    min-width: 0 !important;
+    max-width: 100%;
+}
+
+.svPage .svWrap :focus-visible {
+    outline: 3px solid var(--sv-cyan);
+    outline-offset: 2px;
+}
+
+/* ---------------- shared cards and buttons ---------------- */
+
+.svPage .svWrap .svCard {
+    padding: clamp(22px, 4vw, 40px) clamp(14px, 3vw, 32px);
+    border-radius: 22px;
+    background: var(--sv-paper);
+    box-shadow: var(--sv-shadow);
+}
+
+.svPage .svWrap .svH2Row {
+    gap: 0 8px;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: center;
+    text-align: center;
+}
+
+.svPage .svWrap .svH2 {
+    color: var(--sv-ink);
+    font-size: clamp(26px, 4vw, 38px);
+    font-weight: 700;
+    line-height: 1.15;
+    text-align: center;
+}
+
+.svPage .svWrap .svAccent { color: var(--sv-teal-dark); }
+
+.svPage .svWrap .svSub {
+    display: block;
+    max-width: 62ch;
+    margin: 6px auto 24px;
+    color: var(--sv-muted);
+    text-align: center;
+}
+
+.svPage .svWrap .svErrText {
+    display: block;
+    margin-top: 4px;
+    color: var(--sv-error);
+    font-size: 13.5px;
+    overflow-wrap: anywhere;
+}
+
+.svPage .svWrap .svReqMark {
+    color: var(--sv-req);
+    font-size: 16px;
+    font-weight: 700;
+}
+
+.svPage .svWrap .svBtn {
+    display: inline-flex;
+    align-items: stretch;
+    justify-content: center;
+    height: auto;
+    min-height: 50px;
+    max-width: 100%;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    border-radius: 12px;
+    background: transparent;
+    cursor: pointer;
+    vertical-align: middle;
+}
+
+.svPage .svWrap .svBtn .sapMBtnInner {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    height: auto;
+    min-height: 50px;
+    padding: 12px 26px;
+    /* Override the earlier global emphasized-button border/radius rule. */
+    border: 0 !important;
+    border-radius: 12px !important;
+    background: linear-gradient(135deg, #00b7c7, #008b96) !important;
+    color: white !important;
+    box-shadow: 0 2px 8px rgba(0, 110, 125, .3);
+    font-family: var(--sv-font);
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 1.6;
+    text-shadow: none;
+    white-space: normal;
+    transition: filter .15s, transform .15s;
+}
+
+.svPage .svWrap .svBtn .sapMBtnContent,
+.svPage .svWrap .svTab .sapMBtnContent {
+    display: block;
+    height: auto;
+    min-width: 0;
+    max-width: 100%;
+    margin: 0 !important;
+    padding: 0 !important;
+    color: inherit !important;
+    font: inherit;
+    line-height: 1.6;
+    text-align: center;
+    white-space: normal;
+    overflow: visible;
+    text-overflow: clip;
+}
+
+.svPage .svWrap .svBtn .sapMBtnContent bdi,
+.svPage .svWrap .svTab .sapMBtnContent bdi {
+    color: inherit;
+    font: inherit;
+    white-space: normal;
+}
+
+.svPage .svWrap .svBtn .sapMBtnIcon {
+    position: static;
+    display: block;
+    float: none;
+    flex: none;
+    width: 20px;
+    height: 20px;
+    margin: 0;
+    color: inherit !important;
+    font-size: 18px;
+    line-height: 20px;
+}
+
+.svPage .svWrap .svBtnLight .sapMBtnInner {
+    background: var(--sv-paper) !important;
+    color: var(--sv-teal-dark) !important;
+}
+
+.svPage .svWrap .svBtnGhost .sapMBtnInner {
+    border: 2px solid var(--sv-teal-1) !important;
+    background: transparent !important;
+    color: var(--sv-teal-dark) !important;
+    box-shadow: none;
+}
+
+.svPage .svWrap .svBtn:not(:disabled):hover .sapMBtnInner {
+    filter: brightness(.96);
+    transform: translateY(-1px);
+}
+
+.svPage .svWrap .svBtn:disabled {
+    opacity: .55;
+    cursor: not-allowed;
+}
+
+
+/* ---------------- hero ---------------- */
+
+.svPage .svWrap .svHero { margin-top: 14px; }
+
+.svPage .svWrap .svHeroInner {
+    position: relative;
+    align-items: flex-start;
+    padding: clamp(26px, 5vw, 54px);
+    border-radius: 18px;
+    background: linear-gradient(135deg, var(--sv-teal-1), var(--sv-teal-2) 60%, #00798a);
+    color: #fff;
+    box-shadow: var(--sv-shadow);
+    overflow: hidden;
+}
+
+.svPage .svWrap .svHeroInner::after {
+    content: "";
+    position: absolute;
+    right: -60px;
+    top: -80px;
+    width: 300px;
+    height: 300px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, .08);
+    pointer-events: none;
+}
+
+.svPage .svWrap .svHeroInner > * {
+    position: relative;
+    z-index: 1;
+}
+
+.svPage .svWrap .svEyebrow {
+    display: block;
+    margin-bottom: 6px;
+    color: #d7fbff;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+}
+
+.svPage .svWrap .svHeroTitle {
+    /* Wide enough for the longer line, so the break lands where the copy
+       defines it instead of mid-sentence. */
+    max-width: 34ch;
+    margin: 0 0 10px;
+    color: #fff;
+    font-size: clamp(28px, 4.8vw, 46px);
+    font-weight: 700;
+    line-height: 1.12;
+    /* The heading copy carries its own line break (a real newline from the
+       bundle), which is only honoured with pre-line. */
+    white-space: pre-line;
+}
+
+.svPage .svWrap .svHeroTitle > span {
+    white-space: pre-line;
+}
+
+.svPage .svWrap .svHeroLead {
+    display: block;
+    max-width: 60ch;
+    margin-bottom: 20px;
+    color: #fff;
+    font-size: 18px;
+    opacity: .96;
+}
+
+.svPage .svWrap .svChips {
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 22px;
+}
+
+.svPage .svWrap .svChip {
+    padding: 5px 14px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, .2);
+    color: #fff;
+    font-size: 14.5px;
+    font-weight: 500;
+}
+
+/* ---------------- separate How it works section ---------------- */
+
+.svPage .svWrap .svHow { padding-bottom: 28px; }
+
+.svPage .svWrap .svFlow {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    align-items: stretch;
+    gap: 16px;
+    width: 100%;
+}
+
+.svPage .svWrap .svFlowStep {
+    position: relative;
+    align-items: center;
+    padding: 20px 16px;
+    border-radius: 16px;
+    background: var(--sv-cyan-soft);
+    text-align: center;
+}
+
+.svPage .svWrap .svFlowStep:not(:last-child)::after {
+    content: "\203A";
+    position: absolute;
+    right: -14px;
+    top: 50%;
+    z-index: 2;
+    color: var(--sv-teal-1);
+    font-size: 26px;
+    font-weight: 700;
+    transform: translateY(-50%);
+}
+
+.svPage .svWrap .svStepNum {
+    display: grid;
+    place-items: center;
+    width: 40px;
+    height: 40px;
+    min-height: 40px;
+    margin: 0 auto 10px;
+    border-radius: 50%;
+    background: var(--sv-grad);
+    color: #fff;
+    font-size: 18px;
+    font-weight: 700;
+    line-height: 40px;
+    text-align: center !important;
+}
+
+.svPage .svWrap .svStepTitle,
+.svPage .svWrap .svStepDesc {
+    display: block;
+    width: 100%;
+    text-align: center !important;
+}
+
+.svPage .svWrap .svStepTitle {
+    margin-bottom: 4px;
+    color: var(--sv-ink);
+    font-size: 17px;
+    font-weight: 700;
+}
+
+.svPage .svWrap .svStepDesc {
+    color: var(--sv-muted);
+    font-size: 14.5px;
+}
+
+/* ---------------- property type explorer ---------------- */
+
+.svPage .svWrap .svTabs {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    align-items: stretch;
+    /* Scales with the viewport like the page gutter, so the cards are spaced
+       out on a wide desktop without squeezing them on a small screen. */
+    gap: clamp(16px, 2.6vw, 44px);
+    width: 100%;
+    margin-bottom: 22px;
+}
+
+.svPage .svWrap .svTab {
+    display: flex;
+    align-items: stretch;
+    width: 100%;
+    height: auto;
+    min-height: 100px;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    border-radius: 16px;
+    background: transparent;
+    cursor: pointer;
+    transition: transform .45s cubic-bezier(.4, 0, .2, 1);
+}
+
+/* The active look is painted on an overlay layer instead of the button's own
+   background. A gradient can't be transitioned, and swapping it while the label
+   cross-fades left the text white on white for a moment. Fading an overlay keeps
+   the fill, the label colour and the icon in step. */
+.svPage .svWrap .svTab .sapMBtnInner {
+    position: relative;
+    /* Clips the fill to the padding-box corner radius. Without it the overlay's
+       radius is measured against the border box and pulls away from the corners. */
+    overflow: hidden;
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    height: 100%;
+    min-height: 100px;
+    padding: 14px 8px;
+    border: var(--sv-tab-border) solid var(--sv-line) !important;
+    border-radius: var(--sv-tab-radius) !important;
+    /* Unselected tab surface. Uses the field tint rather than --sv-paper, which
+       the registration card and document rows also rely on. */
+    background: var(--sv-field) !important;
+    color: var(--sv-ink) !important;
+    box-shadow: none;
+    font-family: var(--sv-font);
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 1.6;
+    text-shadow: none;
+    white-space: normal;
+    transition: border-color .45s cubic-bezier(.4, 0, .2, 1),
+                box-shadow .45s cubic-bezier(.4, 0, .2, 1);
+}
+
+/* The fill lives on ::after because UI5 reserves ::before on .sapMBtnInner for
+   its focus ring: it draws a 2px solid var(--sapContent_FocusColor) border there,
+   which merged with the fill and showed as a blue/white band inside the tab. */
+.svPage .svWrap .svTab .sapMBtnInner::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    /* The padding-box radius, so the fill meets the border without leaving a
+       sliver of the card's white background at the corners. */
+    border-radius: calc(var(--sv-tab-radius) - var(--sv-tab-border));
+    background: var(--sv-grad);
+    opacity: 0;
+    transition: opacity .45s cubic-bezier(.4, 0, .2, 1);
+}
+
+/* Keep a focus ring, but only for keyboard users and in the brand colour.
+   UI5 focuses the button root, so the ring has to hang off :focus-visible on
+   .svTab; .sapMBtnInner itself is never the focused element. */
+.svPage .svWrap .svTab .sapMBtnInner::before {
+    border: 0 !important;
+}
+
+.svPage .svWrap .svTab:focus-visible .sapMBtnInner::before {
+    content: "";
+    position: absolute;
+    box-sizing: border-box;
+    left: 1px;
+    top: 1px;
+    right: 1px;
+    bottom: 1px;
+    border: 2px solid var(--sv-teal-dark) !important;
+    border-radius: 14px;
+    pointer-events: none;
+}
+
+.svPage .svWrap .svTab .sapMBtnContent,
+.svPage .svWrap .svTab .sapMBtnIcon {
+    position: relative;
+    z-index: 1;
+}
+
+.svPage .svWrap .svTab .sapMBtnContent {
+    width: 100%;
+    float: none;
+}
+
+.svPage .svWrap .svTab .sapMBtnContent bdi {
+    transition: color .45s cubic-bezier(.4, 0, .2, 1);
+}
+
+.svPage .svWrap .svTab .sapMBtnIcon {
+    position: relative;
+    display: block;
+    float: none;
+    flex: 0 0 34px;
+    width: 34px !important;
+    height: 34px !important;
+    max-width: none;
+    max-height: none;
+    margin: 0 !important;
+    color: var(--sv-teal-1);
+    font-size: 34px;
+    line-height: 34px;
+    object-fit: contain;
+    /* The property type icons are SAP icon-font glyphs, so they are tinted with
+       color; no filter is needed. */
+    transition: color .45s cubic-bezier(.4, 0, .2, 1);
+}
+
+.svPage .svWrap .svTab:not(:disabled):hover {
+    transform: translateY(-2px);
+}
+
+.svPage .svWrap .svTab[data-vendor-selected="false"]:hover .sapMBtnInner {
+    border-color: var(--sv-teal-1) !important;
+}
+
+/* UI5's theme repaints a hovered transparent button's label and icon blue
+   (#0064d9). The vendor tab keeps its own teal so text, icon and border stay
+   in step with the unselected state. */
+.svPage .svWrap .svTab[data-vendor-selected="false"]:not(:disabled):hover .sapMBtnContent,
+.svPage .svWrap .svTab[data-vendor-selected="false"]:not(:disabled):hover .sapMBtnContent bdi,
+.svPage .svWrap .svTab[data-vendor-selected="false"]:not(:disabled):hover .sapMBtnIcon {
+    color: var(--sv-teal-1) !important;
+}
+
+
+.svPage .svWrap .svTab[data-vendor-selected="true"] .sapMBtnInner,
+.svPage .svWrap .svTab .sapMBtnInner.sapMToggleBtnPressed {
+    border-color: var(--sv-cyan) !important;
+    color: #fff !important;
+    box-shadow: var(--sv-shadow);
+}
+
+.svPage .svWrap .svTab[data-vendor-selected="true"] .sapMBtnInner::after,
+.svPage .svWrap .svTab .sapMBtnInner.sapMToggleBtnPressed::after {
+    opacity: 1;
+}
+
+.svPage .svWrap .svTab[data-vendor-selected="true"] .sapMBtnIcon,
+.svPage .svWrap .svTab .sapMToggleBtnPressed .sapMBtnIcon {
+    color: #fff;
+}
+
+/* The selected tab stays white while hovered, instead of the theme's blue. */
+.svPage .svWrap .svTab[data-vendor-selected="true"]:hover .sapMBtnContent,
+.svPage .svWrap .svTab[data-vendor-selected="true"]:hover .sapMBtnContent bdi,
+.svPage .svWrap .svTab[data-vendor-selected="true"]:hover .sapMBtnIcon {
+    color: #fff !important;
+}
+
+
+.svPage .svWrap .svPanel {
+    display: grid;
+    grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+    /* The tree column is centred as one block, the way the reference lays it out.
+       Its height stays fixed at the taller (single) variant so centring doesn't
+       re-position it when the tree is swapped. */
+    align-items: center;
+    gap: clamp(18px, 3vw, 36px);
+    padding: clamp(16px, 3vw, 30px);
+    border-radius: 18px;
+    background: var(--sv-cyan-soft);
+}
+
+/* Switching type or mode replaces the tree, and a type switch also replaces the
+   detail column. The controller adds .svSwapping (both) or .svSwappingTree (tree
+   only), so only what actually changed is faded in. Selecting the same type again
+   or flipping the mode leaves the right-hand column alone.
+   Opacity only: a translate here reads as the content jumping on every click. */
+.svPage .svWrap .svPanel.svSwapping .svTreeCol,
+.svPage .svWrap .svPanel.svSwapping .svDetail,
+.svPage .svWrap .svPanel.svSwappingTree .svTreeCol {
+    animation: svExplorerSwap .45s cubic-bezier(.4, 0, .2, 1) both;
+}
+
+@keyframes svExplorerSwap {
+    from { opacity: .35; }
+    to   { opacity: 1; }
+}
+
+.svPage .svWrap .svTreeCol {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 0;
+}
+
+/* One property / multiple properties toggle */
+
+.svPage .svWrap .svSeg {
+    display: inline-flex;
+    align-self: center;
+    align-items: center;
+    margin-bottom: 16px;
+    padding: 3px;
+    border: 1.5px solid var(--sv-line);
+    border-radius: 999px;
+    background: var(--sv-paper);
+}
+
+.svPage .svWrap .svSegBtn {
+    height: auto !important;
+    margin: 0;
+    padding: 0 !important;
+    border: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+}
+
+.svPage .svWrap .svSegBtn .sapMBtnInner {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: auto;
+    /* UI5's default inner height (1.625rem) leaves the pill floating inside the
+       slot, which reads as off-centre text. 2.125rem matches the reference. */
+    min-height: 2.125rem;
+    padding: 0 14px !important;
+    border: 0 !important;
+    border-radius: 999px !important;
+    background: transparent !important;
+    color: var(--sv-muted) !important;
+    font-family: var(--sv-font);
+    font-size: 13.5px;
+    font-weight: 700;
+    line-height: 1.6;
+    text-shadow: none;
+    box-shadow: none;
+}
+
+/* Same overlay trick as the type tabs: the gradient fades in instead of
+   swapping instantly while the label colour is still catching up. It uses
+   ::after because UI5 draws its focus ring on ::before. */
+.svPage .svWrap .svSegBtn .sapMBtnInner::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    /* The pill has no border, so border-box and padding-box radii are the same. */
+    border-radius: 999px;
+    background: var(--sv-grad);
+    opacity: 0;
+    transition: opacity .45s cubic-bezier(.4, 0, .2, 1);
+}
+
+/* Keyboard-only focus ring, in the brand colour instead of UI5's blue. */
+.svPage .svWrap .svSegBtn .sapMBtnInner::before {
+    border: 0 !important;
+}
+
+.svPage .svWrap .svSegBtn:focus-visible .sapMBtnInner::before {
+    content: "";
+    position: absolute;
+    box-sizing: border-box;
+    left: 1px;
+    top: 1px;
+    right: 1px;
+    bottom: 1px;
+    border: 2px solid var(--sv-teal-dark) !important;
+    border-radius: 999px;
+    pointer-events: none;
+}
+
+.svPage .svWrap .svSegBtn .sapMBtnContent {
+    position: relative;
+    z-index: 1;
+}
+
+.svPage .svWrap .svSegBtn .sapMBtnContent,
+.svPage .svWrap .svSegBtn .sapMBtnContent bdi {
+    float: none;
+    width: auto;
+    height: auto;
+    color: inherit !important;
+    font: inherit;
+    line-height: inherit;
+    text-align: center;
+}
+
+.svPage .svWrap .svSegBtn .sapMBtnContent bdi {
+    transition: color .45s cubic-bezier(.4, 0, .2, 1);
+}
+
+/* UI5 marks the active toggle on the inner span, not on the button root. */
+.svPage .svWrap .svSegBtn .sapMBtnInner.sapMToggleBtnPressed,
+.svPage .svWrap .svSegBtn .sapMBtnInner.sapMBtnEmphasized {
+    color: #fff !important;
+}
+
+.svPage .svWrap .svSegBtn .sapMBtnInner.sapMToggleBtnPressed::after,
+.svPage .svWrap .svSegBtn .sapMBtnInner.sapMBtnEmphasized::after {
+    opacity: 1;
+}
+
+.svPage .svWrap .svSegBtn .sapMBtnInner.sapMToggleBtnPressed .sapMBtnContent,
+.svPage .svWrap .svSegBtn .sapMBtnInner.sapMToggleBtnPressed .sapMBtnContent bdi,
+.svPage .svWrap .svSegBtn .sapMBtnInner.sapMBtnEmphasized .sapMBtnContent,
+.svPage .svWrap .svSegBtn .sapMBtnInner.sapMBtnEmphasized .sapMBtnContent bdi {
+    color: #fff !important;
+}
+
+/* The theme repaints a hovered transparent button blue; keep the brand teal. */
+.svPage .svWrap .svSegBtn:hover .sapMBtnContent,
+.svPage .svWrap .svSegBtn:hover .sapMBtnContent bdi {
+    color: var(--sv-teal-1) !important;
+}
+
+.svPage .svWrap .svSegBtn:hover .sapMBtnInner.sapMToggleBtnPressed .sapMBtnContent,
+.svPage .svWrap .svSegBtn:hover .sapMBtnInner.sapMToggleBtnPressed .sapMBtnContent bdi {
+    color: #fff !important;
+}
+
+
+.svPage .svWrap .svTree {
+    align-items: center;
+    width: 100%;
+}
+
+.svPage .svWrap .svNode {
+    display: block;
+    padding: 8px 14px;
+    border: 2px solid var(--sv-teal-1);
+    border-radius: 12px;
+    background: var(--sv-paper);
+    color: var(--sv-ink);
+    font-size: 14.5px;
+    font-weight: 700;
+    text-align: center;
+}
+
+.svPage .svWrap .svRoot {
+    border-color: var(--sv-cyan);
+    background: var(--sv-grad);
+    color: #fff;
+}
+
+.svPage .svWrap .svStem {
+    width: 2px;
+    height: 16px;
+    min-height: 16px;
+    background: var(--sv-teal-1);
+}
+
+.svPage .svWrap .svBranches {
+    position: relative;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 10px;
+    width: 100%;
+    padding-top: 16px;
+    transition: grid-template-columns .45s cubic-bezier(.4, 0, .2, 1);
+}
+
+.svPage .svWrap .svBranches::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 16.66%;
+    right: 16.66%;
+    height: 16px;
+    border: 2px solid var(--sv-teal-1);
+    border-bottom: 0;
+    border-radius: 10px 10px 0 0;
+}
+
+
+/* A single property gets one centred column and no connector line. The mode
+   marker is a CustomData attribute because UI5 applies static classes reliably
+   but ignores a bound class expression on the same control. */
+.svPage .svWrap .svBranches[data-vendor-single="true"] {
+    grid-template-columns: minmax(0, 260px);
+    justify-content: center;
+    padding-top: 0;
+}
+
+.svPage .svWrap .svBranches[data-vendor-single="true"]::before { display: none; }
+
+.svPage .svWrap .svBranch { gap: 6px; }
+
+.svPage .svWrap .svNode,
+.svPage .svWrap .svLeaf,
+.svPage .svWrap .svMore {
+    transition: border-color .45s cubic-bezier(.4, 0, .2, 1), background .45s cubic-bezier(.4, 0, .2, 1), color .45s cubic-bezier(.4, 0, .2, 1), padding .45s cubic-bezier(.4, 0, .2, 1);
+}
+
+.svPage .svWrap .svBranch .svNode {
+    width: 100%;
+    padding: 7px 8px;
+    font-size: 13.5px;
+}
+
+.svPage .svWrap .svLeaf {
+    display: block;
+    width: 100%;
+    padding: 5px 6px;
+    border: 1px solid var(--sv-line);
+    border-radius: 8px;
+    background: var(--sv-paper);
+    color: var(--sv-muted);
+    font-size: 12.5px;
+    text-align: center;
+}
+
+.svPage .svWrap .svLeaf + .svLeaf { margin-top: 6px; }
+
+.svPage .svWrap .svMore {
+    max-width: 100%;
+    margin-top: 12px;
+    padding: 4px 16px;
+    border: 2px dashed var(--sv-teal-1);
+    border-radius: 999px;
+    color: var(--sv-teal-dark);
+    font-size: 13.5px;
+    font-weight: 700;
+    text-align: center;
+}
+
+.svPage .svWrap .svH3 {
+    margin-bottom: 6px;
+    color: var(--sv-teal-dark);
+    font-size: 24px;
+    font-weight: 700;
+}
+
+.svPage .svWrap .svWho {
+    display: block;
+    margin-bottom: 12px;
+    color: var(--sv-teal-dark);
+    font-size: 13.5px;
+    font-weight: 700;
+}
+
+.svPage .svWrap .svBlurb {
+    display: block;
+    margin-bottom: 12px;
+    color: var(--sv-muted);
+}
+
+/* The two columns have different, content-driven heights: the description grows
+   with its text and the tree grows with its leaves. With the panel centred, any
+   change to either one re-positioned both, which is what made clicking a type
+   look like a jump. While the columns sit side by side, both heights are pinned:
+   the description reserves the tallest variant and the tree column a fixed
+   height, so the centred columns never move. Stacking below 1100px keeps the
+   column wide enough for that reservation to hold.
+   Measured: the tallest description in this range is 469px and the tallest tree
+   316px, at the 16px root size UI5 uses. */
+@media (min-width: 1100px) {
+    .svPage .svWrap .svDetail {
+        min-height: 30rem;
+    }
+
+    .svPage .svWrap .svTreeCol {
+        height: 21rem;
+        justify-content: flex-start;
+    }
+}
+
+
+.svPage .svWrap .svPath {
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 14px;
+}
+
+.svPage .svWrap .svPathItem {
+    padding: 3px 12px;
+    border: 1px solid var(--sv-line);
+    border-radius: 999px;
+    background: var(--sv-paper);
+    font-size: 13.5px;
+    font-weight: 500;
+}
+
+.svPage .svWrap .svPathItem + .svPathItem::before {
+    content: "\203A";
+    margin-right: 8px;
+    color: var(--sv-teal-1);
+    font-weight: 700;
+}
+
+.svPage .svWrap .svPoints {
+    width: 100%;
+    margin-bottom: 18px;
+}
+
+.svPage .svWrap .svPoint {
+    position: relative;
+    display: block;
+    margin: 7px 0;
+    padding-left: 32px;
+    color: var(--sv-ink);
+    font-size: 15.5px;
+}
+
+.svPage .svWrap .svPoint::before {
+    content: "\2713";
+    position: absolute;
+    left: 0;
+    top: 2px;
+    display: grid;
+    place-items: center;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: var(--sv-teal-1);
+    color: #fff;
+    font-size: 13px;
+    font-weight: 700;
+    line-height: 1;
+}
+
+.svPage .svWrap .svNote {
+    display: block;
+    margin-top: 18px;
+    color: var(--sv-muted);
+    font-size: 14.5px;
+    text-align: center;
+}
+
+/* ---------------- benefits ---------------- */
+
+.svPage .svWrap .svWhy {
+    padding: clamp(22px, 4vw, 40px) clamp(10px, 2vw, 24px) 14px;
+}
+
+.svPage .svWrap .svWhy .svH2Row { margin: 0 clamp(8px, 2vw, 16px); }
+.svPage .svWrap .svWhy .svSub { max-width: 60ch; margin-bottom: 22px; }
+
+.svPage .svWrap .svBenefits {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+}
+
+.svPage .svWrap .svBenefit {
+    align-items: center;
+    padding: 10px 16px 18px;
+    border-right: 1px solid var(--sv-line);
+    text-align: center;
+}
+
+.svPage .svWrap .svBenefit:last-child { border-right: 0; }
+
+.svPage .svWrap .svBenefitIcon {
+    display: block;
+    width: 64px;
+    height: 64px;
+    margin-bottom: 10px;
+    object-fit: contain;
+    transition: transform .2s;
+}
+
+.svPage .svWrap .svBenefit:hover .svBenefitIcon { transform: translateY(-4px); }
+
+.svPage .svWrap .svBenefitTitle {
+    width: 100%;
+    margin-bottom: 4px;
+    color: var(--sv-ink);
+    font-size: 20px;
+    font-weight: 700;
+    text-align: center;
+}
+
+.svPage .svWrap .svBenefitSub {
+    margin-bottom: 10px;
+    color: var(--sv-muted);
+    font-size: 15px;
+    text-align: center;
+}
+
+.svPage .svWrap .svPills {
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 6px;
+}
+
+.svPage .svWrap .svPill {
+    padding: 3px 11px;
+    border-radius: 999px;
+    background: var(--sv-cyan-soft);
+    color: var(--sv-teal-dark);
+    font-size: 13.5px;
+    font-weight: 500;
+    text-align: center;
+}
+
+.svPage .svWrap .svWhyCta {
+    justify-content: center;
+    padding: 10px 0 12px;
+    text-align: center;
+}
+
+/* ---------------- registration sidebar ---------------- */
+
+.svPage .svWrap .svReg { scroll-margin-top: 16px; }
+.svPage .svWrap .svReg .svSub { max-width: 56ch; margin-bottom: 22px; }
+
+.svPage .svWrap .svRegCard {
+    display: grid;
+    grid-template-columns: 340px minmax(0, 1fr);
+    align-items: stretch;
+    border-radius: 24px;
+    background: var(--sv-paper);
+    box-shadow: var(--sv-shadow-lg);
+    /* Clip rounded corners without creating a scroll ancestor for the sidebar. */
+    overflow: clip;
+}
+
+.svPage .svWrap .svSide {
+    position: relative;
+    padding: 34px 30px;
+    background: linear-gradient(170deg, var(--sv-teal-1), #007c8c);
+    color: #fff;
+}
+
+.svPage .svWrap .svSideInner {
+    position: sticky;
+    top: 20px;
+}
+
+.svPage .svWrap .svSideTitle {
+    margin-bottom: 4px;
+    color: #fff;
+    font-size: 22px;
+    font-weight: 700;
+}
+
+.svPage .svWrap .svSideSub {
+    display: block;
+    margin-bottom: 24px;
+    color: #fff;
+    font-size: 15px;
+    opacity: .95;
+}
+
+.svPage .svWrap .svProgress { width: 100%; margin-bottom: 22px; }
+.svPage .svWrap .svProgressLabel { color: #fff; font-size: 14px; font-weight: 500; }
+
+.svPage .svWrap .svBar.sapMPI {
+    height: 8px;
+    min-height: 8px;
+    margin: 6px 0 0;
+    padding: 0;
+    border: 0;
+    border-radius: 99px;
+    background: rgba(255, 255, 255, .28);
+    box-shadow: none;
+    overflow: hidden;
+}
+
+.svPage .svWrap .svBar .sapMPIBar,
+.svPage .svWrap .svBar .sapMPIBarRemaining {
+    height: 100%;
+    min-width: 0;
+    border: 0;
+    border-radius: 99px;
+    box-shadow: none;
+    /* UI5's default .sapMPIBar carries a -2px top margin so it overlaps the
+       indicator's border. Our track is borderless, so that margin lifted the
+       fill above the track and made it look off-centre. */
+    margin: 0;
+}
+
+.svPage .svWrap .svBar .sapMPIBar { background: #fff; }
+.svPage .svWrap .svBar .sapMPIBarRemaining { background: transparent; }
+.svPage .svWrap .svBar .sapMPIText { display: none; }
+
+.svPage .svWrap .svSteps { width: 100%; margin-bottom: 26px; }
+
+.svPage .svWrap .svStep {
+    position: relative;
+    align-items: flex-start;
+    gap: 14px;
+    padding-bottom: 22px;
+}
+
+.svPage .svWrap .svStep:last-child { padding-bottom: 0; }
+
+.svPage .svWrap .svStep:not(:last-child)::before {
+    content: "";
+    position: absolute;
+    left: 17px;
+    top: 38px;
+    bottom: 2px;
+    width: 2px;
+    background: rgba(255, 255, 255, .4);
+}
+
+.svPage .svWrap .svStepN {
+    display: grid;
+    place-items: center;
+    min-width: 36px !important;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: #fff;
+    color: var(--sv-teal-dark);
+    font-weight: 700;
+    line-height: 36px;
+    text-align: center !important;
+}
+
+.svPage .svWrap .svStepT { display: block; color: #fff; font-size: 16px; font-weight: 700; }
+.svPage .svWrap .svStepD { display: block; color: #fff; font-size: 14px; opacity: .93; }
+
+.svPage .svWrap .svHelp {
+    padding: 14px 16px;
+    border-radius: 14px;
+    background: rgba(255, 255, 255, .16);
+    color: #fff;
+    font-size: 14.5px;
+}
+
+/* The email link also carries .tealTextLink, whose colour is declared with
+   !important. This rule has a higher specificity, so white is restored here —
+   without !important the teal would win on the translucent teal panel. */
+.svPage .svWrap .svHelp .sapMLnk,
+.svPage .svWrap .svHelp .sapMLnk .sapMLnkText,
+.svPage .svWrap .svHelp .tealTextLink:hover,
+.svPage .svWrap .svHelp .tealTextLink:focus,
+.svPage .svWrap .svHelp .tealTextLink:active,
+.svPage .svWrap .svHelp .tealTextLink.sapMLnkActive {
+    color: #fff !important;
+    background-color: transparent !important;
+    font-weight: 700;
+    text-decoration: underline;
+    white-space: normal;
+    overflow-wrap: anywhere;
+}
+
+/* Hover feedback on a white link: dim slightly rather than change hue. */
+.svPage .svWrap .svHelp .sapMLnk:hover,
+.svPage .svWrap .svHelp .sapMLnk:focus {
+    opacity: .82;
+}
+
+.svPage .svWrap .svFormWrap { min-width: 0; }
+
+/* ---------------- inline AdminSignup form ---------------- */
+
+.svPage .svWrap .svForm {
+    width: 100%;
+    min-width: 0;
+    padding: clamp(20px, 3.5vw, 40px);
+}
+
+.svPage .svWrap .svSec { min-width: 0; margin-bottom: 30px; }
+
+.svPage .svWrap .svSecTitle {
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    margin-bottom: 16px;
+}
+
+.svPage .svWrap .svSecTitle .sapMTitle {
+    color: var(--sv-ink);
+    font-size: 19px;
+    font-weight: 700;
+    line-height: 1.35;
+}
+
+.svPage .svWrap .svSecIcon {
+    display: grid;
+    place-items: center;
+    min-width: 34px;
+    width: 34px;
+    height: 34px;
+    border-radius: 10px;
+    background: var(--sv-cyan-soft);
+    color: var(--sv-teal-dark);
+    font-size: 20px;
+    line-height: 34px;
+}
+
+.svPage .svWrap .svFormGrid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px 18px;
+}
+
+.svPage .svWrap .svSpan2 { grid-column: 1 / -1; }
+.svPage .svWrap .svFld { min-width: 0; }
+
+.svPage .svWrap .svFld > .sapMLabel {
+    display: block;
+    height: auto;
+    margin-bottom: 5px;
+    color: var(--sv-muted);
+    font-size: 14px;
+    font-weight: 500;
+    white-space: normal;
+}
+
+.svPage .svWrap .svForm .sapMLabelRequired::before,
+.svPage .svWrap .svForm .sapMLabelRequired .sapMLabelColonAndRequired::before {
+    color: var(--sv-req);
+    font-weight: 700;
+}
+
+.svPage .svWrap .svPair,
+.svPage .svWrap .svPairWide {
+    display: grid;
+    grid-template-columns: 96px minmax(0, 1fr);
+    align-items: start;
+    gap: 10px;
+    width: 100%;
+}
+
+.svPage .svWrap .svPairWide { grid-template-columns: 110px minmax(0, 1fr); }
+
+.svPage .svWrap .svInputShell {
+    position: relative;
+    display: block;
+    width: 100%;
+    min-width: 0;
+}
+
+.svPage .svWrap .svFieldIcon {
+    position: absolute;
+    left: 12px;
+    top: 23px;
+    z-index: 2;
+    width: 19px;
+    height: 19px;
+    color: var(--sv-teal-1);
+    font-size: 19px;
+    line-height: 19px;
+    text-align: center;
+    transform: translateY(-50%);
+    pointer-events: none;
+}
+
+.svPage .svWrap .svAddressShell .svFieldIcon {
+    top: 20px;
+    transform: none;
+}
+
+.svPage .svWrap .svForm .sapMInputBase {
+    display: block;
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+    height: 46px;
+    margin: 0;
+    padding: 0;
+    vertical-align: top;
+}
+
+.svPage .svWrap .svForm .sapMInputBaseContentWrapper {
+    height: 100%;
+    min-height: 46px;
+    border: 1.5px solid var(--sv-field-line);
+    border-radius: 12px;
+    background: var(--sv-field);
+    box-shadow: none;
+    transition: border-color .15s, box-shadow .15s, background .15s;
+}
+
+.svPage .svWrap .svForm .sapMInputBaseInner {
+    height: 100%;
+    min-width: 0;
+    padding: 0 12px;
+    border: 0;
+    border-radius: 10px;
+    background: transparent;
+    color: var(--sv-ink);
+    box-shadow: none;
+    font-family: var(--sv-font);
+    font-size: 15.5px;
+    line-height: 1.4;
+}
+
+.svPage .svWrap .svInputShell .sapMInputBaseInner { padding-left: 42px; }
+
+.svPage .svWrap .svForm .sapMInputBaseInner::placeholder {
+    color: var(--sv-muted);
+    font-style: normal;
+    opacity: .8;
+}
+
+.svPage .svWrap .svForm .sapMInputBaseIconContainer { height: 100%; }
+
+.svPage .svWrap .svForm .sapMInputBase .sapMInputBaseIconContainer .sapMInputBaseIcon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 100%;
+    margin: 0;
+    border-radius: 0 10px 10px 0;
+    background: transparent;
+    color: var(--sv-teal-dark);
+    line-height: 43px;
+}
+
+.svPage .svWrap .svForm .sapMSlt {
+    display: block;
+    width: 100%;
+    min-width: 0;
+    height: 46px;
+    margin: 0;
+    border: 1.5px solid var(--sv-field-line);
+    border-radius: 12px;
+    background: var(--sv-field);
+    box-shadow: none;
+    transition: border-color .15s, box-shadow .15s, background .15s;
+}
+
+.svPage .svWrap .svForm .sapMSltLabel {
+    height: 100%;
+    padding: 0 36px 0 12px;
+    border-radius: 10px;
+    background: transparent;
+    color: var(--sv-ink);
+    font-family: var(--sv-font);
+    font-size: 15.5px;
+    line-height: 43px;
+}
+
+.svPage .svWrap .svInputShell .sapMSltLabel { padding-left: 42px; }
+
+.svPage .svWrap .svForm .sapMSltArrow {
+    width: 34px;
+    height: 100%;
+    border-radius: 0 10px 10px 0;
+    background: transparent;
+    color: var(--sv-teal-dark);
+    line-height: 43px;
+}
+
+.svPage .svWrap .svForm .sapMTextArea {
+    height: auto;
+    min-height: 100px;
+}
+
+.svPage .svWrap .svForm .sapMTextArea .sapMInputBaseContentWrapper {
+    height: auto;
+    min-height: 100px;
+}
+
+.svPage .svWrap .svForm .sapMTextAreaInner {
+    height: auto;
+    min-height: 100px;
+    padding: 11px 12px;
+    line-height: 1.6;
+    resize: vertical;
+}
+
+/* The textarea keeps room for the leading field icon. UI5 collapses the padding
+   when the field enters an error state (its own state rule wins), which made the
+   typed text slide under the icon, so this is pinned. */
+.svPage .svWrap .svAddressShell .sapMTextAreaInner {
+    padding-left: 42px !important;
+    padding-top: 11px !important;
+}
+
+/* The same state rule can shrink a plain input's leading padding, so it is
+   pinned for the icon-bearing fields too. */
+.svPage .svWrap .svInputShell .sapMInputBaseInner {
+    padding-left: 42px !important;
+}
+
+.svPage .svWrap .svForm .sapMInputBaseContentWrapper:hover,
+.svPage .svWrap .svForm .sapMSlt:not(.sapMSltDisabled):hover {
+    border-color: var(--sv-teal-1);
+}
+
+/* Focus keeps the border highlight but drops the outer halo ring, which read as
+   a blue glow around every field. The border and the raised surface still mark
+   the focused field, so keyboard navigation stays visible. */
+.svPage .svWrap .svForm .sapMInputBaseContentWrapper:focus-within,
+.svPage .svWrap .svForm .sapMSlt:focus-within {
+    border-color: var(--sv-teal-1);
+    background: var(--sv-paper);
+}
+
+/* UI5 draws its focus frame on the wrapper's ::before pseudo-element as a 2px
+   solid var(--sapContent_FocusColor) (#0064d9) border, which is the blue frame
+   seen around a focused field. The field already shows focus through its teal
+   border, so the frame is removed. */
+.svPage .svWrap .svForm .sapMInputBaseContentWrapper::before,
+.svPage .svWrap .svForm .sapMInputBaseContentWrapper::after {
+    border: 0 !important;
+    content: none !important;
+}
+
+/* No halo ring anywhere in the form, including UI5's own focus shadow. The
+   error/warning/success states are excluded so their validation halo survives. */
+.svPage .svWrap .svForm .sapMInputBaseContentWrapper:not(.sapMInputBaseContentWrapperError):not(.sapMInputBaseContentWrapperWarning):not(.sapMInputBaseContentWrapperSuccess),
+.svPage .svWrap .svForm .sapMInputBaseContentWrapper:not(.sapMInputBaseContentWrapperError):not(.sapMInputBaseContentWrapperWarning):not(.sapMInputBaseContentWrapperSuccess):focus-within,
+.svPage .svWrap .svForm .sapMInputBaseContentWrapper.sapMInputBaseFocused:not(.sapMInputBaseContentWrapperError):not(.sapMInputBaseContentWrapperWarning):not(.sapMInputBaseContentWrapperSuccess),
+.svPage .svWrap .svForm .sapMSlt,
+.svPage .svWrap .svForm .sapMSlt:focus-within,
+.svPage .svWrap .svForm .sapMTextArea .sapMInputBaseContentWrapper,
+.svPage .svWrap .svForm .sapMDatePicker .sapMInputBaseContentWrapper {
+    box-shadow: none !important;
+}
+
+/* UI5 draws focus with an outline on the wrapper and the inner field. */
+.svPage .svWrap .svForm .sapMInputBaseContentWrapper,
+.svPage .svWrap .svForm .sapMSlt,
+.svPage .svWrap .svForm .sapMInputBaseInner,
+.svPage .svWrap .svForm .sapMTextAreaInner,
+.svPage .svWrap .svForm .sapMComboBoxBase,
+.svPage .svWrap .svForm .sapMInputBase:focus,
+.svPage .svWrap .svForm .sapMInputBase:focus-within {
+    outline: none !important;
+    outline-offset: 0 !important;
+}
+
+.svPage .svWrap .svForm .sapMInputBaseInner:focus-visible { outline: none; }
+
+.svPage .svWrap .svForm .sapMInputBaseContentWrapperError,
+.svPage .svWrap .svForm .sapMSlt.sapMSltError {
+    border-color: var(--sv-error) !important;
+    box-shadow: 0 0 0 3px rgba(179, 38, 30, .12);
+}
+
+.svPage .svWrap .svForm .sapMInputBaseContentWrapperWarning,
+.svPage .svWrap .svForm .sapMSlt.sapMSltWarning {
+    border-color: var(--sapField_WarningColor, #c77700) !important;
+}
+
+.svPage .svWrap .svForm .sapMInputBaseContentWrapperSuccess,
+.svPage .svWrap .svForm .sapMSlt.sapMSltSuccess {
+    border-color: var(--sv-ok) !important;
+}
+
+.svPage .svWrap .svForm .sapMInputBaseContentWrapperInformation,
+.svPage .svWrap .svForm .sapMSlt.sapMSltInformation {
+    border-color: var(--sv-teal-1) !important;
+}
+
+/* ---------------- documents ---------------- */
+
+.svPage .svWrap .svNotice {
+    display: grid;
+    grid-template-columns: 22px minmax(0, 1fr);
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 14px;
+    padding: 11px 16px;
+    border: 1px solid var(--sv-warn-line);
+    border-radius: 12px;
+    background: var(--sv-warn-bg);
+    color: var(--sv-warn-ink);
+    font-size: 14.5px;
+}
+
+.svPage .svWrap .svNoticeIcon { color: #e8590c; font-size: 22px; }
+
+.svPage .svWrap .svDrop {
+    position: relative;
+    isolation: isolate;
+    align-items: center;
+    gap: 6px;
+    margin-top: 12px;
+    padding: 26px 16px;
+    border: 2px dashed var(--sv-field-line);
+    border-radius: 16px;
+    background: var(--sv-field);
+    color: var(--sv-muted);
+    text-align: center;
+    cursor: pointer;
+    transition: border-color .15s, background .15s;
+}
+
+.svPage .svWrap .svDrop[data-vendor-disabled="false"]:hover,
+.svPage .svWrap .svDrop[data-vendor-disabled="false"].svDropOver {
+    border-color: var(--sv-teal-1);
+}
+
+.svPage .svWrap .svDrop[data-vendor-disabled="false"].svDropOver {
+    background: var(--sv-cyan-soft);
+}
+
+.svPage .svWrap .svDrop[data-vendor-disabled="true"] {
+    opacity: .55;
+    cursor: not-allowed;
+}
+
+.svPage .svWrap .svDrop[data-vendor-disabled="true"] .svUploader { pointer-events: none; }
+
+.svPage .svWrap .svDrop:focus-within {
+    outline: 3px solid var(--sv-cyan);
+    outline-offset: 2px;
+}
+
+.svPage .svWrap .svDropIcon {
+    width: 38px;
+    height: 38px;
+    color: var(--sv-teal-1);
+    font-size: 38px;
+    line-height: 38px;
+}
+
+.svPage .svWrap .svDropTitle {
+    display: block;
+    color: var(--sv-ink);
+    font-weight: 700;
+    text-align: center;
+}
+
+.svPage .svWrap .svDropSub { display: block; color: var(--sv-muted); text-align: center; }
+
+/* Keep the native uploader focusable and let its file input cover the dropzone. */
+.svPage .svWrap .svUploader {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    display: block;
+    width: 100% !important;
+    height: 100% !important;
+    margin: 0;
+    opacity: 0;
+    cursor: inherit;
+}
+
+.svPage .svWrap .svUploader form,
+.svPage .svWrap .svUploader form > div,
+.svPage .svWrap .svUploader .sapUiFupGroup,
+.svPage .svWrap .svUploader .sapUiFupGroup > div,
+.svPage .svWrap .svUploader .sapUiFupGroup > div > div:last-child,
+.svPage .svWrap .svUploader .sapMBtn,
+.svPage .svWrap .svUploader .sapMBtnInner {
+    width: 100% !important;
+    height: 100% !important;
+    min-height: 0;
+    margin: 0;
+    padding: 0;
+}
+
+.svPage .svWrap .svUploader .sapUiFupGroup,
+.svPage .svWrap .svUploader .sapUiFupGroup > div,
+.svPage .svWrap .svUploader .sapUiFupGroup > div > div:last-child {
+    display: block;
+}
+
+.svPage .svWrap .svUploader .sapUiFupInputMask,
+.svPage .svWrap .svUploader input[type="file"] {
+    position: absolute;
+    inset: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    margin: 0;
+    cursor: inherit;
+}
+
+.svPage .svWrap .svFiles {
+    width: 100%;
+    margin-top: 14px;
+    border: 0;
+    background: transparent;
+}
+
+.svPage .svWrap .svFiles .sapMListUl {
+    display: grid;
+    gap: 10px;
+    margin: 0;
+    padding: 0;
+    background: transparent;
+    list-style: none;
+}
+
+.svPage .svWrap .svFiles .sapMLIB {
+    padding: 0;
+    border: 0;
+    background: transparent;
+}
+
+.svPage .svWrap .svFiles .sapMLIBContent { width: 100%; min-width: 0; }
+
+.svPage .svWrap .svFileRow {
+    display: grid;
+    grid-template-columns: 38px minmax(0, 1fr) auto auto;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    padding: 10px 14px;
+    border: 1.5px solid var(--sv-line);
+    border-radius: 12px;
+    background: var(--sv-paper);
+}
+
+.svPage .svWrap .svFileIcon {
+    display: grid;
+    place-items: center;
+    width: 38px;
+    height: 38px;
+    border-radius: 10px;
+    background: var(--sv-cyan-soft);
+    color: var(--sv-teal-dark);
+    font-size: 20px;
+    line-height: 38px;
+}
+
+.svPage .svWrap .svFileRow > .sapMBusyIndicator { justify-self: center; }
+.svPage .svWrap .svFileMeta { grid-column: 2; min-width: 0; }
+
+.svPage .svWrap .svFileName {
+    display: block;
+    width: 100%;
+    color: var(--sv-ink);
+    font-size: 15px;
+    font-weight: 700;
+    overflow-wrap: anywhere;
+}
+
+.svPage .svWrap .svFileSub {
+    display: block;
+    width: 100%;
+    color: var(--sv-muted);
+    font-size: 13px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.svPage .svWrap .svDocAction {
+    height: auto;
+    min-height: 36px;
+    padding: 0;
+    border-radius: 6px;
+}
+
+.svPage .svWrap .svDocAction .sapMBtnInner {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: auto;
+    min-height: 36px;
+    padding: 4px 6px;
+    border: 0 !important;
+    border-radius: 6px !important;
+    background: transparent !important;
+    color: var(--sv-teal-dark) !important;
+    box-shadow: none;
+    font-family: var(--sv-font);
+    font-size: 15px;
+    font-weight: 700;
+    text-shadow: none;
+}
+
+.svPage .svWrap .svDocAction .sapMBtnContent {
+    height: auto;
+    padding: 0;
+    color: inherit !important;
+    font: inherit;
+    line-height: 1.6;
+    text-decoration: underline;
+    white-space: normal;
+}
+
+.svPage .svWrap .svRemoveBtn .sapMBtnInner { color: var(--sv-error) !important; }
+
+/* The View action is a link carrying the app's own .tealTextLink class, which
+   already defines the teal colour for rest, hover, focus and active states. Only
+   the layout inside the document row is added here, so those colours are left
+   alone. */
+.svPage .svWrap .svFileRow .svDocView {
+    grid-column: 3;
+    align-self: center;
+    justify-self: end;
+    padding: 4px 2px;
+    /* Extra breathing room between the View link and the delete button; the row's
+       grid gap alone left them 12px apart. */
+    margin-right: 10px;
+    font-family: var(--sv-font);
+    font-size: 15px;
+    font-weight: 700;
+    line-height: 1.6;
+    text-decoration: underline;
+}
+
+/* The delete action is an icon-only button carrying the app's .myUnifiedBtn
+   fill. It needs a more specific selector than .svDocAction, which pins a
+   transparent background and the teal text colour with !important. */
+.svPage .svWrap .svFileRow .svRemoveBtn.myUnifiedBtn .sapMBtnInner {
+    min-width: 38px;
+    padding: 0 10px;
+    background: linear-gradient(135deg, #00b7c7, #008b96) !important;
+    border-radius: 8px !important;
+    color: #fff !important;
+}
+
+.svPage .svWrap .svFileRow .svRemoveBtn.myUnifiedBtn .sapMBtnIcon {
+    display: inline-block;
+    margin: 0;
+    color: #fff !important;
+    font-size: 18px;
+    line-height: 1;
+}
+
+.svPage .svWrap .svFileRow .svRemoveBtn.myUnifiedBtn:not(:disabled):hover .sapMBtnInner {
+    background: linear-gradient(135deg, #28c2d0, #14aab7) !important;
+}
+
+.svPage .svWrap .svFileRow .svRemoveBtn.myUnifiedBtn:not(:disabled):active .sapMBtnInner {
+    background: linear-gradient(135deg, #009aa8, #007783) !important;
+}
+
+.svPage .svWrap .svFileRow .svRemoveBtn.myUnifiedBtn:disabled .sapMBtnInner {
+    opacity: .5;
+    cursor: not-allowed;
+}
+
+.svPage .svWrap .svEmpty {
+    display: block;
+    margin-top: 14px;
+    color: var(--sv-muted);
+    font-size: 14.5px;
+    text-align: center;
+}
+
+/* ---------------- consent and actions ---------------- */
+
+.svPage .svWrap .svConsent {
+    display: grid;
+    grid-template-columns: 20px minmax(0, 1fr);
+    align-items: start;
+    gap: 10px;
+    margin-top: 4px;
+    padding: 14px 16px;
+    border-radius: 12px;
+    background: var(--sv-cyan-soft);
+    font-size: 15px;
+}
+
+.svPage .svWrap .svConsent .sapMCb {
+    min-width: 20px;
+    width: 20px;
+    height: 20px;
+    margin: 3px 0 0;
+    padding: 0;
+    line-height: 20px;
+}
+
+.svPage .svWrap .svConsent .sapMCbBg {
+    left: 0;
+    top: 0;
+    width: 20px;
+    height: 20px;
+    border: 1.5px solid var(--sv-field-line) !important;
+    border-radius: 4px;
+    background: var(--sv-paper) !important;
+}
+
+/* UI5's theme repaints the box with its own blue palette on hover and active
+   (#e3f0ff / #0064d9), which made the consent checkbox look washed out and
+   transparent the moment the pointer touched it. That theme stylesheet is
+   cross-origin, so it cannot be inspected from the page and its declarations
+   win; the teal is therefore pinned with !important for every state. */
+.svPage .svWrap .svConsent .sapMCb:hover .sapMCbBg,
+.svPage .svWrap .svConsent .sapMCbBg:hover,
+.svPage .svWrap .svConsent .sapMCb.sapMCbActive .sapMCbBg,
+.svPage .svWrap .svConsent .sapMCbBg:active {
+    border-color: var(--sv-teal-1) !important;
+    background: var(--sv-paper) !important;
+}
+
+.svPage .svWrap .svConsent .sapMCbBg.sapMCbMarkChecked,
+.svPage .svWrap .svConsent .sapMCb:hover .sapMCbBg.sapMCbMarkChecked,
+.svPage .svWrap .svConsent .sapMCbBg.sapMCbMarkChecked:hover,
+.svPage .svWrap .svConsent .sapMCb.sapMCbActive .sapMCbBg.sapMCbMarkChecked,
+.svPage .svWrap .svConsent .sapMCbBg.sapMCbMarkChecked:active {
+    border-color: var(--sv-teal-1) !important;
+    background: var(--sv-teal-1) !important;
+}
+
+.svPage .svWrap .svConsent .sapMCbMarkChecked::before {
+    color: #fff !important;
+    font-size: 14px;
+    line-height: 17px;
+}
+
+.svPage .svWrap .svConsent .sapMCbErr .sapMCbBg { border-color: var(--sv-error); }
+.svPage .svWrap .svConsent:has(.sapMCbErr) { outline: 2px solid var(--sv-error); }
+
+.svPage .svWrap .svConsentText {
+    min-width: 0;
+    color: var(--sv-ink);
+    font-size: 15px;
+    overflow-wrap: anywhere;
+}
+
+.svPage .svWrap .svConsentText a {
+    color: var(--sv-teal-dark);
+    text-decoration: underline;
+    text-underline-offset: .15em;
+}
+
+/* The consent links live inside FormattedText, so they only ever carry UI5's
+   .sapMLnk class. Its theme turns them blue on hover (#0064d9) and white on
+   focus, which is invisible on this pale background. They are pinned to the
+   same teal palette as .tealTextLink. */
+.svPage .svWrap .svConsentText a,
+.svPage .svWrap .svConsentText a.sapMLnk,
+.svPage .svWrap .svConsentText a .sapMLnkText {
+    color: #008b96 !important;
+    background-color: transparent !important;
+}
+
+.svPage .svWrap .svConsentText a:hover,
+.svPage .svWrap .svConsentText a:focus,
+.svPage .svWrap .svConsentText a:focus-visible,
+.svPage .svWrap .svConsentText a:active,
+.svPage .svWrap .svConsentText a.sapMLnkActive,
+.svPage .svWrap .svConsentText a.sapMLnkActive .sapMLnkText {
+    color: #006d75 !important;
+    background-color: transparent !important;
+    text-decoration: underline;
+}
+
+.svPage .svWrap .svActions {
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 22px;
+}
+
+.svPage .svWrap .svActions .svBtn { min-width: 150px; }
+
+/* ---------------- success ---------------- */
+
+.svPage .svWrap .svSuccess {
+    align-items: center;
+    padding: 70px 24px;
+    text-align: center;
+}
+
+.svPage .svWrap .svSuccessIcon {
+    display: grid;
+    place-items: center;
+    width: 84px;
+    height: 84px;
+    margin: 0 auto 16px;
+    border-radius: 50%;
+    background: var(--sv-cyan-soft);
+    color: var(--sv-ok);
+    font-size: 44px;
+    line-height: 84px;
+}
+
+.svPage .svWrap .svSuccessTitle {
+    margin-bottom: 8px;
+    color: var(--sv-teal-dark);
+    font-size: 26px;
+    font-weight: 700;
+    text-align: center;
+}
+
+    .svPage .svWrap .svSuccessText {
+    display: block;
+    max-width: 52ch;
+    margin: 0 auto 20px;
+    color: var(--sv-muted);
+    text-align: center;
+    /* The confirmation message carries its own line breaks. */
+    white-space: pre-line;
+    }
+
+/* ---------------- responsive ---------------- */
+
+@media (max-width: 1100px) {
+    .svPage .svWrap .svBenefits {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        row-gap: 8px;
+    }
+
+    .svPage .svWrap .svBenefit:nth-child(3) { border-right: 0; }
+}
+
+@media (max-width: 960px) {
+    .svPage .svWrap .svRegCard { grid-template-columns: minmax(0, 1fr); }
+    .svPage .svWrap .svSide { padding: 24px 22px; }
+    .svPage .svWrap .svSideInner { position: static; }
+
+    .svPage .svWrap .svSteps {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 12px;
+    }
+
+    .svPage .svWrap .svStep {
+        flex-direction: column;
+        gap: 8px;
+        padding-bottom: 0;
+    }
+
+    .svPage .svWrap .svStep::before { display: none; }
+    .svPage .svWrap .svFlow { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .svPage .svWrap .svFlowStep::after { display: none; }
+}
+
+@media (max-width: 900px) {
+    .svPage .svWrap .svTabs { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+
+/* Stack the explorer below the reserved-height range so the pinned heights above
+   never have to grow with the text. */
+@media (max-width: 1099px) {
+    .svPage .svWrap .svPanel { grid-template-columns: minmax(0, 1fr); }
+}
+
+
+@media (max-width: 720px) {
+    .svPage .svWrap .svBenefits {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 12px;
+    }
+
+    .svPage .svWrap .svBenefit,
+    .svPage .svWrap .svBenefit:nth-child(3),
+    .svPage .svWrap .svBenefit:last-child {
+        padding: 16px 10px;
+        border: 1.5px solid var(--sv-line);
+        border-radius: 16px;
+    }
+
+    .svPage .svWrap .svBenefit:last-child { grid-column: 1 / -1; }
+    .svPage .svWrap .svFormGrid { grid-template-columns: minmax(0, 1fr); }
+}
+
+@media (max-width: 520px) {
+    .svPage .svWrap .svTabs { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+
+    .svPage .svWrap .svFlow,
+    .svPage .svWrap .svBranches,
+    .svPage .svWrap .svBranches[data-vendor-single="true"],
+    .svPage .svWrap .svBenefits,
+    .svPage .svWrap .svSteps {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .svPage .svWrap .svStem,
+    .svPage .svWrap .svBranches::before { display: none; }
+
+    .svPage .svWrap .svStep { flex-direction: row; }
+    .svPage .svWrap .svFileMeta { grid-column: 2 / -1; }
+    .svPage .svWrap .svFileRow .svDocAction,
+    .svPage .svWrap .svFileRow .svDocView { grid-row: 2; grid-column: 3; }
+    .svPage .svWrap .svFileRow .svRemoveBtn { grid-column: 4; }
+
+    .svPage .svWrap .svActions .svBtn,
+    .svPage .svWrap .svHeroInner .svBtn { width: 100%; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .svPage .svWrap *,
+    .svPage .svWrap *::before,
+    .svPage .svWrap *::after {
+        transition: none !important;
+        animation: none !important;
+        scroll-behavior: auto !important;
+    }
+
+    .svPage .svWrap .svBtn .sapMBtnInner,
+    .svPage .svWrap .svTab,
+    .svPage .svWrap .svBenefitIcon {
+        transform: none !important;
+    }
+}
+
+/* ==================================================================
+   Vendor form dropdown popups
+   A Select/ComboBox opens its list into the static area, outside the view,
+   so it cannot be reached from .svPage and does not inherit its custom
+   properties. While the vendor tab is open the controller puts .svVendorScope
+   on <body>, which scopes these rules (and the token declarations they need)
+   to the vendor page without affecting the rest of the app.
+   ================================================================== */
+
+body.svVendorScope {
+    --svteal-1: #00a7b5;
+    --svteal-dark: #007a86;
+    --svteal-soft: #e3f8fb;
+    --svteal-ink: #10252a;
+}
+
+body.svVendorScope .sapMSltPicker .sapMSelectListItem {
+    color: var(--svteal-ink);
+    font-family: Roboto, "Segoe UI", Arial, sans-serif;
+    font-size: 15px;
+}
+
+/* The selected row used UI5's blue selection colours (#ebf8ff / #0064d9). */
+body.svVendorScope .sapMSltPicker .sapMSelectListItemBaseSelected,
+body.svVendorScope .sapMSltPicker .sapMSelectListItemBaseSelected.sapMSelectListItemBaseHoverable:hover {
+    background: var(--svteal-soft) !important;
+    border-color: var(--svteal-1) !important;
+    color: var(--svteal-dark) !important;
+    font-weight: 700;
+}
+
+body.svVendorScope .sapMSltPicker .sapMSelectListItemBaseHoverable:hover {
+    background: #eefafd !important;
+}
+
+/* Keep the picker's own focus frame in the brand colour rather than blue. */
+body.svVendorScope .sapMSltPicker .sapMSelectListItemBase::before,
+body.svVendorScope .sapMSltPicker .sapMSelectListItemBase::after {
+    border-color: var(--svteal-1);
+}
+
+body.svVendorScope .sapMSltPicker .sapMSelectListItemBase:focus,
+body.svVendorScope .sapMSltPicker .sapMSelectListItemBase:focus-visible,
+body.svVendorScope .sapMSltPicker .sapMSelectList:focus {
+    outline-color: var(--svteal-dark) !important;
+}

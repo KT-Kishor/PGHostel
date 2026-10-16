@@ -1,0 +1,83 @@
+<core:FragmentDefinition
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core">
+
+    <VBox class="svCard svPtypes" renderType="Bare">
+        <HBox justifyContent="Center" wrap="Wrap" renderType="Bare" class="svH2Row">
+            <Text text="{i18n>vrPtTitle}"       class="svH2"/>
+            <Text text="{i18n>vrPtTitleAccent}" class="svH2 svAccent"/>
+        </HBox>
+        <Text text="{i18n>vrPtSub}" textAlign="Center" class="svSub"/>
+        <MessageStrip text="{pt>/loadError}" type="Error" showIcon="true" visible="{= !!${pt>/loadError} }"/>
+
+        <HBox id="vendorTypeTabs" class="svTabs" renderType="Bare" width="100%" items="{path:'pt>/types', templateShareable:false}">
+            <ToggleButton text="{pt>id}"
+                          icon="{pt>icon}"
+                          tooltip="{pt>id}"
+                          width="100%"
+                          pressed="{= ${pt>id} === ${ptState>/selectedId} }"
+                          type="Transparent"
+                          class="svTab"
+                          press=".onSelectPropertyType">
+                <customData>
+                    <core:CustomData key="vendor-selected" writeToDom="true"
+                                     value="{= ${pt>id} === ${ptState>/selectedId} ? 'true' : 'false' }"/>
+                </customData>
+            </ToggleButton>
+        </HBox>
+
+        <HBox id="vendorTypePanel" class="svPanel" renderType="Bare">
+            <VBox class="svTreeCol" renderType="Bare">
+
+                <!-- One property / multiple properties. Each type starts on its
+                     own default (see defaultMode in vendorPropertyTypes.json). -->
+                <HBox id="vendorModeToggle" class="svSeg" renderType="Bare" justifyContent="Center">
+                    <ToggleButton text="{i18n>vrPtSegSingle}"
+                                  type="Transparent"
+                                  class="svSegBtn"
+                                  pressed="{= ${ptState>/mode} === 'single' }"
+                                  press=".onModeSingle"/>
+                    <ToggleButton text="{i18n>vrPtSegMulti}"
+                                  type="Transparent"
+                                  class="svSegBtn"
+                                  pressed="{= ${ptState>/mode} === 'multi' }"
+                                  press=".onModeMulti"/>
+                </HBox>
+
+                <VBox class="svTree" renderType="Bare" alignItems="Center">
+                    <Text text="{i18n>vrPtRootNode}" textAlign="Center" class="svNode svRoot"/>
+                    <VBox class="svStem" renderType="Bare" width="2px" height="16px"/>
+                    <HBox class="svBranches" renderType="Bare" width="100%"
+                          items="{path:'ptState>/nodes', templateShareable:false}">
+                        <customData>
+                            <core:CustomData key="vendor-single" writeToDom="true"
+                                             value="{= ${ptState>/isSingle} ? 'true' : 'false' }"/>
+                        </customData>
+                        <VBox class="svBranch" renderType="Bare">
+                            <Text text="{ptState>name}" textAlign="Center" width="100%" class="svNode"/>
+                            <VBox renderType="Bare" width="100%" items="{path:'ptState>leaves', templateShareable:false}">
+                                <Text text="{ptState>}" textAlign="Center" width="100%" class="svLeaf"/>
+                            </VBox>
+                        </VBox>
+                    </HBox>
+                    <Text text="{ptState>/more}" textAlign="Center" class="svMore"/>
+                </VBox>
+            </VBox>
+
+            <VBox class="svDetail" renderType="Bare" alignItems="Start">
+                <Title text="{ptState>/name}" level="H3" wrapping="true" class="svH3"/>
+                <Text text="{ptState>/who}" class="svWho"/>
+                <Text text="{ptState>/blurb}" class="svBlurb"/>
+                <HBox class="svPath" wrap="Wrap" renderType="Bare" items="{path:'ptState>/path', templateShareable:false}">
+                    <Text text="{ptState>}" class="svPathItem"/>
+                </HBox>
+                <VBox class="svPoints" renderType="Bare" items="{path:'ptState>/points', templateShareable:false}">
+                    <Text text="{ptState>}" class="svPoint"/>
+                </VBox>
+                <Button id="ptCta" text="{ptState>/ctaText}" class="svBtn" type="Emphasized" press=".onPtCtaPress"/>
+            </VBox>
+        </HBox>
+
+        <Text text="{i18n>vrPtNote}" textAlign="Center" class="svNote"/>
+    </VBox>
+</core:FragmentDefinition>
