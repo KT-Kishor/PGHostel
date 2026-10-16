@@ -10874,6 +10874,7 @@ text-transform: none !important;
 /* Base Button Styling (Unselected state) */
 .stayTypeButton {
     background-color: #ffffff !important;
+
     border: 1px solid #e5e7eb !important;
     border-radius: 16px !important;
     color: #111827 !important;
@@ -10903,7 +10904,7 @@ text-transform: none !important;
     font-size: 1.75rem !important;
     margin-right: 0 !important;
     margin-bottom: 0.75rem !important;
-    color: #00bcd4 !important; /* Teal icon color */
+    color: #008b96 !important; /* Teal icon color */
     display: block !important;
 }
 
@@ -10939,7 +10940,7 @@ text-transform: none !important;
 /* Selected / Active State (Cyan Card look) */
 .stayTypeButton.selected-stay-btn,
 .stayTypeButton.sapMBtnActive {
-    background-color: #00bcd4 !important;
+    background: linear-gradient(135deg, #00b7c7, #008b96) !important;
     border-color: #00bcd4 !important;
     box-shadow: 0 10px 15px -3px rgba(0, 188, 212, 0.3);
 }
@@ -10953,11 +10954,10 @@ text-transform: none !important;
 }
 /* Container Layout */
 .stayDetailsContainer {
-    background-color: #e6f7f9;
     border-radius: 20px;
-    padding: 2.5rem;
     margin-top: 1.5rem;
-    width: 100%;
+    padding: 3.5rem 1rem  ;
+    background-color: #e6f7f9;
 }
 
 /* ================= LEFT PREVIEW CARD ================= */
@@ -11776,5 +11776,84 @@ text-transform: none !important;
 
     .serviceApartmentsBtn .sapMBtnIcon {
         flex-shrink: 0 !important;
+    }
+}
+/* Main Banner Container */
+.listPropertyBanner {
+    background: linear-gradient(135deg, #00b7c7, #008b96) !important;
+    border-radius: 20px !important;
+    padding: 40px 50px !important;
+    box-sizing: border-box;
+    box-shadow: 0 10px 30px rgba(0, 139, 150, 0.2);
+    width: calc(100% - 2rem) !important;
+    margin: 2rem auto !important;
+}
+
+/* Banner Title Styles */
+.bannerTitle {
+    font-size: 2.2rem !important;
+    font-weight: 800 !important;
+    color: #ffffff !important;
+    margin-bottom: 8px !important;
+    line-height: 1.2 !important;
+    white-space: normal !important;
+    word-break: break-word !important;
+}
+
+/* Banner Subtitle Styles */
+.bannerSubtitle {
+    font-size: 1.05rem !important;
+    color: #e0f2f1 !important;
+    line-height: 1.5 !important;
+}
+
+/* Register Button Styling */
+.btnRegister .sapMBtnInner {
+    background-color: #ffffff !important;
+    border-color: #ffffff !important;
+    color: #008b96 !important;
+    padding: 12px 24px !important;
+    height: 50px !important;
+    border-radius: 12px !important;
+    font-weight: 700 !important;
+    font-size: 1rem !important;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s ease, background-color 0.2s ease;
+}
+
+.btnRegister:hover .sapMBtnInner {
+    background-color: #f8fafc !important;
+}
+
+/* ==========================================
+   RESPONSIVE MEDIA QUERY (Tablet & Mobile)
+   ========================================== */
+@media (max-width: 850px) {
+    .listPropertyBanner {
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        padding: 35px 25px !important;
+    }
+
+    .bannerContent {
+        width: 100% !important;
+        margin-bottom: 20px !important;
+    }
+
+    .bannerTitle {
+        font-size: 1.75rem !important;
+    }
+
+    .bannerAction {
+        width: 100% !important;
+    }
+
+    .btnRegister {
+        width: 100% !important;
+    }
+    
+    .btnRegister .sapMBtnInner {
+        width: 100% !important;
+        text-align: center !important;
     }
 }

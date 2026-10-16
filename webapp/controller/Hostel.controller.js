@@ -23,7 +23,7 @@ sap.ui.define([
           blurb: "Paying guest accommodation with rooms and beds for people who need a place for longer.",
           best: ["Students", "Working professionals", "Longer stays", "Relocating"],
           see: ["Rooms and beds", "Amenities included", "Starting price and deposit details", "House rules"] },
-        { id: "Service Apartments", badge: "Service Apartments", icon: "sap-icon://addresses",
+        { id: "Service Apartments", badge: "Service Apartments", icon: "sap-icon://building",
           blurb: "Apartment-style stays with the comfort of home, ideal for families, groups and longer visits.",
           best: ["Families", "Groups", "Longer visits", "Work trips"],
           see: ["Apartment types", "Facilities and amenities", "Starting price", "Cancellation policy"] },

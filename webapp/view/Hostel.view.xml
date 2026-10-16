@@ -375,8 +375,8 @@
     alignItems="Center"
     justifyContent="Start"
     wrap="Wrap" >
-                    <Button text="Learn more" type="Emphasized" class="btnPrimary"/>
-                    <Button text="Contact us" type="Default" class="btnOutline"/>
+                    <Button text="Learn more" type="Emphasized" class="btnPrimary" press="onUsermanualPress"/>
+                    <Button text="Contact us" type="Default" class="btnOutline" press="onfootercontacttabselect"/>
                 </HBox>
             </VBox>
 
@@ -421,6 +421,28 @@
 
         </HBox>
     </VBox>
+    <HBox class="listPropertyBanner" width="100%" justifyContent="SpaceBetween" alignItems="Center" wrap="Wrap">
+        
+        <!-- Left Content Area -->
+        <VBox class="bannerContent">
+            <Title 
+                text="Own a property? List it on StayVriksha." 
+                level="H2" 
+                wrapping="true" 
+                class="bannerTitle"/>
+            <Text 
+                text="Reach more guests and manage multiple branches from one dashboard." 
+                class="bannerSubtitle"/>
+        </VBox>
+
+        <!-- Right Action Button Area -->
+        <HBox class="bannerAction sapUiTinyMarginBottom">
+            <Button 
+                text="Register your property" 
+                class="btnRegister"/>
+        </HBox>
+
+    </HBox>
             <!-- </VBox> -->
 
                                <VBox class="sapUiTinyMarginTop">
