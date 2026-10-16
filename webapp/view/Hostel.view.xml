@@ -149,11 +149,11 @@
 
   
    <FormattedText
-    htmlText="Find the right &lt;strong&gt;stay&lt;/strong&gt; for you"
+    htmlText="{i18n>findRightStay}"
     class="stayTypesTitle"/>
 
     <Text
-        text="Hotels, hostels, PGs, service apartments and rented apartments, all in one place."
+        text="{i18n>Allstays}"
         class="stayTypesDescription"/>
 
    <FlexBox
@@ -163,37 +163,45 @@
     alignItems="Center"
     class="stayTypesFlex">
 
-    <Button
-        id="btnHotels"
-        text="Hotels"
+
+        <Button
+   id="btnHotels"
+        text="{i18n>cardHotels}"
         icon="sap-icon://building"
         press="onStayTypePress"
-        class="stayTypeButton selected-stay-btn myUnifiedBtn"/>
+        class="stayTypeButton selected-stay-btn myUnifiedBtn">
+
+    <customData>
+        <core:CustomData
+            key="stayId"
+            value="Hotels"/>
+    </customData>
+</Button>
 
     <Button
         id="btnHostels"
-        text="Hostels"
+        text="{i18n>cardhostels}"
         icon="sap-icon://group"
         press="onStayTypePress"
         class="stayTypeButton myUnifiedBtn"/>
 
     <Button
         id="btnPG"
-        text="PG"
+        text="{i18n>CardPG}"
         icon="sap-icon://home"
         press="onStayTypePress"
         class="stayTypeButton myUnifiedBtn"/>
 
     <Button
         id="btnServiceApartments"
-        text="Service Apartments"
+        text="{i18n>cardServiceApartments}"
         icon="sap-icon://building"
         press="onStayTypePress"
         class="stayTypeButton myUnifiedBtn serviceApartmentsBtn"/>
 
     <Button
         id="btnRentedApartments"
-        text="Rented Apartments"
+        text="{i18n>cardRentedApartments}"
         icon="sap-icon://key"
         press="onStayTypePress"
         class="stayTypeButton myUnifiedBtn serviceApartmentsBtn"/>
@@ -224,9 +232,9 @@
                 <VBox class="skeletonLineLong"/>
                 <VBox class="skeletonLineShort"/>
 
-                <Text text="Starting at INR —" class="hotelPriceText"/>
+                <Text text="{i18n>StartingatINR}" class="hotelPriceText"/>
 
-                <Button text="View Rooms" class="myUnifiedBtn "/>
+                <Button text="{i18n>ViewRooms}" class="myUnifiedBtn "/>
             </VBox>
         </VBox>
 
@@ -237,13 +245,13 @@
             <Text text="{view>blurb}" class="hotelDetailSubtitle"/>
 
             <!-- BEST FOR Section -->
-            <Label text="BEST FOR" class="sectionHeaderLabel"/>
+            <Label text="{i18n>BESTFOR}" class="sectionHeaderLabel"/>
             <HBox class="tagsContainer" items="{view>best}">
                 <Text text="{view>}" class="stayTag"/>
             </HBox>
 
             <!-- WHAT YOU'LL SEE Section -->
-            <Label text="WHAT YOU'LL SEE BEFORE YOU BOOK" class="sectionHeaderLabel"/>
+            <Label text="{i18n>WHATYOUSEEBEFOREYOUBOOK}" class="sectionHeaderLabel"/>
             <VBox class="featureList" items="{view>see}">
                 <HBox alignItems="Center" class="featureItem">
                     <core:Icon src="sap-icon://accept" class="featureIconround"/>
@@ -252,7 +260,7 @@
             </VBox>
 
             <!-- Action Button -->
-            <Button text="Browse {view>id}" press="onBrowseHotelsPress" class="myUnifiedBtn browscss"/>
+            <Button text="{i18n>Browse} {view>id}" press="onBrowseHotelsPress" class="myUnifiedBtn browscss"/>
         </VBox>
 
     </HBox>
@@ -261,8 +269,8 @@
 <VBox class="whyBookMainCard" width="100%">
 
     <!-- Header Section -->
-    <FormattedText htmlText="Why Book With &lt;strong&gt;StayVriksha&lt;/strong&gt;?"  class="stayTypesTitle"/>
-    <Text text="Simple, clear and built around guests." class="stayTypesDescription"/>
+    <FormattedText htmlText="{i18n>whyBookWith}"  class="stayTypesTitle"/>
+    <Text text="{i18n>Simpleclearandbuiltaroundguests}" class="stayTypesDescription"/>
 
    
 
@@ -272,36 +280,36 @@
         <!-- Item 1: Easy Booking -->
         <VBox class="featureGridItem" alignItems="Center" justifyContent="Center">
             <core:Icon src="sap-icon://calendar" class="featureGridIcon"/>
-            <Title text="Easy Booking" level="H3" class="featureGridTitle"/>
-            <Text text="Search by city, property type and locality, compare rooms and book in a few taps." class="featureGridDesc" textAlign="Center"/>
+            <Title text="{i18n>EasyBooking}" level="H3" class="featureGridTitle"/>
+            <Text text="{i18n>Searchtaps}" class="featureGridDesc" textAlign="Center"/>
         </VBox>
 
         <!-- Item 2: Transparent Prices -->
         <VBox class="featureGridItem Transparenttext" alignItems="Center" justifyContent="Center" >
             <core:Icon src="sap-icon://money-bills" class="featureGridIcon"/>
-            <Title text="Transparent Prices" level="H3" class="featureGridTitle"/>
-            <Text text="See the starting price up front. Taxes and platform charges are shown before you pay." class="featureGridDesc" textAlign="Center"/>
+            <Title text="{i18n>TransparentPrices}" level="H3" class="featureGridTitle"/>
+            <Text text="{i18n>Seethepay}" class="featureGridDesc" textAlign="Center"/>
         </VBox>
 
         <!-- Item 3: Clear Refund Rules -->
         <VBox class="featureGridItem" alignItems="Center" justifyContent="Center">
             <core:Icon src="sap-icon://refresh" class="featureGridIcon"/>
-            <Title text="Clear Refund Rules" level="H3" class="featureGridTitle"/>
-            <Text text="Every listing shows its cancellation and refund policy before you confirm." class="featureGridDesc" textAlign="Center"/>
+            <Title text="{i18n>ClearRefundRules}" level="H3" class="featureGridTitle"/>
+            <Text text="{i18n>Everylistingconfirm}" class="featureGridDesc" textAlign="Center"/>
         </VBox>
 
         <!-- Item 4: Support That Helps -->
         <VBox class="featureGridItem" alignItems="Center" justifyContent="Center">
             <core:Icon src="sap-icon://headset" class="featureGridIcon"/>
-            <Title text="Support That Helps" level="H3" class="featureGridTitle"/>
-            <Text text="Raise a request any time and our team will help with bookings, issues and refunds." class="featureGridDesc" textAlign="Center"/>
+            <Title text="{i18n>SupportThatHelps}" level="H3" class="featureGridTitle"/>
+            <Text text="{i18n>Raisearequestanytimeandourteamwillhelpwithbookingsissuesandrefunds}" class="featureGridDesc" textAlign="Center"/>
         </VBox>
 
         <!-- Item 5: Deals & Coupons -->
         <VBox class="featureGridItem" alignItems="Center" justifyContent="Center">
             <core:Icon src="sap-icon://sales-order-item" class="featureGridIcon"/>
-            <Title text="Deals &amp; Coupons" level="H3" class="featureGridTitle"/>
-            <Text text="Apply coupons on hotels, hostels, PGs and apartments and save on your stay." class="featureGridDesc" textAlign="Center"/>
+            <Title text="{i18n>DealsCoupons}" level="H3" class="featureGridTitle"/>
+            <Text text="{i18n>ApplycouponsonhotelshostelsPGsandapartmentsandsaveonyourstay}" class="featureGridDesc" textAlign="Center"/>
         </VBox>
 
     </FlexBox>
@@ -312,12 +320,12 @@
     <!-- Heading -->
     <VBox class="bookingStepsHeader" alignItems="Center">
         <Title
-            text="Book in three steps"
+            text="{i18n>Bookinthreesteps}"
             level="H2"
             class="bookingStepsTitle"/>
 
         <Text
-            text="From search to confirmation, no hassle."
+            text="{i18n>Fromsearchtoconfirmationnohassle}"
             class="bookingStepsSubtitle"/>
     </VBox>
 
@@ -332,27 +340,27 @@
         <!-- Step 1 -->
         <VBox class="bookingStepCard" width="32%">
             <Text text="1" class="bookingStepNumber"/>
-            <Title text="Search" level="H4" class="bookingStepCardTitle"/>
+            <Title text="{i18n>cardSearch}" level="H4" class="bookingStepCardTitle"/>
             <Text
-                text="Choose your city, property type, property name or locality, then tap Go."
+                text="{i18n>ChoosetapGo}"
                 class="bookingStepDescription"/>
         </VBox>
 
         <!-- Step 2 -->
         <VBox class="bookingStepCard" width="32%">
             <Text text="2" class="bookingStepNumber"/>
-            <Title text="Compare &amp; choose" level="H4" class="bookingStepCardTitle"/>
+            <Title text="{i18n>Comparechoose}" level="H4" class="bookingStepCardTitle"/>
             <Text
-                text="View rooms, amenities, starting prices, house rules and the cancellation policy."
+                text="{i18n>cancellationpolicy}"
                 class="bookingStepDescription"/>
         </VBox>
 
         <!-- Step 3 -->
         <VBox class="bookingStepCard" width="32%">
             <Text text="3" class="bookingStepNumber"/>
-            <Title text="Book &amp; stay" level="H4" class="bookingStepCardTitle"/>
+            <Title text="{i18n>Bookstay}" level="H4" class="bookingStepCardTitle"/>
             <Text
-                text="Confirm your booking, keep your confirmation and reference number, and enjoy your stay."
+                text="{i18n>Confirmstay}"
                 class="bookingStepDescription"/>
         </VBox>
 
@@ -365,18 +373,18 @@
             
             <!-- Left Side: Information & CTAs -->
             <VBox class="aboutContent" width="48%">
-                <Text text="ABOUT US" class="aboutTag"/>
-                <Title text="India’s first booking platform for every kind of stay" level="H1" class="aboutTitle"/>
-                <Text text="StayVriksha brings hotels, hostels, PGs, service apartments and rented apartments together in one place, so guests can find and book with confidence." class="aboutDescription"/>
-                <Text text="For property owners, we provide an end-to-end solution to advertise properties and manage branches, rooms, beds, bookings, invoices, staff and reviews." class="aboutDescription"/>
+                <Text text="{i18n>ABOUTUS}" class="aboutTag"/>
+                <Title text="{i18n>Indiafirstbookingplatformforeverykindstay}" level="H1" class="aboutTitle"/>
+                <Text text="{i18n>staydesc}" class="aboutDescription"/>
+                <Text text="{i18n>staysecdesc}" class="aboutDescription"/>
                 
                 <!-- Action Buttons -->
                 <HBox class="aboutActions"   width="100%"
     alignItems="Center"
     justifyContent="Start"
     wrap="Wrap" >
-                    <Button text="Learn more" type="Emphasized" class="btnPrimary" press="onUsermanualPress"/>
-                    <Button text="Contact us" type="Default" class="btnOutline" press="onfootercontacttabselect"/>
+                    <Button text="{i18n>Learnmore}" type="Emphasized" class="btnPrimary" press="onUsermanualPress"/>
+                    <Button text="{i18n>cardContactus}" type="Default" class="btnOutline" press="onfootercontacttabselect"/>
                 </HBox>
             </VBox>
 
@@ -388,15 +396,15 @@
                     <!-- Card 1: Every kind of stay -->
                     <VBox class="featureCard" width="48%">
                         <core:Icon src="sap-icon://grid" class="featureIcon"/>
-                        <Title text="Every kind of stay" level="H4" class="featureTitle"/>
-                        <Text text="Five property types, one platform." class="featureDesc"/>
+                        <Title text="{i18n>Everykindofstay}" level="H4" class="featureTitle"/>
+                        <Text text="{i18n>Fivepropertytypesoneplatform}" class="featureDesc"/>
                     </VBox>
 
                     <!-- Card 2: Easy to find -->
                     <VBox class="featureCard" width="48%">
                         <core:Icon src="sap-icon://search" class="featureIcon"/>
-                        <Title text="Easy to find" level="H4" class="featureTitle"/>
-                        <Text text="Search by city, type and locality." class="featureDesc"/>
+                        <Title text="{i18n>Easytofind}" level="H4" class="featureTitle"/>
+                        <Text text="{i18n>Searchbycitytypeandlocality}" class="featureDesc"/>
                     </VBox>
                 </HBox>
 
@@ -405,15 +413,15 @@
                     <!-- Card 3: Clear policies -->
                     <VBox class="featureCard" width="48%">
                         <core:Icon src="sap-icon://shield" class="featureIcon"/>
-                        <Title text="Clear policies" level="H4" class="featureTitle"/>
-                        <Text text="Rules and refunds shown upfront." class="featureDesc"/>
+                        <Title text="{i18n>Clearpolicies}" level="H4" class="featureTitle"/>
+                        <Text text="{i18n>Rulesandrefundsshownupfront}" class="featureDesc"/>
                     </VBox>
 
                     <!-- Card 4: Guest-first -->
                     <VBox class="featureCard" width="48%">
                         <core:Icon src="sap-icon://favorite" class="featureIcon"/>
-                        <Title text="Guest-first" level="H4" class="featureTitle"/>
-                        <Text text="Reviews and support when you need it." class="featureDesc"/>
+                        <Title text="{i18n>Guestfirst}" level="H4" class="featureTitle"/>
+                        <Text text="{i18n>Reviewsandsupportwhenyouneedit}" class="featureDesc"/>
                     </VBox>
                 </HBox>
 
@@ -426,19 +434,19 @@
         <!-- Left Content Area -->
         <VBox class="bannerContent">
             <Title 
-                text="Own a property? List it on StayVriksha." 
+                text="{i18n>OwnpropertyListitonStayVriksha}" 
                 level="H2" 
                 wrapping="true" 
                 class="bannerTitle"/>
             <Text 
-                text="Reach more guests and manage multiple branches from one dashboard." 
+                text="{i18n>Reachmoreguestsmanagemultiplebranchesfromonedashboard}" 
                 class="bannerSubtitle"/>
         </VBox>
 
         <!-- Right Action Button Area -->
         <HBox class="bannerAction sapUiTinyMarginBottom">
             <Button 
-                text="Register your property" 
+                text="{i18n>Registeryourproperty}" 
                 class="btnRegister"/>
         </HBox>
 
