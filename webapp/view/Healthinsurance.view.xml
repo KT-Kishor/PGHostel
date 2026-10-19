@@ -35,13 +35,13 @@
             <uxap:ObjectPageDynamicHeaderTitle>
                 <uxap:expandedHeading>
                     <Title
-                        text="{HealthInsuranceModel>/sPath} {i18n>insurence}"
+                        text="{= (${HealthInsuranceModel>/sPath} === 'Health' ? ${i18n>Health} : ${i18n>Travel}) + ' ' + ${i18n>insurence} }"
                         level="H1"
                     />
                 </uxap:expandedHeading>
                 <uxap:snappedHeading>
                     <Title
-                        text="{HealthInsuranceModel>/sPath} {i18n>insurence}"
+                        text="{= (${HealthInsuranceModel>/sPath} === 'Health' ? ${i18n>Health} : ${i18n>Travel}) + ' ' + ${i18n>insurence} }"
                         level="H2"
                     />
                 </uxap:snappedHeading>
