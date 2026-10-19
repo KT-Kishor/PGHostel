@@ -9,7 +9,7 @@
             <Text text="{i18n>vrHeroLead}" class="svHeroLead"/>
 
             <HBox wrap="Wrap" renderType="Bare" class="svChips" items="{path:'pt>/types', templateShareable:false}">
-                <Text text="{pt>id}" class="svChip"/>
+                <Text text="{pt>name}" class="svChip"/>
             </HBox>
 
             <Button text="{i18n>vrHeroCta}"

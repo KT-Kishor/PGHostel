@@ -1,11 +1,12 @@
 <core:FragmentDefinition xmlns="sap.m" xmlns:core="sap.ui.core">
     <VBox id="register" class="svReg" renderType="Bare">
-        <HBox justifyContent="Center" wrap="Wrap" renderType="Bare" class="svH2Row">
-            <Text text="{i18n>vrRegTitle}" class="svH2"/>
-            <Text text="{i18n>vrRegTitleAccent}" class="svH2 svAccent"/>
-        </HBox>
-        <Text text="{i18n>vrRegSub}" textAlign="Center" class="svSub"/>
         <HBox class="svRegCard" renderType="Bare">
+            <VBox class="svRegHeader" renderType="Bare">
+                <HBox justifyContent="Center" wrap="Wrap" renderType="Bare" class="svH2Row">
+                    <FormattedText htmlText="{i18n>vrRegHeading}" class="svH2"/>
+                </HBox>
+                <Text text="{i18n>vrRegSub}" textAlign="Center" class="svSub"/>
+            </VBox>
             <VBox class="svSide" renderType="Bare">
                 <VBox class="svSideInner" renderType="Bare">
                     <Title text="{i18n>vrSideTitle}" level="H3" wrapping="true" class="svSideTitle"/>

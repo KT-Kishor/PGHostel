@@ -241,13 +241,7 @@ var oResourceBundle = this._getResourceBundle();
 
 this._updateStaysData(oResourceBundle);
 
-        const sLocale = localStorage.getItem("selectedLanguage") || "en";
-            sap.ui.getCore().getConfiguration().setLanguage(sLocale);
-             const oLanguageModel = new sap.ui.model.json.JSONModel({
-        key: sLocale
-    });
-
-    this.getView().setModel(oLanguageModel, "langageModel");
+            this._applyHostelLanguage(localStorage.getItem("selectedLanguage") || "en");
             var bBusyOnLoad = sessionStorage.getItem("hostelBusyOnLoad") === "true";
             sessionStorage.removeItem("hostelBusyOnLoad");
             if (bBusyOnLoad) {
@@ -4383,11 +4377,11 @@ const sSuccessMsg = this.i18nModel.getText("registrationSuccess", [
                     if (this._vrExited) return;
                     this._initAdminSignupControls();
                     if (aMissing.some(entry => !oComponent.getModel(entry[1]))) {
-                        oModel.setProperty("/LocationsError", this._vrT("vrErrLocations"));
+                        this._vrSetSignupMessage("LocationsError", "vrErrLocations");
                     }
                 })
                 .catch(() => {
-                    if (!this._vrExited) oModel.setProperty("/LocationsError", this._vrT("vrErrLocations"));
+                    if (!this._vrExited) this._vrSetSignupMessage("LocationsError", "vrErrLocations");
                 })
                 .finally(() => {
                     this._adminGeoRequest = null;
@@ -4659,14 +4653,14 @@ const sSuccessMsg = this.i18nModel.getText("registrationSuccess", [
             const oModel = this.getView().getModel("AdminSignupModel");
             if (!sValue) {
                 oSTD.setValueState("Error");
-                oSTD.setValueStateText("STD Code is required");
+                oSTD.bindProperty("valueStateText", "i18n>stdCodeRequired");
                 oModel.setProperty("/STDCode", "");
                 return;
             }
             const STD_REGEX = /^\+[1-9][0-9]*$/;
             if (!STD_REGEX.test(sValue)) {
                 oSTD.setValueState("Error");
-                oSTD.setValueStateText("Must start with + and have no leading zero (e.g., +91)");
+                oSTD.bindProperty("valueStateText", "i18n>STDPlusicon");
                 oModel.setProperty("/STDCode", "");
             } else {
                 oSTD.setValueState("None");
@@ -4691,9 +4685,10 @@ const sSuccessMsg = this.i18nModel.getText("registrationSuccess", [
                 oInput.setValueState("None");
             } else if (!std) {
                 oInput.setValueState("Error");
-                oInput.setValueStateText(this._vrT("selectISDCodeFirst"));
+                oInput.bindProperty("valueStateText", "i18n>selectISDCodeFirst");
             } else {
                 utils._LCvalidateISDmobile(oInput, std);
+                oInput.bindProperty("valueStateText", "i18n>" + (std === "+91" ? "MSmobileNoValueStateIN" : "MSmobileNoValueStateINT"));
             }
             this._updateAdminSignupProgress();
         },
@@ -4794,7 +4789,7 @@ const sSuccessMsg = this.i18nModel.getText("registrationSuccess", [
                 await this.ajaxCreateWithJQuery("HM_Login", payload);
                 if (this._vrExited) return;
                 const sUsername = (oAdmin.VendorName || "").trim();
-                const sSalutation = this.byId("adminSalutation")?.getSelectedItem()?.getText() || oAdmin.Salutation || "";
+                const sSalutation = oAdmin.Salutation || "";
                 oModel.setProperty("/SuccessMessage", this._vrT("registrationSubmittedMessage", [sSalutation, sUsername]));
                 oModel.setProperty("/Submitted", true);
                 oModel.setProperty("/Progress", 100);
@@ -4864,7 +4859,7 @@ const sSuccessMsg = this.i18nModel.getText("registrationSuccess", [
                 oZone.removeStyleClass("svDropOver");
                 if (!bEnabled) {
                     if (!oModel.getProperty("/CurrentDocType")) {
-                        oModel.setProperty("/DocumentError", this._vrT("vrDocStepBlocked"));
+                        this._vrSetSignupMessage("DocumentError", "vrDocStepBlocked");
                     }
                     return;
                 }
@@ -4951,7 +4946,7 @@ const sSuccessMsg = this.i18nModel.getText("registrationSuccess", [
 
             const selectedDocType = oDocType ? oDocType.getSelectedKey() : null;
             if (!selectedDocType) {
-                oModel.setProperty("/DocumentError", this._vrT("vrDocStepBlocked"));
+                this._vrSetSignupMessage("DocumentError", "vrDocStepBlocked");
                 if (oUploader) oUploader.clear();
                 return;
             }
@@ -4960,12 +4955,12 @@ const sSuccessMsg = this.i18nModel.getText("registrationSuccess", [
                 return;
             }
             if (!file.size) {
-                oModel.setProperty("/DocumentError", this._vrT("vrErrEmptyFile"));
+                this._vrSetSignupMessage("DocumentError", "vrErrEmptyFile");
                 if (oUploader) oUploader.clear();
                 return;
             }
             if (this._isDuplicateFile(file.name)) {
-                oModel.setProperty("/DocumentError", this._vrT("thisfilealreadyuploaded"));
+                this._vrSetSignupMessage("DocumentError", "thisfilealreadyuploaded");
                 if (oUploader) oUploader.clear();
                 return;
             }
@@ -4990,7 +4985,7 @@ const sSuccessMsg = this.i18nModel.getText("registrationSuccess", [
             try {
                 if (file.size > iMaxSizeBytes && isImage) {
                     if (typeof imageCompression === "undefined") {
-                        throw new Error("Compression library missing");
+                        throw Object.assign(new Error("Compression library missing"), { i18nKey: "Compressionlibrarynotavailable" });
                     }
                     const options = {
                         maxSizeMB: (MAX_SIZE_KB - 10) / 1024,
@@ -5001,10 +4996,10 @@ const sSuccessMsg = this.i18nModel.getText("registrationSuccess", [
                     processedFile = await imageCompression(file, options);
 
                     if (processedFile.size > iMaxSizeBytes) {
-                        throw new Error(file.name + " could not be compressed below 400 KB.");
+                        throw Object.assign(new Error("File compression failed"), { i18nKey: "fileCompressionFailed", i18nArgs: [file.name] });
                     }
                 } else if (file.size > iMaxSizeBytes && !isImage) {
-                    throw new Error(file.name + " exceeds the 400 KB size limit.");
+                    throw Object.assign(new Error("File size limit exceeded"), { i18nKey: "fileExceeds400KB", i18nArgs: [file.name] });
                 }
 
                 // Convert to Base64
@@ -5052,7 +5047,7 @@ const sSuccessMsg = this.i18nModel.getText("registrationSuccess", [
             } catch (err) {
                 if (!this._vrExited) {
                     this._removeProcessingRow(sTempId);
-                    oModel.setProperty("/DocumentError", err.message || this._vrT("vrErrReadFile"));
+                    this._vrSetSignupMessage("DocumentError", err.i18nKey || "vrErrReadFile", err.i18nArgs);
                 }
             } finally {
                 this._adminFileReader = null;
@@ -5070,7 +5065,7 @@ const sSuccessMsg = this.i18nModel.getText("registrationSuccess", [
         },
 
         onAdminFileTypeMismatch: function () {
-            this.getView().getModel("AdminSignupModel").setProperty("/DocumentError", this._vrT("vrErrDocType"));
+            this._vrSetSignupMessage("DocumentError", "vrErrDocType");
             this.byId("adminFileUploader")?.clear();
         },
     
@@ -5173,7 +5168,7 @@ const sSuccessMsg = this.i18nModel.getText("registrationSuccess", [
             const oModel = this.getView().getModel("AdminSignupModel");
             const bSelected = oEvent.getSource().getSelected();
             oModel.setProperty("/Consent", bSelected);
-            oModel.setProperty("/ConsentError", bSelected ? "" : this._vrT("vrErrConsent"));
+            this._vrSetSignupMessage("ConsentError", bSelected ? "" : "vrErrConsent");
             this._updateAdminSignupProgress();
         },
 
@@ -5200,6 +5195,15 @@ const sSuccessMsg = this.i18nModel.getText("registrationSuccess", [
                 const oField = C(sId);
                 const bValid = fnValidate(oField);
                 oField.setValueState(bValid ? "None" : "Error");
+                if (sId === "adminMobileNo") {
+                    oField.bindProperty("valueStateText", "i18n>" + (std === "+91" ? "MSmobileNoValueStateIN" : "MSmobileNoValueStateINT"));
+                } else if (sId === "adminAddress") {
+                    oField.bindProperty("valueStateText", "i18n>vrErrAddress");
+                } else if (sId === "adminGender") {
+                    oField.bindProperty("valueStateText", "i18n>vrErrGender");
+                } else if (sId === "adminSalutation") {
+                    oField.bindProperty("valueStateText", "i18n>MVDsalutation");
+                }
                 if (!bValid) {
                     oFirstBad = oField;
                     break;
@@ -5207,12 +5211,12 @@ const sSuccessMsg = this.i18nModel.getText("registrationSuccess", [
             }
             if (!oFirstBad) {
                 const bDocuments = (M.getProperty("/Documents") || []).some(doc => !doc.isProcessing && doc.File);
-                M.setProperty("/DocumentError", bDocuments ? "" : this._vrT("vrErrDocRequired"));
+                this._vrSetSignupMessage("DocumentError", bDocuments ? "" : "vrErrDocRequired");
                 if (!bDocuments) oFirstBad = C("adminDocType");
             }
             if (!oFirstBad) {
                 const bConsent = !!M.getProperty("/Consent");
-                M.setProperty("/ConsentError", bConsent ? "" : this._vrT("vrErrConsent"));
+                this._vrSetSignupMessage("ConsentError", bConsent ? "" : "vrErrConsent");
                 if (!bConsent) oFirstBad = C("adminConsent");
             }
             this._updateAdminSignupProgress();
@@ -5670,6 +5674,7 @@ const sSuccessMsg = this.i18nModel.getText("registrationSuccess", [
 
             // âœ… Strict validation (CONTROL, not event)
             utils._LCstrictValidationSelect(oSalutation);
+            oSalutation.bindProperty("valueStateText", "i18n>MVDsalutation");
             const oModel = this.getView().getModel("AdminSignupModel");
             oModel.setProperty("/Salutation", sKey);
             oModel.setProperty("/Gender", oGender.getSelectedKey());
@@ -5680,7 +5685,7 @@ const sSuccessMsg = this.i18nModel.getText("registrationSuccess", [
             const sAddress = oInput.getValue();
             this.getView().getModel("AdminSignupModel").setProperty("/Address", sAddress);
             oInput.setValueState(sAddress.trim().length >= 10 ? "None" : "Error");
-            oInput.setValueStateText(this._vrT("vrErrAddress"));
+            oInput.bindProperty("valueStateText", "i18n>vrErrAddress");
             this._updateAdminSignupProgress();
         },
 
@@ -6192,10 +6197,16 @@ onPoliciesPress: function () {
 
 onLanguagePress: function (oEvent) {
     var sLocale = oEvent.getSource().getSelectedKey();
-    var oView = this.getView();
+
+    if (["en", "kn", "hi"].indexOf(sLocale) === -1) { return; }
 
     // Save selected language
     localStorage.setItem("selectedLanguage", sLocale);
+    this._applyHostelLanguage(sLocale);
+},
+
+_applyHostelLanguage: function (sLocale) {
+    var oView = this.getView();
 
     // Update SAPUI5 language configuration
     sap.ui.getCore().getConfiguration().setLanguage(sLocale);
@@ -6216,9 +6227,13 @@ onLanguagePress: function (oEvent) {
     // Update the resource bundle used in controller methods
     this.i18nModel = oResourceModel.getResourceBundle();
     this._updateStaysData(this.i18nModel);
+    var oLanguageModel = oView.getModel("langageModel");
+    if (oLanguageModel) {
+        oLanguageModel.setProperty("/key", sLocale);
+    } else {
+        oView.setModel(new JSONModel({ key: sLocale }), "langageModel");
+    }
     this._vrRefreshTexts();
-
-    // Refresh UI bindings
 },
 onBuyHealthInsurance:function() {
               var oRouter = this.getOwnerComponent().getRouter();
@@ -6291,13 +6306,62 @@ onBuyTravelInsurance:function() {
         },
 
         _vrRefreshTexts: function () {
-            var oState = this.getView().getModel("ptState");
+            var oView = this.getView(),
+                oState = oView.getModel("ptState"),
+                oPt = oView.getModel("pt");
 
-            if (this._vrExited || !oState) { return; }
+            if (this._vrExited || !oState || !oPt) { return; }
 
-            var sId = oState.getProperty("/selectedId");
-            oState.setProperty("/ctaText", sId ? this._vrT("vrPtCta", [sId]) : "");
-            this.getView().getModel("pt").setProperty("/loadError", this._vrTypesLoadFailed ? this._vrT("vrErrLoadTypes") : "");
+            if (this._vrPropertyTypesSource) {
+                // Resolve a fresh copy so switching languages never translates IDs
+                // or loses the resource keys needed for the next language change.
+                const localize = value => {
+                    if (typeof value === "string") {
+                        return value.startsWith("vrData") ? this._vrT(value) : value;
+                    }
+                    if (Array.isArray(value)) { return value.map(localize); }
+                    if (value && typeof value === "object") {
+                        return Object.fromEntries(Object.entries(value).map(([key, item]) => [key, localize(item)]));
+                    }
+                    return value;
+                };
+                const sId = oState.getProperty("/selectedId");
+                const sMode = sId ? oState.getProperty("/mode") : undefined;
+                oPt.setData(localize(this._vrPropertyTypesSource));
+                const iIndex = oPt.getProperty("/types").findIndex(type => type.id === sId);
+                this._vrShowPropertyType(iIndex < 0 ? 0 : iIndex, sMode, true);
+            }
+            oPt.setProperty("/loadError", this._vrTypesLoadFailed ? this._vrT("vrErrLoadTypes") : "");
+
+            const oSignup = oView.getModel("AdminSignupModel");
+            if (oSignup) {
+                Object.entries(this._vrSignupMessages || {}).forEach(([sProperty, oMessage]) => {
+                    if (oSignup.getProperty("/" + sProperty) === oMessage.text) {
+                        oMessage.text = this._vrT(oMessage.key, oMessage.args);
+                        oSignup.setProperty("/" + sProperty, oMessage.text);
+                    } else {
+                        delete this._vrSignupMessages[sProperty];
+                    }
+                });
+                if (oSignup.getProperty("/Submitted")) {
+                    const sSalutation = oSignup.getProperty("/Salutation") || "";
+                    oSignup.setProperty("/SuccessMessage", this._vrT("registrationSubmittedMessage", [sSalutation, (oSignup.getProperty("/VendorName") || "").trim()]));
+                }
+                oSignup.refresh(true);
+            }
+        },
+
+        _vrSetSignupMessage: function (sProperty, sKey, aArgs) {
+            const oModel = this.getView().getModel("AdminSignupModel");
+            if (!oModel || this._vrExited) { return; }
+            this._vrSignupMessages = this._vrSignupMessages || {};
+            const sText = sKey ? this._vrT(sKey, aArgs) : "";
+            if (sKey) {
+                this._vrSignupMessages[sProperty] = { key: sKey, args: aArgs, text: sText };
+            } else {
+                delete this._vrSignupMessages[sProperty];
+            }
+            oModel.setProperty("/" + sProperty, sText);
         },
 
         /* ---------------------------------------------------------------- */
@@ -6331,6 +6395,7 @@ onBuyTravelInsurance:function() {
 
                 this._vrTypesLoadFailed = oEvent.getParameter("success") === false || !Array.isArray(aTypes) || !aTypes.length;
                 if (this._vrTypesLoadFailed) {
+                    this._vrPropertyTypesSource = null;
                     oPt.setData({ types: [], benefits: [] });
                     this._vrRefreshTexts();
                     return;
@@ -6343,8 +6408,7 @@ onBuyTravelInsurance:function() {
                         oItem.icon = sap.ui.require.toUrl("sap/ui/com/project1/" + oItem.icon);
                     }
                 });
-                oPt.refresh(true);
-                this._vrShowPropertyType(0);
+                this._vrPropertyTypesSource = { types: aTypes, benefits: aBenefits };
                 this._vrRefreshTexts();
             }.bind(this));
 
@@ -6355,7 +6419,7 @@ onBuyTravelInsurance:function() {
         /*  PROPERTY TYPE EXPLORER                                          */
         /* ---------------------------------------------------------------- */
 
-        _vrShowPropertyType: function (iIndex, sMode) {
+        _vrShowPropertyType: function (iIndex, sMode, bRefreshTexts) {
             var oPt    = this.getView().getModel("pt"),
                 oState = this.getView().getModel("ptState"),
                 aTypes = oPt.getProperty("/types") || [];
@@ -6378,14 +6442,14 @@ onBuyTravelInsurance:function() {
             // Set the detail properties only when the type changed. Writing the
             // same values back would still replace the path/points arrays and make
             // the bound lists on the right re-render.
-            if (bTypeChanged) {
+            if (bTypeChanged || bRefreshTexts) {
                 oState.setProperty("/selectedId", oType.id);
-                oState.setProperty("/name", oType.id);
+                oState.setProperty("/name", oType.name);
                 oState.setProperty("/who", oType.who);
                 oState.setProperty("/blurb", oType.blurb);
                 oState.setProperty("/path", oType.path);
                 oState.setProperty("/points", oType.points);
-                oState.setProperty("/ctaText", this._vrT("vrPtCta", [oType.id]));
+                oState.setProperty("/ctaText", this._vrT("vrPtCta", [oType.name]));
             }
 
             oState.setProperty("/mode", sActiveMode);
@@ -6395,7 +6459,7 @@ onBuyTravelInsurance:function() {
 
             this._vrSyncPropertyTabs();
             this._vrSyncModeToggle();
-            this._vrAnimateExplorer(bTypeChanged);
+            if (!bRefreshTexts) { this._vrAnimateExplorer(bTypeChanged); }
         },
 
         // Fades in whatever the swap actually replaced. A type change replaces the

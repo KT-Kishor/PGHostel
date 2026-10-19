@@ -2,170 +2,175 @@
   "types": [
     {
       "id": "Hotels",
+      "name": "vrDataHotelsName",
       "icon": "sap-icon://bed",
-      "who": "For hotel owners and hotel groups",
+      "who": "vrDataHotelsWho",
       "defaultMode": "multi",
-      "blurb": "List a single hotel or a whole chain. Each hotel gets its own rooms, facilities and amenities.",
-      "path": ["Admin panel", "Hotel", "Rooms", "Facilities & amenities"],
+      "blurb": "vrDataHotelsBlurb",
+      "path": ["vrDataAdminPanel", "vrDataHotel", "vrDataRooms", "vrDataFacilitiesAmenities"],
       "single": [
-        { "name": "Your hotel", "leaves": ["Deluxe Room", "Suite", "Family Room"] }
+        { "name": "vrDataYourHotel", "leaves": ["vrDataDeluxeRoom", "vrDataSuite", "vrDataFamilyRoom"] }
       ],
       "multi": [
-        { "name": "Hotel / Branch 1", "leaves": ["Deluxe Room", "Suite"] },
-        { "name": "Hotel / Branch 2", "leaves": ["Standard Room", "Family Room"] },
-        { "name": "Hotel / Branch 3", "leaves": ["Executive Room", "Suite"] }
+        { "name": "vrDataHotelBranch1", "leaves": ["vrDataDeluxeRoom", "vrDataSuite"] },
+        { "name": "vrDataHotelBranch2", "leaves": ["vrDataStandardRoom", "vrDataFamilyRoom"] },
+        { "name": "vrDataHotelBranch3", "leaves": ["vrDataExecutiveRoom", "vrDataSuite"] }
       ],
       "more": {
-        "single": "+ Add another hotel anytime",
-        "multi": "+ Add more hotels"
+        "single": "vrDataHotelsMoreSingle",
+        "multi": "vrDataHotelsMoreMulti"
       },
       "points": [
-        "Add one hotel, or every branch under one account",
-        "Set up rooms for each hotel",
-        "Configure facilities and amenities per hotel",
-        "Manage bookings, invoices and coupons"
+        "vrDataHotelsPoint1",
+        "vrDataHotelsPoint2",
+        "vrDataHotelsPoint3",
+        "vrDataManageBookingsInvoicesCoupons"
       ],
       "selected": false
     },
     {
       "id": "Hostels",
+      "name": "vrDataHostelsName",
       "icon": "sap-icon://home-share",
-      "who": "For single hostels and hostel chains",
+      "who": "vrDataHostelsWho",
       "defaultMode": "multi",
-      "blurb": "Create one hostel or many, and organise each into rooms and individual beds.",
-      "path": ["Admin panel", "Hostel", "Rooms", "Beds"],
+      "blurb": "vrDataHostelsBlurb",
+      "path": ["vrDataAdminPanel", "vrDataHostel", "vrDataRooms", "vrDataBeds"],
       "single": [
-        { "name": "Your hostel", "leaves": ["Dorm A Â· Bed 1", "Dorm A Â· Bed 2", "Room 1 Â· Bed 1"] }
+        { "name": "vrDataYourHostel", "leaves": ["vrDataDormABed1", "vrDataDormABed2", "vrDataRoom1Bed1"] }
       ],
       "multi": [
-        { "name": "Hostel / Branch 1", "leaves": ["Dorm A Â· Bed 1", "Dorm A Â· Bed 2"] },
-        { "name": "Hostel / Branch 2", "leaves": ["Room 1 Â· Bed 1", "Room 1 Â· Bed 2"] },
-        { "name": "Hostel / Branch 3", "leaves": ["Dorm B Â· Bed 1", "Dorm B Â· Bed 2"] }
+        { "name": "vrDataHostelBranch1", "leaves": ["vrDataDormABed1", "vrDataDormABed2"] },
+        { "name": "vrDataHostelBranch2", "leaves": ["vrDataRoom1Bed1", "vrDataRoom1Bed2"] },
+        { "name": "vrDataHostelBranch3", "leaves": ["vrDataDormBBed1", "vrDataDormBBed2"] }
       ],
       "more": {
-        "single": "+ Add another hostel anytime",
-        "multi": "+ Add more hostels"
+        "single": "vrDataHostelsMoreSingle",
+        "multi": "vrDataHostelsMoreMulti"
       },
       "points": [
-        "Add one hostel or several branches",
-        "Set up rooms and beds in each hostel",
-        "Add facilities and amenities guests look for",
-        "Manage bookings, deposits and coupons"
+        "vrDataHostelsPoint1",
+        "vrDataHostelsPoint2",
+        "vrDataHostelsPoint3",
+        "vrDataHostelsPoint4"
       ],
       "selected": false
     },
     {
       "id": "PG",
+      "name": "vrDataPGName",
       "icon": "sap-icon://home",
-      "who": "For owners of one PG or many",
+      "who": "vrDataPGWho",
       "defaultMode": "multi",
-      "blurb": "Run a single PG or several, each with its own rooms, beds and deposits.",
-      "path": ["Admin panel", "PG", "Rooms", "Beds"],
+      "blurb": "vrDataPGBlurb",
+      "path": ["vrDataAdminPanel", "vrDataPGName", "vrDataRooms", "vrDataBeds"],
       "single": [
-        { "name": "Your PG", "leaves": ["Room 101 Â· Bed A", "Room 101 Â· Bed B", "Room 102 Â· Bed A"] }
+        { "name": "vrDataYourPG", "leaves": ["vrDataRoom101BedA", "vrDataRoom101BedB", "vrDataRoom102BedA"] }
       ],
       "multi": [
-        { "name": "PG / Branch 1", "leaves": ["Room 101 Â· Bed A", "Room 101 Â· Bed B"] },
-        { "name": "PG / Branch 2", "leaves": ["Room 12 Â· Bed A", "Room 12 Â· Bed B"] },
-        { "name": "PG / Branch 3", "leaves": ["Room 3 Â· Bed A", "Room 3 Â· Bed B"] }
+        { "name": "vrDataPGBranch1", "leaves": ["vrDataRoom101BedA", "vrDataRoom101BedB"] },
+        { "name": "vrDataPGBranch2", "leaves": ["vrDataRoom12BedA", "vrDataRoom12BedB"] },
+        { "name": "vrDataPGBranch3", "leaves": ["vrDataRoom3BedA", "vrDataRoom3BedB"] }
       ],
       "more": {
-        "single": "+ Add another PG anytime",
-        "multi": "+ Add more PGs"
+        "single": "vrDataPGMoreSingle",
+        "multi": "vrDataPGMoreMulti"
       },
       "points": [
-        "Add one PG, or each PG as a separate property",
-        "Set up rooms and beds",
-        "Track deposits and invoices",
-        "Handle staff and support requests"
+        "vrDataPGPoint1",
+        "vrDataPGPoint2",
+        "vrDataPGPoint3",
+        "vrDataPGPoint4"
       ],
       "selected": false
     },
     {
       "id": "Service Apartments",
+      "name": "vrDataServiceApartmentsName",
       "icon": "sap-icon://building",
-      "who": "For individual owners and operators alike",
+      "who": "vrDataServiceApartmentsWho",
       "defaultMode": "multi",
-      "blurb": "Offer one serviced apartment or many, in one building or across locations, each with its own amenities.",
-      "path": ["Admin panel", "Property", "Apartments", "Amenities"],
+      "blurb": "vrDataServiceApartmentsBlurb",
+      "path": ["vrDataAdminPanel", "vrDataProperty", "vrDataApartments", "vrDataAmenities"],
       "single": [
-        { "name": "Your apartment building", "leaves": ["1 BHK Apartment", "2 BHK Apartment"] }
+        { "name": "vrDataYourApartmentBuilding", "leaves": ["vrDataApartment1BHK", "vrDataApartment2BHK"] }
       ],
       "multi": [
-        { "name": "Property 1", "leaves": ["1 BHK Apartment", "2 BHK Apartment"] },
-        { "name": "Property 2", "leaves": ["Studio", "1 BHK Apartment"] },
-        { "name": "Property 3", "leaves": ["2 BHK Apartment", "3 BHK Apartment"] }
+        { "name": "vrDataProperty1", "leaves": ["vrDataApartment1BHK", "vrDataApartment2BHK"] },
+        { "name": "vrDataProperty2", "leaves": ["vrDataStudio", "vrDataApartment1BHK"] },
+        { "name": "vrDataProperty3", "leaves": ["vrDataApartment2BHK", "vrDataApartment3BHK"] }
       ],
       "more": {
-        "single": "+ Add another property anytime",
-        "multi": "+ Add more properties"
+        "single": "vrDataPropertiesMoreSingle",
+        "multi": "vrDataPropertiesMoreMulti"
       },
       "points": [
-        "Add a single apartment or several buildings",
-        "Set up the apartments you offer",
-        "Configure facilities and amenities",
-        "Manage bookings, invoices and coupons"
+        "vrDataServiceApartmentsPoint1",
+        "vrDataServiceApartmentsPoint2",
+        "vrDataServiceApartmentsPoint3",
+        "vrDataManageBookingsInvoicesCoupons"
       ],
       "selected": false
     },
     {
       "id": "Rented Apartments",
+      "name": "vrDataRentedApartmentsName",
       "icon": "sap-icon://key",
-      "who": "For homeowners and landlords, no business needed",
+      "who": "vrDataRentedApartmentsWho",
       "defaultMode": "single",
-      "blurb": "Own a house, villa, flat or building? List what you have for rent, whether it is one property or many, and manage tenants, deposits and rent in one place.",
-      "path": ["Admin panel", "Property", "Units", "Tenant & deposit"],
+      "blurb": "vrDataRentedApartmentsBlurb",
+      "path": ["vrDataAdminPanel", "vrDataProperty", "vrDataUnits", "vrDataTenantDeposit"],
       "single": [
-        { "name": "Your house", "leaves": ["Ground floor", "First floor"] }
+        { "name": "vrDataYourHouse", "leaves": ["vrDataGroundFloor", "vrDataFirstFloor"] }
       ],
       "multi": [
-        { "name": "Independent house", "leaves": ["Whole house"] },
-        { "name": "Villa", "leaves": ["Whole villa"] },
-        { "name": "Apartment building", "leaves": ["Flat 101", "Flat 102"] }
+        { "name": "vrDataIndependentHouse", "leaves": ["vrDataWholeHouse"] },
+        { "name": "vrDataVilla", "leaves": ["vrDataWholeVilla"] },
+        { "name": "vrDataApartmentBuilding", "leaves": ["vrDataFlat101", "vrDataFlat102"] }
       ],
       "more": {
-        "single": "+ Add another property anytime",
-        "multi": "+ Add more properties"
+        "single": "vrDataPropertiesMoreSingle",
+        "multi": "vrDataPropertiesMoreMulti"
       },
       "points": [
-        "Add your house, villa, flat or building",
-        "Rent the whole property or individual flats and floors",
-        "Set rent and deposit, and manage invoices",
-        "Review complaints, damages and reviews"
+        "vrDataRentedApartmentsPoint1",
+        "vrDataRentedApartmentsPoint2",
+        "vrDataRentedApartmentsPoint3",
+        "vrDataRentedApartmentsPoint4"
       ],
       "selected": false
     }
   ],
   "benefits": [
     {
-      "title": "Infrastructure",
-      "subtitle": "Manage your property setup",
+      "title": "vrDataInfrastructureTitle",
+      "subtitle": "vrDataInfrastructureSubtitle",
       "icon": "image/vendor/infrastructure.svg",
-      "items": ["Branches", "Rooms", "Beds", "Facilities", "Amenities"]
+      "items": ["vrDataBranches", "vrDataRooms", "vrDataBeds", "vrDataFacilities", "vrDataAmenities"]
     },
     {
-      "title": "Operations",
-      "subtitle": "Full control of daily business",
+      "title": "vrDataOperationsTitle",
+      "subtitle": "vrDataOperationsSubtitle",
       "icon": "image/vendor/operations.svg",
-      "items": ["Bookings", "Invoices", "Deposits", "Coupons"]
+      "items": ["vrDataBookings", "vrDataInvoices", "vrDataDeposits", "vrDataCoupons"]
     },
     {
-      "title": "User Management",
-      "subtitle": "Your team and your guests",
+      "title": "vrDataUsersTitle",
+      "subtitle": "vrDataUsersSubtitle",
       "icon": "image/vendor/users.svg",
-      "items": ["Staff members", "Support requests"]
+      "items": ["vrDataStaffMembers", "vrDataSupportRequests"]
     },
     {
-      "title": "Feedback & Issues",
-      "subtitle": "Keep guests happy",
+      "title": "vrDataFeedbackTitle",
+      "subtitle": "vrDataFeedbackSubtitle",
       "icon": "image/vendor/feedback.svg",
-      "items": ["Complaints", "Damages", "Reviews"]
+      "items": ["vrDataComplaints", "vrDataDamages", "vrDataReviews"]
     },
     {
-      "title": "Analytics",
-      "subtitle": "Real-time insights",
+      "title": "vrDataAnalyticsTitle",
+      "subtitle": "vrDataAnalyticsSubtitle",
       "icon": "image/vendor/analytics.svg",
-      "items": ["Across all dashboards"]
+      "items": ["vrDataAllDashboards"]
     }
   ]
 }

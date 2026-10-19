@@ -4,8 +4,7 @@
 
     <VBox class="svCard svHow" renderType="Bare">
         <HBox justifyContent="Center" wrap="Wrap" renderType="Bare" class="svH2Row">
-            <Text text="{i18n>vrHowTitle}"       class="svH2"/>
-            <Text text="{i18n>vrHowTitleAccent}" class="svH2 svAccent"/>
+            <FormattedText htmlText="{i18n>vrHowHeading}" class="svH2"/>
         </HBox>
         <Text text="{i18n>vrHowSub}" textAlign="Center" class="svSub"/>
 

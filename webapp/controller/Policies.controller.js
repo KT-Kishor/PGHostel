@@ -1,8 +1,9 @@
 sap.ui.define([
     "./BaseController",
     "sap/ui/model/json/JSONModel",
+    "sap/ui/model/resource/ResourceModel",
     "sap/ui/core/Fragment"
-], function (BaseController, JSONModel, Fragment) {
+], function (BaseController, JSONModel, ResourceModel, Fragment) {
     "use strict";
 
     return BaseController.extend("sap.ui.com.project1.controller.Policies", {
@@ -46,16 +47,7 @@ sap.ui.define([
             this._applySelectedLanguage();
 
             var oModel = new JSONModel();
-            oModel.loadData(
-                sap.ui.require.toUrl("sap/ui/com/project1/model/policies.json")
-            );
             this.getView().setModel(oModel, "policies");
-
-            // The language selector of the quick links footer binds to this
-            // model, so it opens on the language that is already stored.
-            this.getView().setModel(new JSONModel({
-                key: localStorage.getItem("selectedLanguage") || "en"
-            }), "langageModel");
 
             oModel.attachRequestCompleted(function () {
                 // The file holds i18n keys, not text, so the key-based source is
@@ -65,6 +57,9 @@ sap.ui.define([
                 this._localizePolicies();
                 this._renderPolicy(this._sPendingPolicyId);
             }.bind(this));
+            oModel.loadData(
+                sap.ui.require.toUrl("sap/ui/com/project1/model/policies.json")
+            );
 
             // Re-arm the scroll-spy every time the policy HTML is rendered,
             // otherwise it keeps observing the headings of the previous policy.
@@ -77,6 +72,10 @@ sap.ui.define([
         onExit: function () {
             this._teardownScrollSpy();
             this._restoreDefaultTitle();
+            if (this._oPolicyI18nModel) {
+                this._oPolicyI18nModel.destroy();
+                this._oPolicyI18nModel = null;
+            }
         },
 
         /**
@@ -101,15 +100,6 @@ sap.ui.define([
             // changed on another page in the meantime, so it is picked up here.
             var bLanguageChanged = this._applySelectedLanguage();
 
-            // The language may have been changed on another page, so the
-            // footer selector is put back on the stored value as well.
-            const sLocale = localStorage.getItem("selectedLanguage") || "en";
-            sap.ui.getCore().getConfiguration().setLanguage(sLocale);
-            const oLanguageModel = new sap.ui.model.json.JSONModel({
-                key: sLocale
-            });
-
-            this.getView().setModel(oLanguageModel, "langageModel");
             // The JSON bundle is still loading on the very first match; the
             // policy is rendered once the request completes.
             if (!this._aPoliciesSource) {
@@ -138,19 +128,33 @@ sap.ui.define([
          */
         _applySelectedLanguage: function () {
             var sLocale = localStorage.getItem("selectedLanguage") || "en";
-            var bChanged = sLocale !== this._sLocale;
-            this._sLocale = sLocale;
+            var oView = this.getView();
+            var bChanged = sLocale !== this._sLocale || !this._oPolicyI18nModel;
 
             sap.ui.getCore().getConfiguration().setLanguage(sLocale);
 
-            // Refresh the i18n resource bundle. A resource model replaces its
-            // bundle when the language changes, so the bundle is read from the
-            // model again instead of keeping the one cached for the previous
-            // language.
-            var oI18nModel = this._getI18nModel();
-            if (oI18nModel) {
-                oI18nModel.refresh(true);
-                this.i18nModel = oI18nModel.getResourceBundle();
+            // Deep links open a fresh tab. Load the stored locale explicitly
+            // instead of reading a shared bundle still switching from English.
+            if (bChanged) {
+                var oPreviousModel = this._oPolicyI18nModel;
+                this._oPolicyI18nModel = new ResourceModel({
+                    bundleName: "sap.ui.com.project1.i18n.i18n",
+                    bundleLocale: sLocale,
+                    async: false
+                });
+                oView.setModel(this._oPolicyI18nModel, "i18n");
+                this.i18nModel = this._oPolicyI18nModel.getResourceBundle();
+                this._sLocale = sLocale;
+                if (oPreviousModel) {
+                    oPreviousModel.destroy();
+                }
+            }
+
+            var oLanguageModel = oView.getModel("langageModel");
+            if (oLanguageModel) {
+                oLanguageModel.setProperty("/key", sLocale);
+            } else {
+                oView.setModel(new JSONModel({ key: sLocale }), "langageModel");
             }
 
             return bChanged;
@@ -161,8 +165,8 @@ sap.ui.define([
          *
          * On init the view is still being created and the component's models are
          * only propagated to it once it is placed, so the view has none of them
-         * yet: the component model is used as a fallback there. Both are the
-         * same manifest model instance, so either one can be refreshed.
+         * yet: the component model is used as a fallback there until the page's
+         * locale-specific resource model is available.
          */
         _getI18nModel: function () {
             var oView = this.getView();
@@ -975,30 +979,11 @@ sap.ui.define([
          * translated again so the whole page follows the new language.
          */
         onLanguagePress: function (oEvent) {
-
             var sLocale = oEvent.getSource().getSelectedKey();
-            var oView = this.getView();
+            if (["en", "kn", "hi"].indexOf(sLocale) === -1) { return; }
 
-            // Save selected language
             localStorage.setItem("selectedLanguage", sLocale);
-
-            // Update SAPUI5 language configuration
-            sap.ui.getCore().getConfiguration().setLanguage(sLocale);
-
-            // Create the resource model for the selected language
-            var oResourceModel = new sap.ui.model.resource.ResourceModel({
-                bundleName: "sap.ui.com.project1.i18n.i18n",
-                bundleLocale: sLocale
-            });
-
-            // Set the updated i18n model
-            oView.setModel(oResourceModel, "i18n");
-
-            // Update the resource bundle used in controller methods
-            this.i18nModel = oResourceModel.getResourceBundle();
-
-            // Refresh UI bindings
-
+            this._applySelectedLanguage();
             if (this._aPoliciesSource) {
                 this._localizePolicies();
                 this._renderPolicy(this._sPendingPolicyId);

@@ -4,16 +4,15 @@
 
     <VBox class="svCard svPtypes" renderType="Bare">
         <HBox justifyContent="Center" wrap="Wrap" renderType="Bare" class="svH2Row">
-            <Text text="{i18n>vrPtTitle}"       class="svH2"/>
-            <Text text="{i18n>vrPtTitleAccent}" class="svH2 svAccent"/>
+            <FormattedText htmlText="{i18n>vrPtHeading}" class="svH2"/>
         </HBox>
         <Text text="{i18n>vrPtSub}" textAlign="Center" class="svSub"/>
         <MessageStrip text="{pt>/loadError}" type="Error" showIcon="true" visible="{= !!${pt>/loadError} }"/>
 
         <HBox id="vendorTypeTabs" class="svTabs" renderType="Bare" width="100%" items="{path:'pt>/types', templateShareable:false}">
-            <ToggleButton text="{pt>id}"
+            <ToggleButton text="{pt>name}"
                           icon="{pt>icon}"
-                          tooltip="{pt>id}"
+                          tooltip="{pt>name}"
                           width="100%"
                           pressed="{= ${pt>id} === ${ptState>/selectedId} }"
                           type="Transparent"

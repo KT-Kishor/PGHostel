@@ -11939,6 +11939,12 @@ text-transform: none !important;
    ScrollContainer that also contains the shared quicklinks footer.
    ================================================================== */
 
+.svPage {
+    /* background: #f3f8f7; */
+    /* background: #E4FCF9;mast */
+    --sv-page: #F4FFFD;
+}
+
 .svPage .svWrap {
     --sv-teal-1: #00a7b5;
     --sv-teal-2: #0092a0;
@@ -11948,7 +11954,9 @@ text-transform: none !important;
     --sv-ink: #10252a;
     --sv-muted: #4a6469;
     --sv-paper: #fff;
-    --sv-page: #f2fafb;
+    /* --sv-page: #f3f8f7; */
+    /* --sv-page: #E4FCF9;mast */
+    --sv-page: #F4FFFD;
     --sv-line: #cfe9ee;
     --sv-field: #f7fcfd;
     --sv-field-line: #b4d0d6;
@@ -11959,8 +11967,8 @@ text-transform: none !important;
     --sv-warn-line: #f1d575;
     --sv-warn-ink: #5c4400;
     --sv-grad: linear-gradient(180deg, var(--sv-teal-1), var(--sv-teal-2));
-    --sv-shadow: 0 4px 14px rgba(0, 110, 125, .18);
-    --sv-shadow-lg: 0 12px 40px rgba(0, 110, 125, .22);
+    --sv-shadow: 0 3px 12px rgba(16, 37, 42, .06);
+    --sv-shadow-lg: 0 8px 24px rgba(16, 37, 42, .08);
     --sv-font: Roboto, "Segoe UI", Arial, sans-serif;
 
     /* Property type card geometry. Shared by the card and its fill overlay so the
@@ -12048,6 +12056,7 @@ text-transform: none !important;
 
 .svPage .svWrap .svCard {
     padding: clamp(22px, 4vw, 40px) clamp(14px, 3vw, 32px);
+    border: 1px solid #dce9e7;
     border-radius: 22px;
     background: var(--sv-paper);
     box-shadow: var(--sv-shadow);
@@ -12070,6 +12079,20 @@ text-transform: none !important;
 }
 
 .svPage .svWrap .svAccent { color: var(--sv-teal-dark); }
+
+.svPage .svWrap .svH2 strong {
+    color: var(--sv-teal-dark);
+    font-weight: inherit;
+}
+
+.svPage:lang(kn) .svWrap .svH2,
+.svPage:lang(hi) .svWrap .svH2,
+.svPage:lang(kn) .svWrap .svH3,
+.svPage:lang(hi) .svWrap .svH3,
+.svPage:lang(kn) .svWrap .svHeroTitle,
+.svPage:lang(hi) .svWrap .svHeroTitle {
+    line-height: 1.4;
+}
 
 .svPage .svWrap .svSub {
     display: block;
@@ -12454,6 +12477,7 @@ text-transform: none !important;
 .svPage .svWrap .svTab .sapMBtnContent {
     width: 100%;
     float: none;
+    overflow-wrap: anywhere;
 }
 
 .svPage .svWrap .svTab .sapMBtnContent bdi {
@@ -12828,6 +12852,17 @@ text-transform: none !important;
         height: 21rem;
         justify-content: flex-start;
     }
+
+    .svPage:lang(kn) .svWrap .svTreeCol,
+    .svPage:lang(hi) .svWrap .svTreeCol {
+        height: auto;
+        min-height: 21rem;
+    }
+
+    /* Match the card's bottom padding to center the note vertically. */
+    .svPage .svWrap .svPtypes .svNote {
+        margin-top: 40px;
+    }
 }
 
 
@@ -12965,20 +13000,31 @@ text-transform: none !important;
     text-align: center;
 }
 
-/* ---------------- registration sidebar ---------------- */
+/* ---------------- registration card ---------------- */
 
 .svPage .svWrap .svReg { scroll-margin-top: 16px; }
-.svPage .svWrap .svReg .svSub { max-width: 56ch; margin-bottom: 22px; }
 
 .svPage .svWrap .svRegCard {
     display: grid;
     grid-template-columns: 340px minmax(0, 1fr);
     align-items: stretch;
+    border: 1px solid #dce9e7;
     border-radius: 24px;
     background: var(--sv-paper);
     box-shadow: var(--sv-shadow-lg);
     /* Clip rounded corners without creating a scroll ancestor for the sidebar. */
     overflow: clip;
+}
+
+.svPage .svWrap .svRegHeader {
+    grid-column: 1 / -1;
+    padding: clamp(24px, 3vw, 36px) clamp(20px, 3.5vw, 40px);
+    border-bottom: 1px solid #dce9e7;
+}
+
+.svPage .svWrap .svRegHeader .svSub {
+    max-width: 56ch;
+    margin-bottom: 0;
 }
 
 .svPage .svWrap .svSide {
@@ -13910,6 +13956,11 @@ text-transform: none !important;
 
     .svPage .svWrap .svStem,
     .svPage .svWrap .svBranches::before { display: none; }
+
+    /* Replace the spacing lost when the single-property connector is hidden. */
+    .svPage .svWrap .svBranches[data-vendor-single="true"] {
+        padding-top: 16px;
+    }
 
     .svPage .svWrap .svStep { flex-direction: row; }
     .svPage .svWrap .svFileMeta { grid-column: 2 / -1; }

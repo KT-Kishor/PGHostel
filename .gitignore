@@ -11,3 +11,5 @@ archive.zip
 branch_structure.json
 .gitignore
 scripts
+.kilo/
+.kilocode/

@@ -3,6 +3,7 @@
     xmlns:core="sap.ui.core"
     xmlns:u="sap.ui.unified">
 
+    <!-- Keep registration option text, keys and filenames canonical; localize UI labels only. -->
     <VBox id="adminSignupForm" class="svForm" renderType="Bare"
           busy="{AdminSignupModel>/Submitting}" busyIndicatorDelay="0">
         <VBox class="svSec" renderType="Bare">
@@ -37,7 +38,7 @@
                     <HBox class="svInputShell" renderType="Bare">
                         <core:Icon src="sap-icon://calendar" class="svFieldIcon"/>
                         <DatePicker id="adminDOB" value="{AdminSignupModel>/DOB}" width="100%"
-                                    placeholder="DD/MM/YYYY" displayFormat="dd/MM/yyyy" valueFormat="yyyy-MM-dd"
+                                    placeholder="{i18n>vrDobPlaceholder}" displayFormat="dd/MM/yyyy" valueFormat="yyyy-MM-dd"
                                     initialFocusedDateValue="{controller>/focusedDate}"
                                     minDate="{AdminSignupModel>/DOBMin}" maxDate="{AdminSignupModel>/DOBMax}"
                                     change="ADMIN_onChangeDOB"
@@ -52,9 +53,9 @@
                                 forceSelection="true" change="ADMIN_onChangeGender"
                                 valueStateText="{i18n>pleaseselectGender}">
                             <core:Item key="" text="{i18n>vrGenderPlaceholder}"/>
-                            <core:Item key="Male" text="{i18n>vrGenderMale}"/>
-                            <core:Item key="Female" text="{i18n>vrGenderFemale}"/>
-                            <core:Item key="Other" text="{i18n>vrGenderOther}"/>
+                            <core:Item key="Male" text="Male"/>
+                            <core:Item key="Female" text="Female"/>
+                            <core:Item key="Other" text="Other"/>
                         </Select>
                     </HBox>
                 </VBox>
@@ -130,6 +131,7 @@
                     <HBox class="svPairWide" renderType="Bare">
                         <ComboBox id="adminsignUpSTD" value="{AdminSignupModel>/STDCode}"
                                   width="100%" change="ADMIN_onChangeSTD" placeholder="{i18n>iSD}"
+                                  valueStateText="{i18n>stdCodeRequired}"
                                   tooltip="{i18n>vrCountryCode}" showSecondaryValues="true"
                                   items="{path:'CountryModel>/', length:1000}" filterSecondaryValues="true">
                             <core:ListItem key="{CountryModel>stdCode}" text="{CountryModel>stdCode}"
@@ -150,8 +152,8 @@
                         <core:Icon src="sap-icon://home" class="svFieldIcon"/>
                         <TextArea id="adminAddress" value="{AdminSignupModel>/Address}" width="100%"
                                   rows="3" valueLiveUpdate="true" maxLength="120"
-                                  placeholder="{i18n>vrAddressPlaceholder}" liveChange="ADMIN_onAddressChange"
-                                  change="ADMIN_onAddressChange"/>
+                                   placeholder="{i18n>vrAddressPlaceholder}" liveChange="ADMIN_onAddressChange"
+                                   change="ADMIN_onAddressChange" valueStateText="{i18n>vrErrAddress}"/>
                     </HBox>
                 </VBox>
             </HBox>
@@ -213,8 +215,9 @@
                         <core:Icon src="sap-icon://document-text" class="svFileIcon"
                                    visible="{= !${AdminSignupModel>isProcessing} }"/>
                         <VBox class="svFileMeta" renderType="Bare">
-                            <Text text="{AdminSignupModel>FileName}" tooltip="{AdminSignupModel>FileName}"
-                                  wrapping="false" class="svFileName"/>
+                            <Text text="{AdminSignupModel>FileName}"
+                                  tooltip="{AdminSignupModel>FileName}"
+                                  wrapping="false" class="svFileName" visible="{= !${AdminSignupModel>isProcessing} }"/>
                             <Text text="{path:'AdminSignupModel>size', formatter:'.Formatter.formatFileSize'}"
                                   class="svFileSub" visible="{= !${AdminSignupModel>isProcessing} }"/>
                         </VBox>

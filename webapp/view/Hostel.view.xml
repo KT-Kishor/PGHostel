@@ -68,6 +68,7 @@
                             key="idVendor"
                             tooltip="{i18n>vrTabTitle}"
                             text="{i18n>vrTabTitle}"
+                            visible="false"
                         />
                         <!-- <IconTabFilter key="idFacilities" text="Facilities" /> -->
                         <IconTabFilter
@@ -468,6 +469,7 @@
         <HBox class="bannerAction sapUiTinyMarginBottom">
             <Button 
                 text="{i18n>Registeryourproperty}" 
+                press="onAdminSIGNUP"
                 class="btnRegister"/>
         </HBox>
 
