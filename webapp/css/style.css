@@ -8644,6 +8644,12 @@ text-transform: none !important;
 	max-width: 100%;
 }
 
+/* The carousel carries a theme minimum width that is wider than this column,
+   so it overflowed its flex item and pushed the picture off centre. */
+.umPage .umAdWrap .sapMCrsl {
+	min-width: 0 !important;
+}
+
 /* ===== Card ===== */
 .umCard {
 	background: var(--um-surface);
