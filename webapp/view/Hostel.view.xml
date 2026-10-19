@@ -172,7 +172,7 @@
     <Button
         id="btnHotels"
         text="{i18n>cardHotels}"
-        icon="sap-icon://building"
+        icon="sap-icon://bed"
         press="onStayTypePress"
         class="stayTypeButton selected-stay-btn myUnifiedBtn">
         <customData>
@@ -184,7 +184,7 @@
     <Button 
         id="btnHostels"
         text="{i18n>cardhostels}"
-        icon="sap-icon://group"
+        icon="sap-icon://home-share"
         press="onStayTypePress"
         class="stayTypeButton myUnifiedBtn">
         <customData>
@@ -282,7 +282,7 @@
             </VBox>
 
             <!-- Action Button -->
-            <Button text="{i18n>Browse} {view>badge}" press="onBrowseHotelsPress" class="myUnifiedBtn browscss"/>
+            <Button text="{i18n>Browse} {view>badge}" press="onBrowseHotelsPress" class="myUnifiedBtn browscss wrapButtonText"/>
         </VBox>
 
     </HBox>
@@ -343,7 +343,6 @@
     <VBox class="bookingStepsHeader" alignItems="Center">
         <Title
             text="{i18n>Bookinthreesteps}"
-            level="H2"
             class="bookingStepsTitle"/>
 
         <Text

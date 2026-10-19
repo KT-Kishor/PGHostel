@@ -442,7 +442,7 @@ this._updateStaysData(oResourceBundle);
 },
 
 
-        onBrowseHotelsPress: function () {
+        onBrowseHotelsPress:async function () {
             var sCurrentId = this.getView().getModel("view").getProperty("/selectedId");
 
             if(sCurrentId==="Hostels"){
@@ -465,9 +465,10 @@ this._updateStaysData(oResourceBundle);
           this.key="idRooms"
           this.PropertyType=sCurrentId
           this.isInitialLoad=false
-          this.byId("id_PropertyType").setSelectedKeys([sCurrentId]);
 
-          this.onTabSelect()
+          await this.onTabSelect()
+          this.byId("id_PropertyType").setSelectedKeys([sCurrentId]);
+          
 
         },
         onAfterAnimate: function () {

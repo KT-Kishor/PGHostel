@@ -11,13 +11,17 @@
 >
 		<Page
 			showHeader="true"
+              navButtonPress="onNavBack"
+        showNavButton="true"
+        class="myUnifiedBtn"
+        title="{i18n>InsuranceApplication}"
 			>
-                <headerContent>
+                <!-- <headerContent>
             <core:Fragment
                 fragmentName="sap.ui.com.project1.fragment.Header"
                 type="XML"
             />
-        </headerContent>
+        </headerContent> -->
     <uxap:ObjectPageLayout
         id="insuranceObjectPage"
         showTitleInHeaderContent="true"
@@ -31,13 +35,13 @@
             <uxap:ObjectPageDynamicHeaderTitle>
                 <uxap:expandedHeading>
                     <Title
-                        text="{i18n>InsuranceApplication}"
+                        text="{HealthInsuranceModel>/sPath} {i18n>insurence}"
                         level="H1"
                     />
                 </uxap:expandedHeading>
                 <uxap:snappedHeading>
                     <Title
-                        text="{i18n>InsuranceApplication}"
+                        text="{HealthInsuranceModel>/sPath} {i18n>insurence}"
                         level="H2"
                     />
                 </uxap:snappedHeading>
