@@ -13947,3 +13947,24 @@ body.svVendorScope .sapMSltPicker .sapMSelectListItemBase:focus-visible,
 body.svVendorScope .sapMSltPicker .sapMSelectList:focus {
     outline-color: var(--svteal-dark) !important;
 }
+
+/* Footer links reuse .tealTextLink behaviour but must stay white on the teal
+   footer background, so they carry this class as an override. */
+.svFooterWhiteLink,
+.svFooterWhiteLink.sapMLnk,
+.svFooterWhiteLink .sapMLnk,
+.svFooterWhiteLink .sapMLnkText,
+.svFooterWhiteLink:hover,
+.svFooterWhiteLink:focus,
+.svFooterWhiteLink:active,
+.svFooterWhiteLink.sapMLnkActive,
+.svFooterWhiteLink.sapMLnkActive .sapMLnkText {
+  color: #ffffff !important;
+  background-color: transparent !important;
+}
+
+.svFooterWhiteLink::selection,
+.svFooterWhiteLink *::selection {
+  color: #ffffff !important;
+  background: transparent !important;
+}

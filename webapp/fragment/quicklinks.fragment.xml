@@ -90,11 +90,11 @@
             <!-- Quick Links -->
             <VBox class="svFooterColumn">
                 <Title text="{i18n>Quicklinks}" level="H5"/>
-                <Link text="{i18n>quickHome}" press="onfooterhometabselect"/>
-                <Link text="{i18n>rooms}" press="onfootertabselect"/>
-                <Link text="{i18n>contact}" press="onfootercontacttabselect"/>
-                <Link text="{i18n>userManualTitle}" press="onUsermanualPress"/>
-                <Link text="{i18n>adminVendorRegistration}" press="onAdminSIGNUP"/>
+                <Link text="{i18n>quickHome}" press="onfooterhometabselect" class="tealTextLink svFooterWhiteLink"/>
+                <Link text="{i18n>rooms}" press="onfootertabselect" class="tealTextLink svFooterWhiteLink"/>
+                <Link text="{i18n>contact}" press="onfootercontacttabselect" class="tealTextLink svFooterWhiteLink"/>
+                <Link text="{i18n>userManualTitle}" press="onUsermanualPress" class="tealTextLink svFooterWhiteLink"/>
+                <Link text="{i18n>adminVendorRegistration}" press="onAdminSIGNUP" class="tealTextLink svFooterWhiteLink"/>
             </VBox>
 
             <!-- Policies -->
@@ -102,8 +102,8 @@
                 <Link
                     text="{i18n>policiesTitle}"
                     press="onPoliciesPress"
-                    class="svFooterColumnTitle"/>
-                <Link text="{i18n>policyLinkTerms}" press="onPolicyLinkPress">
+                    class="svFooterColumnTitle tealTextLink svFooterWhiteLink"  />
+                <Link text="{i18n>policyLinkTerms}" press="onPolicyLinkPress" class="tealTextLink svFooterWhiteLink">
                     <customData>
                         <core:CustomData
                             key="policyId"
@@ -111,7 +111,7 @@
                             writeToDom="true"/>
                     </customData>
                 </Link>
-                <Link text="{i18n>policyLinkPrivacy}" press="onPolicyLinkPress">
+                <Link text="{i18n>policyLinkPrivacy}" press="onPolicyLinkPress" class="tealTextLink svFooterWhiteLink">
                     <customData>
                         <core:CustomData
                             key="policyId"
@@ -119,7 +119,7 @@
                             writeToDom="true"/>
                     </customData>
                 </Link>
-                <Link text="{i18n>policyLinkRefund}" press="onPolicyLinkPress">
+                <Link text="{i18n>policyLinkRefund}" press="onPolicyLinkPress" class="tealTextLink svFooterWhiteLink">
                     <customData>
                         <core:CustomData
                             key="policyId"
@@ -127,7 +127,7 @@
                             writeToDom="true"/>
                     </customData>
                 </Link>
-                <Link text="{i18n>policyLinkVendor}" press="onPolicyLinkPress">
+                <Link text="{i18n>policyLinkVendor}" press="onPolicyLinkPress" class="tealTextLink svFooterWhiteLink">
                     <customData>
                         <core:CustomData
                             key="policyId"
@@ -135,7 +135,7 @@
                             writeToDom="true"/>
                     </customData>
                 </Link>
-                <Link text="{i18n>policyLinkGrievance}" press="onPolicyLinkPress">
+                <Link text="{i18n>policyLinkGrievance}" press="onPolicyLinkPress" class="tealTextLink svFooterWhiteLink">
                     <customData>
                         <core:CustomData
                             key="policyId"
@@ -155,7 +155,7 @@
                         <Text text="{i18n>resetPasswordEmailFilter}"/>
                         <Link
                             text="admin@stayvriksha.in"
-                            href="mailto:admin@stayvriksha.in"/>
+                            href="mailto:admin@stayvriksha.in" class="tealTextLink svFooterWhiteLink"/>
                     </VBox>
                 </HBox>
 
