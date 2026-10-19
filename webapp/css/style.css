@@ -8610,6 +8610,40 @@ text-transform: none !important;
 	font-size: 0.86rem !important;
 }
 
+/* ===== Advertisement panel under the index ===== */
+/* Top spacing comes from the medium margin class in the view. */
+.umPage .umAdWrap {
+	width: 100%;
+	min-width: 0;
+	max-width: 100%;
+}
+
+.umPage .umAdTitle {
+	margin: 0 0 6px 2px;
+	color: var(--um-ink) !important;
+	font-size: 15px !important;
+}
+
+/* Keep spacing inside the panel content so it fits the narrow sidebar. */
+.umPage .umAdWrap .adPanel {
+	margin-bottom: 0 !important;
+	padding: 0 !important;
+	max-width: 100%;
+	box-sizing: border-box;
+}
+
+.umPage .umAdWrap .adPanel > .sapMPanelContent {
+	max-width: 100%;
+	box-sizing: border-box;
+	overflow-x: hidden;
+}
+
+/* UI5 gives flex wrappers an inline automatic minimum width. */
+.umPage .umAdWrap .sapMFlexItem {
+	min-width: 0 !important;
+	max-width: 100%;
+}
+
 /* ===== Card ===== */
 .umCard {
 	background: var(--um-surface);
@@ -12749,6 +12783,17 @@ text-transform: none !important;
     transition: grid-template-columns .45s cubic-bezier(.4, 0, .2, 1);
 }
 
+/* Kannada and Hindi labels are wider than the English ones and wrap inside the
+   branches, so the tree's height is content-driven there. Animating the column
+   change re-wraps those labels on every frame, and the panel re-centres the
+   growing/shrinking block while it moves, which reads as jitter. Those locales
+   switch columns instantly; the opacity fade in .svSwapping/.svSwappingTree
+   still runs. */
+.svPage:lang(kn) .svWrap .svBranches,
+.svPage:lang(hi) .svWrap .svBranches {
+    transition: none;
+}
+
 .svPage .svWrap .svBranches::before {
     content: "";
     position: absolute;
@@ -12848,15 +12893,15 @@ text-transform: none !important;
         min-height: 30rem;
     }
 
+    /* The translated labels are taller than the English ones, but the tree
+       column keeps the same fixed height for every language: a content-sized
+       column grew and shrank with the swapped tree, and because the panel
+       centres its columns that moved the mode toggle and re-centred the whole
+       detail column on every mode switch. The overflow is not clipped and the
+       row is at least as tall as the detail column, so a taller tree fits. */
     .svPage .svWrap .svTreeCol {
         height: 21rem;
         justify-content: flex-start;
-    }
-
-    .svPage:lang(kn) .svWrap .svTreeCol,
-    .svPage:lang(hi) .svWrap .svTreeCol {
-        height: auto;
-        min-height: 21rem;
     }
 
     /* Match the card's bottom padding to center the note vertically. */

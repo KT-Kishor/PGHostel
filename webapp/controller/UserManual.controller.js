@@ -95,6 +95,12 @@ _onRouteMatched: async function  (oEvent) {
             this.getView().setModel(new JSONModel({
                 key: localStorage.getItem("selectedLanguage") || "en"
             }), "langageModel");
+
+            // The advertisement panel under the index binds to this model, so it
+            // exists (empty) before the first render and fills in once the
+            // pictures arrive.
+            this._setupAdvertisementModel([]);
+            this._loadAdvertisements();
 },
 	 onBack:function(){
   if (this._sFlag === "view") {
@@ -392,10 +398,9 @@ onPolicyLinkPress: function (oEvent) {
 },
 
 onAdminSIGNUP: function () {
-    // Vendor registration lives on the hostel page.
-    this.getOwnerComponent()
-        .getRouter()
-        .navTo("RouteHostel");
+    // Vendor registration lives on the hostel page, in the
+    // "List your property" tab.
+    this._navToHostelTab("idVendor");
 },
 
 /**
@@ -468,6 +473,209 @@ onLanguagePress: function (oEvent) {
     // The index entries are resolved from the same bundle, so the list is
     // rebuilt to show the titles in the new language.
     this._buildIndex();
+},
+
+/* ------------------------------------------------------------
+ *  Advertisements
+ *
+ *  The panel under the index reuses the advertisement carousel of the booking
+ *  page: the same service, the same picture transformation and the same
+ *  auto-slide with pause/resume. Only the slide size differs, because this
+ *  column is narrower.
+ * ------------------------------------------------------------ */
+
+_loadAdvertisements: async function () {
+    try {
+        const oResponse = await this.ajaxReadWithJQuery("HM_Advertisement");
+        const aAdvertisements = oResponse?.data || [];
+
+        const aCarouselItems = this._transformAdvertisementData(aAdvertisements);
+        this._setupAdvertisementModel(aCarouselItems);
+    } catch (oError) {
+        this._setupAdvertisementModel([]);
+    }
+},
+
+_transformAdvertisementData: function (aAdvertisements) {
+    const aCarouselItems = [];
+    const that = this;
+
+    aAdvertisements.forEach(function (oAd) {
+        // Extract photos from Photo1, Photo2, Photo3, etc.
+        for (let i = 1; i <= 3; i++) {
+            const sPhotoField = `Photo${i}`;
+            const sNameField = `Photo${i}Name`;
+            const sTypeField = `Photo${i}Type`;
+
+            if (oAd[sPhotoField]) {
+                const sImageSrc = that._prepareImageData(oAd[sPhotoField], oAd[sTypeField]);
+
+                if (sImageSrc) {
+                    aCarouselItems.push({
+                        id: oAd.ID + '-' + i,
+                        image: sImageSrc,
+                        title: oAd[sNameField] || `Advertisement ${i}`,
+                        url: oAd.URL,
+                        originalAd: oAd
+                    });
+                }
+            }
+        }
+    });
+
+    return aCarouselItems;
+},
+
+_prepareImageData: function (sImageData, sImageType) {
+    if (!sImageData) {
+        return null;
+    }
+
+    const sCleanData = sImageData.replace(/\s/g, '');
+
+    if (sCleanData.startsWith('data:')) {
+        return sCleanData;
+    }
+
+    let sType = sImageType || 'image/png';
+
+    if (!sType.startsWith('image/')) {
+        sType = 'image/png';
+    }
+
+    return `data:${sType};base64,${sCleanData}`;
+},
+
+_setupAdvertisementModel: function (aCarouselItems) {
+    if (!this.getView()) {
+        return;
+    }
+
+    const oAdvertisementModel = new JSONModel({
+        Advertisements: aCarouselItems,
+        currentPage: 0,
+        itemsPerPage: 1
+    });
+    this.getView().setModel(oAdvertisementModel, "AdvertisementModel");
+
+    // The panel takes space under the index, so the index height is refitted
+    // once the pictures have rendered.
+    window.setTimeout(function () {
+        this._fitToc();
+    }.bind(this), 0);
+
+    if (aCarouselItems.length > 1) {
+        this._startAdvertisementCarouselAutoSlide();
+    } else {
+        // A previous visit may have left a loop running for pictures that are
+        // no longer there.
+        this._stopAdvertisementCarouselAutoSlide();
+    }
+},
+
+_startAdvertisementCarouselAutoSlide: function () {
+    const oCarousel = this.byId("AdvertisementCarousel");
+
+    // The carousel is rendered after the first binding pass, so the start waits
+    // for it. The attempts are capped so a closed page cannot keep retrying.
+    if (!oCarousel || oCarousel.getPages().length <= 1) {
+        this._iAdCarouselRetries = (this._iAdCarouselRetries || 0) + 1;
+
+        if (this._iAdCarouselRetries > 40 || !this.getView()) {
+            return;
+        }
+
+        setTimeout(() => this._startAdvertisementCarouselAutoSlide(), 300);
+        return;
+    }
+    this._iAdCarouselRetries = 0;
+
+    // The pictures are rendered by now, so the index is refitted above the
+    // panel's final height.
+    this._fitToc();
+
+    this._stopAdvertisementCarouselAutoSlide();
+
+    const fnPauseResume = () => {
+        this._stopAdvertisementCarouselAutoSlide();
+
+        // Resume after 3 seconds of inactivity
+        this._iAdCarouselResumeTimer = setTimeout(() => {
+            this._iAdCarouselResumeTimer = null;
+
+            if (oCarousel && !oCarousel.bIsDestroyed && oCarousel.getPages().length > 1) {
+                this._startAdvertisementCarouselAutoSlide();
+            }
+        }, 3000);
+    };
+
+    // Attach events and store references so they are detached on the next start
+    ['touchstart', 'mousedown'].forEach(event => {
+        const handler = fnPauseResume.bind(this);
+        oCarousel.attachBrowserEvent(event, handler);
+        this._adCarouselPauseResumeHandlers.push({
+            element: oCarousel,
+            event: event,
+            fn: handler
+        });
+    });
+
+    this._adCarouselInterval = setInterval(() => {
+        if (oCarousel && !oCarousel.bIsDestroyed) {
+            oCarousel.next();
+        } else {
+            this._stopAdvertisementCarouselAutoSlide();
+        }
+    }, 3000);
+},
+
+_stopAdvertisementCarouselAutoSlide: function () {
+    if (this._adCarouselInterval) {
+        clearInterval(this._adCarouselInterval);
+        this._adCarouselInterval = null;
+    }
+
+    if (this._iAdCarouselResumeTimer) {
+        clearTimeout(this._iAdCarouselResumeTimer);
+        this._iAdCarouselResumeTimer = null;
+    }
+
+    if (this._adCarouselPauseResumeHandlers) {
+        this._adCarouselPauseResumeHandlers.forEach(handler => {
+            if (handler.element && handler.event && handler.fn) {
+                handler.element.detachBrowserEvent(handler.event, handler.fn);
+            }
+        });
+    }
+
+    // Always a fresh array, so a first start can safely push into it.
+    this._adCarouselPauseResumeHandlers = [];
+},
+
+onAdvertisementImagePress: function (oEvent) {
+    const oImage = oEvent.getSource();
+    const oBindingContext = oImage.getBindingContext("AdvertisementModel");
+    const oBundle = this._bundle();
+    const sMessage = oBundle
+        ? oBundle.getText("advertisementClicked")
+        : "Advertisement clicked";
+
+    if (oBindingContext) {
+        const oAdItem = oBindingContext.getObject();
+        if (oAdItem && oAdItem.url) {
+            // Open the URL in a new tab
+            window.open(oAdItem.url, "_blank");
+            return;
+        }
+    }
+
+    MessageToast.show(sMessage);
+},
+
+onExit: function () {
+    // Base cleanup (shared carousel timers) plus the ad loop of this page.
+    BaseController.prototype.onExit.call(this);
+    this._stopAdvertisementCarouselAutoSlide();
 },
 
 /* ------------------------------------------------------------
@@ -972,12 +1180,18 @@ _fitToc: function () {
     var iChrome = oBodyDom.getBoundingClientRect().top - iPanelTop;
     var iGap = 8;
 
-    var iByFooter = iFooterTop - iTop - iChrome - iGap;
+    // The advertisement panel shares this sticky column and sits under the
+    // index, so the list stops above it instead of overlapping it.
+    var oAdWrap = this.byId("umAdWrap");
+    var oAdDom = oAdWrap && oAdWrap.getVisible() ? oAdWrap.getDomRef() : null;
+    var iAdHeight = oAdDom ? oAdDom.getBoundingClientRect().height + 12 : 0;
+
+    var iByFooter = iFooterTop - iTop - iChrome - iGap - iAdHeight;
 
     // A sticky element cannot be pinned past the end of its container, so the
     // height is also bounded by where that container ends.
     var iByContainer = oColDom.parentElement
-        ? oColDom.parentElement.getBoundingClientRect().bottom - iTop - iChrome
+        ? oColDom.parentElement.getBoundingClientRect().bottom - iTop - iChrome - iAdHeight
         : iByFooter;
 
     var iHeight = Math.max(180, Math.min(iByFooter, iByContainer));

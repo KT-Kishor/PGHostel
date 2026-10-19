@@ -92,6 +92,42 @@
 									  visible="{umIndex>/empty}"/>
 							</VBox>
 						</Panel>
+
+						<!-- ===== Advertisements, same panel and auto-slide as on the
+						     booking page, kept under the index in this column ===== -->
+						<VBox id="umAdWrap" class="umAdWrap sapUiMediumMarginTop">
+							<Title
+								text="{i18n>advertisements}"
+								class="umAdTitle"
+							/>
+							<Panel
+								class="adPanel panelbracket"
+							>
+								<VBox class="sapUiTinyMargin">
+									<Carousel
+										id="AdvertisementCarousel"
+										height="215px"
+										showPageIndicator="true"
+										arrowsPlacement="Content"
+										loop="true"
+										pages="{
+											path: 'AdvertisementModel>/Advertisements',
+											templateShareable: false
+										}"
+									>
+										<pages>
+											<Image
+												src="{AdvertisementModel>image}"
+												alt="{AdvertisementModel>title}"
+												width="100%"
+												height="170px"
+												press="onAdvertisementImagePress"
+											/>
+										</pages>
+									</Carousel>
+								</VBox>
+							</Panel>
+						</VBox>
 					</VBox>
 
 					<!-- ======== CARDS ======== -->

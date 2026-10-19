@@ -206,7 +206,11 @@ sap.ui.define([
             if (!oModel || !oBundle) return;
 
             var fnText = function (sKey) {
-                return typeof sKey === "string" && sKey ? oBundle.getText(sKey) : sKey;
+                if (typeof sKey !== "string" || !sKey) return sKey;
+                // A literal value (such as a date) is not an i18n key, so a
+                // missing key falls back to the value itself instead of the
+                // key placeholder UI5 would otherwise return.
+                return oBundle.getText(sKey, null, true) || sKey;
             };
 
             var aPolicies = (this._aPoliciesSource || []).map(function (oPolicy) {
@@ -214,7 +218,6 @@ sap.ui.define([
                     tab:      fnText(oPolicy.tab),
                     title:    fnText(oPolicy.title),
                     subtitle: fnText(oPolicy.subtitle),
-                    updated:  fnText(oPolicy.updated),
                     keyPoints: (oPolicy.keyPoints || []).map(fnText),
                     sections: (oPolicy.sections || []).map(function (oSection) {
                         return Object.assign({}, oSection, {
@@ -245,13 +248,18 @@ sap.ui.define([
                 return Object.assign({}, s, { number: i + 1 });
             });
 
+            // The date is data, not translatable text: it comes from the
+            // catalog's single lastUpdated value so one edit refreshes every
+            // tab in every language. A per-policy value still wins if present.
+            var sUpdated = oPolicy.updated || oModel.getProperty("/lastUpdated") || "";
+
             // Build the policy HTML body once, then hand it to the HTML control
             oModel.setProperty("/currentHtml",     this._buildHtml(aSections, oPolicy));
             oModel.setProperty("/currentId",       oPolicy.id);
             oModel.setProperty("/currentTab",      oPolicy.tab);
             oModel.setProperty("/currentTitle",    oPolicy.title);
             oModel.setProperty("/currentSubtitle", oPolicy.subtitle);
-            oModel.setProperty("/currentUpdated",  oPolicy.updated);
+            oModel.setProperty("/currentUpdated",  sUpdated);
             oModel.setProperty("/currentSections", aSections);
 
             var oPrev = aPolicies[iIdx - 1];
@@ -939,8 +947,10 @@ sap.ui.define([
         },
 
         onAdminSIGNUP: function () {
-            // Vendor registration dialog lives on the hostel page.
-            this.getRouter().navTo("RouteHostel");
+            // Vendor registration lives on the hostel page, in the
+            // "List your property" tab. Queue that tab before navigating so
+            // the hostel page opens it instead of the default tab.
+            this._navToHostelTab("idVendor");
         },
 
         /**

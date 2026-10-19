@@ -3348,6 +3348,10 @@ sap.ui.define([
             this.getOwnerComponent().getRouter().navTo("RouteHostel");
             sessionStorage.setItem("homePageReturnTab", sTabKey);
         },
+        onAdminSIGNUP: function () {
+            sessionStorage.setItem("homePageReturnTab", "idVendor");
+            this.getOwnerComponent().getRouter().navTo("RouteHostel");
+        },
         onPoliciesPress: function () {
             this.getOwnerComponent()
                 .getRouter()

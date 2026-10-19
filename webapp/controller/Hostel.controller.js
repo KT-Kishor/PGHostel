@@ -278,7 +278,11 @@ this._updateStaysData(oResourceBundle);
             // Refresh vendor labels after route localization without resetting the form.
             this._initVendorRegistration();
             this._initAdminSignupControls();
-            if (sStoredTab === "idVendor") this.onAdminLoadLocations();
+            if (sStoredTab === "idVendor") {
+                this._setVendorScope(true);
+                this.onAdminLoadLocations();
+                this._vrScrollToTop();
+            }
 
             this.iTop = 4; // records per load
             this.iSkip = 0; // starting index
@@ -4349,15 +4353,20 @@ const sSuccessMsg = this.i18nModel.getText("registrationSuccess", [
             const oPage = this.byId("idVendor");
             if (oNav && oNav.getCurrentPage() !== oPage) {
                 oNav.attachEventOnce("afterNavigate", function (oEvent) {
-                    if (!this._vrExited && oEvent.getParameter("to") === oPage) {
-                        this._vrScrollTo("register");
+                    // ORIGINAL (restore by uncommenting, then remove the _vrScrollToTop block below):
+                    // if (!this._vrExited && oEvent.getParameter("to") === oPage) {
+                    //     this._vrScrollTo("register");
+                    // }
+                    if (oEvent.getParameter("to") === oPage) {
+                        this._vrScrollToTop();
                     }
                 }, this);
             }
             oHeader.setSelectedKey("idVendor");
             this.onTabSelect({ getParameter: function () { return oItem; } });
             this._initAdminSignupControls();
-            this._vrScrollTo("register");
+            // ORIGINAL: this._vrScrollTo("register");
+            this._vrScrollToTop();
         },
 
         onAdminLoadLocations: function () {
@@ -6606,6 +6615,14 @@ onBuyTravelInsurance:function() {
 
             if (oCtrl && oCtrl.getDomRef()) {
                 oCtrl.getDomRef().scrollIntoView({ behavior: "smooth", block: "start" });
+            }
+        },
+
+        _vrScrollToTop: function () {
+            var oPage = this.byId("idVendor");
+
+            if (oPage && oPage.scrollTo) {
+                oPage.scrollTo(0, 0);
             }
         }
 

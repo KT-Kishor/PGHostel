@@ -1,4 +1,5 @@
 {
+    "lastUpdated": "01/10/2026",
     "policies": [
         {
             "id": "terms",
@@ -6,7 +7,6 @@
             "icon": "sap-icon://document-text",
             "title": "policyTermsTitle",
             "subtitle": "policyTermsSubtitle",
-            "updated": "policyUpdatedPlaceholder",
             "keyPoints": [
                 "policyTermsKp1",
                 "policyTermsKp2",
@@ -121,7 +121,6 @@
             "icon": "sap-icon://locked",
             "title": "policyPrivacyTitle",
             "subtitle": "policyPrivacySubtitle",
-            "updated": "policyUpdatedPlaceholder",
             "sections": [
                 {
                     "id": "privacy-1",
@@ -191,7 +190,6 @@
             "icon": "sap-icon://undo",
             "title": "policyRefundTitle",
             "subtitle": "policyRefundSubtitle",
-            "updated": "policyUpdatedPlaceholder",
             "sections": [
                 {
                     "id": "refund-1",
@@ -261,7 +259,6 @@
             "icon": "sap-icon://home",
             "title": "policyVendorTitle",
             "subtitle": "policyVendorSubtitle",
-            "updated": "policyUpdatedPlaceholder",
             "keyPoints": [
                 "policyVendorKp1",
                 "policyVendorKp2"
@@ -350,7 +347,6 @@
             "icon": "sap-icon://comment",
             "title": "policyGrievanceTitle",
             "subtitle": "policyGrievanceSubtitle",
-            "updated": "policyUpdatedPlaceholder",
             "keyPoints": [
                 "policyGrievanceKp1",
                 "policyGrievanceKp2",
