@@ -279,6 +279,7 @@
             containerQuery="true"
             hSpacing="1"
             vSpacing="1"
+            class="stayBranchesGrid"
             content="{path: 'TopModel>/Branches'}"
         >
             <VBox class="BranchCard sapUiLargeMarginTop">

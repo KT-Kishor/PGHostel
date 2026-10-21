@@ -11306,6 +11306,32 @@ text-transform: none !important;
         width: 100%;
     }
 
+    /* Let the Home grid shrink below the carousel's theme minimum width. */
+    .stayDetailsContainer > .sapMFlexItem {
+        min-width: 0 !important;
+        max-width: 100%;
+        width: 100%;
+    }
+
+    .stayBranchesGrid {
+        width: 100%;
+        min-width: 0;
+        max-width: 100%;
+        padding: 0 !important;
+        box-sizing: border-box;
+    }
+
+    .stayBranchesGrid > div {
+        width: 100% !important;
+        margin-left: 0 !important;
+        margin-right: 0 !important;
+        min-width: 0;
+    }
+
+    .stayBranchesGrid .sapMCrsl {
+        min-width: 0 !important;
+    }
+
     .hotelPreviewCard,
     .hotelDetailsContent {
         flex: 1 1 100% !important;
