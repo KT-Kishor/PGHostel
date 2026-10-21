@@ -18,9 +18,9 @@
     "acorn": "^8.15.0"
   },
   "scripts": {
-    "start": "fiori run --open \"test/flpSandbox.html?sap-ui-xx-viewCache=false#sapuicomproject1-display\"",
+    "start": "node api.js && fiori run --open \"test/flpSandbox.html?sap-ui-xx-viewCache=false#sapuicomproject1-display\"",
     "start-local": "fiori run --config ./ui5-local.yaml --open \"test/flpSandbox.html?sap-ui-xx-viewCache=false#sapuicomproject1-display\"",
-    "build": "ui5 build --config=ui5.yaml --clean-dest --dest dist",
+    "build": "node api.js && ui5 build --config=ui5.yaml --clean-dest --dest dist",
     "deploy": "fiori verify",
     "deploy-config": "fiori add deploy-config",
     "start-noflp": "fiori run --open \"index.html?sap-ui-xx-viewCache=false\"",
