@@ -15,47 +15,60 @@
     <tnt:ToolPage class="sapUiTinyMarginTop">
         <tnt:header>
             <tnt:ToolHeader>
-                <Image
-                    src="./image/3 log 1.0.png"
-                    height="110px"
-                    tooltip="{i18n>companyLogo}"
-                    class="sapUiSmallMarginTop"
-                />
-                <!-- <Title level="H1" text="SHAH HOSTEL" class="custom-text"/> -->
-                <ToolbarSpacer />
-                   <Button
-                    text="{i18n>Registeryourpropertycap}"
-                    id="Vendor"
-                    tooltip="{i18n>Registeryourproperty}"
-                    class="sapUiSmallMarginTop loginButton"
-                    press="onAdminSIGNUP"
-                >
-               
-                </Button>
-                <Button
-                    text="{i18n>sIGNINUP}"
-                    id="loginButton"
-                    tooltip="{i18n>signInorSignUp}"
-                    class="sapUiSmallMarginTop loginButton"
-                    press="onpressLogin"
-                    visible="{= !${UIModel>/isLoggedIn} }"
-                >
-               
-                    <layoutData>
-                        <OverflowToolbarLayoutData priority="NeverOverflow" />
-                    </layoutData>
-                </Button>
-               
-                <Avatar
-                    visible="{UIModel>/isLoggedIn}"
-                    id="ProfileAvatar"
-                    src="{LoginModel>/Photo}"
-                    initials="{= ${LoginModel>/EmployeeName} ? ${LoginModel>/EmployeeName}.charAt(0).toUpperCase() : '' }"
-                    tooltip="{= ${LoginModel>/UserName} || ${i18n>profilePic} }"
-                    press="onPressAvatar"
-                    class="profileAvatar"
-                />
-            </tnt:ToolHeader>
+    <Image
+        src="./image/3 log 1.0.png"
+        height="110px"
+        tooltip="{i18n>companyLogo}"
+        class="sapUiSmallMarginTop"
+    />
+    
+    <ToolbarSpacer />
+
+    <!-- Register Property Button -->
+    <Button
+        text="{i18n>Registeryourpropertycap}"
+        id="Vendor"
+        tooltip="{i18n>Registeryourproperty}"
+        class="sapUiTinyMarginTop loginButton"
+        press="onAdminSIGNUP"
+    >
+        <layoutData>
+            <!-- High priority means it stays visible longer, but will hide into '3 dots' on small screens -->
+            <OverflowToolbarLayoutData priority="High" />
+        </layoutData>
+    </Button>
+
+    <!-- Sign In / Sign Up Button -->
+    <Button
+        text="{i18n>sIGNINUP}"
+        id="loginButton"
+        tooltip="{i18n>signInorSignUp}"
+        class="sapUiTinyMarginTop loginButton"
+        press="onpressLogin"
+        visible="{= !${UIModel>/isLoggedIn} }"
+    >
+        <layoutData>
+            <!-- Changed from 'NeverOverflow' to 'High' so it collapses into 3 dots when needed -->
+            <OverflowToolbarLayoutData priority="High" />
+        </layoutData>
+    </Button>
+
+    <!-- Profile Avatar -->
+    <Avatar
+        visible="{UIModel>/isLoggedIn}"
+        id="ProfileAvatar"
+        src="{LoginModel>/Photo}"
+        initials="{= ${LoginModel>/EmployeeName} ? ${LoginModel>/EmployeeName}.charAt(0).toUpperCase() : '' }"
+        tooltip="{= ${LoginModel>/UserName} || ${i18n>profilePic} }"
+        press="onPressAvatar"
+        class="profileAvatar"
+    >
+        <layoutData>
+            <!-- Keep avatar always visible outside the 3 dots -->
+            <OverflowToolbarLayoutData priority="NeverOverflow" />
+        </layoutData>
+    </Avatar>
+</tnt:ToolHeader>
         </tnt:header>
         <tnt:subHeader>
             <tnt:ToolHeader>
