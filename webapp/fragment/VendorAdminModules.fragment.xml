@@ -19,7 +19,7 @@
             </VBox>
         </HBox>
 
-        <HBox justifyContent="Center" renderType="Bare" class="svWhyCta">
+        <HBox justifyContent="Center" renderType="Bare" class="svWhyCta" visible="false">
             <Button text="{i18n>vrWhyCta}" class="svBtn" type="Emphasized" press=".onScrollToRegister"/>
         </HBox>
     </VBox>

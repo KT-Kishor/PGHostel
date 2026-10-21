@@ -6386,6 +6386,7 @@ onBuyTravelInsurance:function() {
                 selectedId: "",
                 name:       "",
                 who:        "",
+                headline:   "",
                 blurb:      "",
                 mode:       "multi",
                 isSingle:   false,
@@ -6455,6 +6456,7 @@ onBuyTravelInsurance:function() {
                 oState.setProperty("/selectedId", oType.id);
                 oState.setProperty("/name", oType.name);
                 oState.setProperty("/who", oType.who);
+                oState.setProperty("/headline", oType.headline || "");
                 oState.setProperty("/blurb", oType.blurb);
                 oState.setProperty("/path", oType.path);
                 oState.setProperty("/points", oType.points);

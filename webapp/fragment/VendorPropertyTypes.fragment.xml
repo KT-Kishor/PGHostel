@@ -6,7 +6,8 @@
         <HBox justifyContent="Center" wrap="Wrap" renderType="Bare" class="svH2Row">
             <FormattedText htmlText="{i18n>vrPtHeading}" class="svH2"/>
         </HBox>
-        <Text text="{i18n>vrPtSub}" textAlign="Center" class="svSub"/>
+        <Text text="{i18n>vrPtTagline}" textAlign="Center" class="svPtTagline"/>
+        <Text text="{i18n>vrPtSub}" textAlign="Center" class="svSub svPtDescription"/>
         <MessageStrip text="{pt>/loadError}" type="Error" showIcon="true" visible="{= !!${pt>/loadError} }"/>
 
         <HBox id="vendorTypeTabs" class="svTabs" renderType="Bare" width="100%" items="{path:'pt>/types', templateShareable:false}">
@@ -66,10 +67,20 @@
             <VBox class="svDetail" renderType="Bare" alignItems="Start">
                 <Title text="{ptState>/name}" level="H3" wrapping="true" class="svH3"/>
                 <Text text="{ptState>/who}" class="svWho"/>
+                <Title
+                    text="{ptState>/headline}"
+                    level="H4"
+                    wrapping="true"
+                    class="svHeadline"
+                    visible="{= !!${ptState>/headline} }"/>
                 <Text text="{ptState>/blurb}" class="svBlurb"/>
                 <HBox class="svPath" wrap="Wrap" renderType="Bare" items="{path:'ptState>/path', templateShareable:false}">
                     <Text text="{ptState>}" class="svPathItem"/>
                 </HBox>
+                <Label
+                    text="{i18n>vrPtWhatYouCanManage}"
+                    class="svPointsTitle"
+                    visible="{= ${ptState>/points}.length > 0 }"/>
                 <VBox class="svPoints" renderType="Bare" items="{path:'ptState>/points', templateShareable:false}">
                     <Text text="{ptState>}" class="svPoint"/>
                 </VBox>

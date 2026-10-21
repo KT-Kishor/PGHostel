@@ -68,7 +68,7 @@
                             key="idVendor"
                             tooltip="{i18n>vrTabTitle}"
                             text="{i18n>vrTabTitle}"
-                            visible="false"
+                            visible="true"
                         />
                         <!-- <IconTabFilter key="idFacilities" text="Facilities" /> -->
                         <IconTabFilter
