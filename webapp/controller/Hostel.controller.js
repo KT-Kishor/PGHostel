@@ -50,6 +50,8 @@ sap.ui.define([
             this.getView().setModel(oDateModel, "controller");
 
             this._initVendorRegistration();
+      
+                  
         },
 
         onBeforeRendering: function () {
@@ -155,42 +157,135 @@ sap.ui.define([
         { 
             id: "Hotels", 
             badge: oResourceBundle.getText("stayHotels"), 
-            icon: "sap-icon://building",
+            icon: "sap-icon://bed",
             blurb: oResourceBundle.getText("blurbHotels"),
+            Subtitle: oResourceBundle.getText("FindYourStayMakeEveryJourneyComfortable"),
             best: [oResourceBundle.getText("tagTravel"), oResourceBundle.getText("tagBusinessTrips"), oResourceBundle.getText("tagGetaways"), oResourceBundle.getText("tagFamilies")],
-            see: [oResourceBundle.getText("seeRoomTypesAndPhotos"), oResourceBundle.getText("seeFacilitiesAndAmenities"), oResourceBundle.getText("seeStartingPrice"), oResourceBundle.getText("seeCancellationPolicy")] 
+         see: [
+    {
+        title: oResourceBundle.getText("seeRoomTypesAndPhotosTitle"),
+        description: oResourceBundle.getText("seeRoomTypesAndPhotosDesc")
+    },
+    {
+        title: oResourceBundle.getText("seeFacilitiesAndAmenitiesTitle"),
+        description: oResourceBundle.getText("seeFacilitiesAndAmenitiesDesc")
+    },
+    {
+        title: oResourceBundle.getText("seeStartingPriceTitle"),
+        description: oResourceBundle.getText("seeStartingPriceDesc")
+    },
+    {
+        title: oResourceBundle.getText("seeCancellationPolicyTitle"),
+        description: oResourceBundle.getText("seeCancellationPolicyDesc")
+    }
+]
         },
         { 
             id: "Hostels", 
             badge: oResourceBundle.getText("stayHostels"), 
-            icon: "sap-icon://group",
+            icon: "sap-icon://home-share",
             blurb: oResourceBundle.getText("blurbHostels"),
+            Subtitle: oResourceBundle.getText("AffordableStaysGreatConnections"),
+
             best: [oResourceBundle.getText("tagStudents"), oResourceBundle.getText("tagSoloTravellers"), oResourceBundle.getText("tagBudgetStays"), oResourceBundle.getText("tagShortVisits")],
-            see: [oResourceBundle.getText("seeRoomsAndBeds"), oResourceBundle.getText("seeFacilitiesAndAmenities"), oResourceBundle.getText("seeStartingPrice"), oResourceBundle.getText("seeHouseRulesAndCancellationPolicy")] 
+              see: [
+    {
+        title: oResourceBundle.getText("seeRoomTypesAndPhotosTitlehotels"),
+        description: oResourceBundle.getText("seeRoomTypesAndPhotosDeschotels")
+    },
+    {
+        title: oResourceBundle.getText("seeFacilitiesAndAmenitiesTitle"),
+        description: oResourceBundle.getText("seeFacilitiesAndAmenitiesDeschotels")
+    },
+    {
+        title: oResourceBundle.getText("seeStartingPriceTitle"),
+        description: oResourceBundle.getText("seeStartingPriceDeschotels")
+    },
+    {
+        title: oResourceBundle.getText("seeCancellationPolicyTitlehotels"),
+        description: oResourceBundle.getText("seeCancellationPolicyDeschotels")
+    }
+]
         },
         { 
             id: "PG", 
             badge: oResourceBundle.getText("stayPG"), 
             icon: "sap-icon://home",
             blurb: oResourceBundle.getText("blurbPG"),
+            Subtitle: oResourceBundle.getText("FeelatHomeStayforLonger"),
             best: [oResourceBundle.getText("tagStudents"), oResourceBundle.getText("tagWorkingProfessionals"), oResourceBundle.getText("tagLongerStays"), oResourceBundle.getText("tagRelocating")],
-            see: [oResourceBundle.getText("seeRoomsAndBeds"), oResourceBundle.getText("seeAmenitiesIncluded"), oResourceBundle.getText("seeStartingPriceAndDepositDetails"), oResourceBundle.getText("seeHouseRules")] 
+                 see: [
+    {
+        title: oResourceBundle.getText("seeRoomTypesAndPhotosTitlehotels"),
+        description: oResourceBundle.getText("seeRoomTypesAndPhotosDescPG")
+    },
+    {
+        title: oResourceBundle.getText("seeFacilitiesAndAmenitiesTitlePG"),
+        description: oResourceBundle.getText("seeFacilitiesAndAmenitiesDescPG")
+    },
+    {
+        title: oResourceBundle.getText("seeStartingPriceTitlePG"),
+        description: oResourceBundle.getText("seeStartingPriceDescPG")
+    },
+    {
+        title: oResourceBundle.getText("seeCancellationPolicyTitlePG"),
+        description: oResourceBundle.getText("seeCancellationPolicyDescPG")
+    }
+]
         },
         { 
             id: "Service Apartments", 
             badge: oResourceBundle.getText("stayServiceApartments"), 
             icon: "sap-icon://building",
             blurb: oResourceBundle.getText("blurbServiceApartments"),
+            Subtitle: oResourceBundle.getText("TheComfortofHomeTheFreedomtoStay"),
+
             best: [oResourceBundle.getText("tagFamilies"), oResourceBundle.getText("tagGroups"), oResourceBundle.getText("tagLongerVisits"), oResourceBundle.getText("tagWorkTrips")],
-            see: [oResourceBundle.getText("seeApartmentTypes"), oResourceBundle.getText("seeFacilitiesAndAmenities"), oResourceBundle.getText("seeStartingPrice"), oResourceBundle.getText("seeCancellationPolicy")] 
+                  see: [
+    {
+        title: oResourceBundle.getText("seeRoomTypesAndPhotosTitleapp"),
+        description: oResourceBundle.getText("seeRoomTypesAndPhotosDescapp")
+    },
+    {
+        title: oResourceBundle.getText("seeFacilitiesAndAmenitiesTitle"),
+        description: oResourceBundle.getText("seeFacilitiesAndAmenitiesDescapp")
+    },
+    {
+        title: oResourceBundle.getText("seeStartingPriceTitle"),
+        description: oResourceBundle.getText("seeStartingPriceDescapp")
+    },
+    {
+        title: oResourceBundle.getText("seeCancellationPolicyTitle"),
+        description: oResourceBundle.getText("seeCancellationPolicyDescapp")
+    }
+]
         },
         { 
             id: "Rented Apartments", 
             badge: oResourceBundle.getText("stayRentedApartments"), 
             icon: "sap-icon://key",
             blurb: oResourceBundle.getText("blurbRentedApartments"),
+            Subtitle: oResourceBundle.getText("FindYourSpaceMakeItFeelLikeHome"),
+
             best: [oResourceBundle.getText("tagLongTermStays"), oResourceBundle.getText("tagFamilies"), oResourceBundle.getText("tagRelocating"), oResourceBundle.getText("tagWorkingProfessionals")],
-            see: [oResourceBundle.getText("seeApartmentDetails"), oResourceBundle.getText("seeFacilitiesAndAmenities"), oResourceBundle.getText("seeRentAndDepositDetails"), oResourceBundle.getText("seeRulesAndTerms")] 
+                        see: [
+    {
+        title: oResourceBundle.getText("seeRoomTypesAndPhotosTitleRE"),
+        description: oResourceBundle.getText("seeRoomTypesAndPhotosDescRE")
+    },
+    {
+        title: oResourceBundle.getText("seeFacilitiesAndAmenitiesTitle"),
+        description: oResourceBundle.getText("seeFacilitiesAndAmenitiesDescRE")
+    },
+    {
+        title: oResourceBundle.getText("seeStartingPriceTitle"),
+        description: oResourceBundle.getText("seeStartingPriceDescRE")
+    },
+    {
+        title: oResourceBundle.getText("seeCancellationPolicyTitleRE"),
+        description: oResourceBundle.getText("seeCancellationPolicyDescRE")
+    }
+]
         }
     ];
 
@@ -234,8 +329,63 @@ _getResourceBundle: function () {
 
     return oI18nModel.getResourceBundle();
 },
+Topproperty:async function (sPropertyType) {
+     const convertBase64ToImage = (base64String, fileType) => {
+                    if (!base64String) return "./image/Fallback.png";
+
+                    let sBase64 = base64String.replace(/\s/g, "");
+
+                    if (sBase64.startsWith("data:image")) return sBase64;
+
+                    const mimeType = fileType || "image/jpeg";
+                    return `data:${mimeType};base64,${sBase64}`;
+                };
+              var oVisibilityModel = new JSONModel({ NoData: false, ShowViewMore: false });
+                this.getView().setModel(oVisibilityModel, "TopModel");
+                 let response = await this.ajaxReadWithJQuery("HM_GetBranchImage", {
+                        City: "Kalaburagi",
+                        PropertyType: sPropertyType || "",
+                        top: 1,
+                        skip: 0,
+                        flag: "true"
+                    });
+             var aBranchesData = response?.data || [];
+
+
+aBranchesData = aBranchesData.map((branch) => ({
+                       BranchID: branch.BranchID,
+                        Name: branch.Name,
+                        City: branch.City,
+                        Address: branch.Address,
+                        PropertyType: branch.PropertyType,
+                        LandMark: branch.LandMark,
+                        Country: branch.Country,
+                        GSTIN: branch.GSTIN,
+                        CheckInTime: branch.CheckinTime,
+                        CheckOutTime: branch.CheckoutTime,
+                        GeoLocation: branch.GeoLocation,
+                        TotalFeedbacks: branch.TotalFeedbacks,
+                        AverageRating: branch.AverageRating,
+                        StartingPrice: branch.StartingPrice,
+                        Currency: branch.Currency,
+    Image: convertBase64ToImage(
+        branch.Attachment,
+        branch.AttachmentType
+    )
+}));
+
+            oVisibilityModel.setProperty("/Branches", aBranchesData)
+             if(aBranchesData.length>0){
+              oVisibilityModel.setProperty("/Branch", false)
+             }else{
+              oVisibilityModel.setProperty("/Branch", true)
+             }
+
+},
 
         _onRouteMatched: async function () {
+               await this.Topproperty("Hotel")
+
          // Inside your Controller or Component initialization where i18n bundle is available:
 var oResourceBundle = this._getResourceBundle();
 
@@ -298,6 +448,7 @@ this._updateStaysData(oResourceBundle);
             //  Disable controls initially
             this.byId("id_Branch").setEnabled(true);
             this.byId("id_Area").setEnabled(true);
+            this.byId("id_Pricerange").setEnabled(true);
             this.byId("id_Roomtype").setEnabled(true);
             this.byId("id_PropertyType").setEnabled(true);
 
@@ -402,10 +553,11 @@ this._updateStaysData(oResourceBundle);
             }
             
         },
-  onStayTypePress: function (oEvent) {
+  onStayTypePress:async function (oEvent) {
     var oButton = oEvent.getSource();
     // Retrieve the stable, non-translated ID from custom data
     var sSelectedId = oButton.data("stayId"); 
+   
 
     var oModel = this.getView().getModel("view");
     var aStays = oModel.getProperty("/staysList");
@@ -437,6 +589,21 @@ this._updateStaysData(oResourceBundle);
 
     // 3. Add 'selected-stay-btn' ONLY to the currently clicked button
     oButton.addStyleClass("selected-stay-btn");
+        if(sSelectedId==="Hostels"){
+                sSelectedId="Hostel"
+            }else if(sSelectedId==="Hotels"){
+                sSelectedId="Hotel"
+
+            }else if(sSelectedId==="Service Apartments"){
+                sSelectedId="Service Apartment"
+
+            }else if(sSelectedId==="Rented Apartments"){
+                sSelectedId="Rented Apartment"
+
+            }
+            this.getBusyDialog()
+          await  this.Topproperty(sSelectedId)
+            this.closeBusyDialog()
 },
 
 
@@ -2464,14 +2631,18 @@ const sSuccessMsg = this.i18nModel.getText("registrationSuccess", [
             const oAreaTypeCombo = oView.byId("id_Area");
             const oRoomTypeCombo = oView.byId("id_Roomtype");
             const oPropertyTypeCombo = oView.byId("id_PropertyType");
+            const oPricerange = oView.byId("id_Pricerange");
+
             // ðŸ”¹ Reset all selected keys
             if (oBranchCombo) oBranchCombo.setSelectedKey("");
             if (oAreaTypeCombo) oAreaTypeCombo.setSelectedKey("");
             if (oRoomTypeCombo) oRoomTypeCombo.setSelectedKey("");
+            if (oPricerange) oPricerange.setSelectedKey("");
             if (oPropertyTypeCombo) oPropertyTypeCombo.setSelectedKeys([]).setValueState("None");
             // ðŸ”¹ Make Area, Room Type and Property Type non-editable
             if (oAreaTypeCombo) oAreaTypeCombo.setEnabled(false);
             if (oRoomTypeCombo) oRoomTypeCombo.setEnabled(false);
+            if (oPricerange) oPricerange.setEnabled(false);
             if (oPropertyTypeCombo) oPropertyTypeCombo.setEnabled(false);
         },
 
@@ -2626,10 +2797,14 @@ const sSuccessMsg = this.i18nModel.getText("registrationSuccess", [
             const oAreaCombo = oView.byId("id_Area");
             const oRoomType = oView.byId("id_Roomtype");
             const oPropertyType = oView.byId("id_PropertyType");
+            const oPricerange = oView.byId("id_Pricerange");
+
             // Reset previous selections
             oAreaCombo.setSelectedKey("").setEnabled(false);
             oRoomType.setSelectedKey("").setEnabled(false);
-            oPropertyType.setSelectedKeys([]).setValueState("None").setEnabled(false);
+            oPricerange.setSelectedKey("").setEnabled(false);
+
+            oPropertyType.setValueState("None").setEnabled(false);
             const oSelectedItem = oEvent.getParameter("selectedItem");
             if (!oSelectedItem) return;
             // ðŸ”¹ Selected Branch Name
@@ -2649,6 +2824,8 @@ const sSuccessMsg = this.i18nModel.getText("registrationSuccess", [
             oAreaCombo.setEnabled(true);
             oRoomType.setEnabled(true);
             oPropertyType.setEnabled(true);
+            oPricerange.setEnabled(true);
+
 
         },
         onPropertyTypeChange: function (oEvent) {
@@ -2711,7 +2888,7 @@ const sSuccessMsg = this.i18nModel.getText("registrationSuccess", [
         },
         viewRooms: function (oEvent) {
             var oSource = oEvent.getSource();
-            var oCtx = oSource.getBindingContext("VisibilityModel");
+            var oCtx = oSource.getBindingContext("VisibilityModel") || oSource.getBindingContext("TopModel");
             if (!oCtx) return;
             var oBranchData = oCtx.getObject();
             var oRouter = this.getOwnerComponent().getRouter();
@@ -2721,6 +2898,7 @@ const sSuccessMsg = this.i18nModel.getText("registrationSuccess", [
             var sUrl = window.location.origin + window.location.pathname + "#" + sHash;
             sap.m.URLHelper.redirect(sUrl, true);
         },
+
         onSearchRooms: async function () {
             this.iTop = 4
             this.iSkip = 0
@@ -2763,13 +2941,16 @@ const sSuccessMsg = this.i18nModel.getText("registrationSuccess", [
             var sSelectedPropertyType = this._getSelectedPropertyTypes(oPropertyTypeCB).join(",");
             oPropertyTypeCB.setValueState("None");
 
+            const sPricerange = this.byId("id_Pricerange")?.getSelectedKey() || this.byId("id_Pricerange")?.getValue();
+
+
             this.isInitialLoad = false;
             this.isShowmore = true;
 
 
             try {
                 this.getBusyDialog()
-                await this._loadFilteredData(oBranchcity, finalBranch, sSelectedACType, sSelectedPropertyType);
+                await this._loadFilteredData(oBranchcity, finalBranch, sSelectedACType, sSelectedPropertyType,sPricerange);
                 this.closeBusyDialog()
 
             } catch (e) {
@@ -2787,9 +2968,9 @@ const sSuccessMsg = this.i18nModel.getText("registrationSuccess", [
             oContainer.setBusy(true)
             this.isInitialLoad = false;
             this.isShowmore = false
+            const sPricerange = this.byId("id_Pricerange")?.getSelectedKey() || this.byId("id_Pricerange")?.getValue();
 
-
-            await this._loadFilteredData(this.Scity, this.sBranchCode, this.sACType, this.sPropertyType);
+            await this._loadFilteredData(this.Scity, this.sBranchCode, this.sACType, this.sPropertyType,sPricerange);
             oContainer.setBusy(false);
         },
 
@@ -2965,7 +3146,7 @@ const sSuccessMsg = this.i18nModel.getText("registrationSuccess", [
                     });
             });
         },
-        _loadFilteredData: async function (Scity, sBranchCode, BranchName, sPropertyType) {
+        _loadFilteredData: async function (Scity, sBranchCode, BranchName, sPropertyType,sPricerange) {
             const oView = this.getView();
             const oVisibilityModel = oView.getModel("VisibilityModel");
 
@@ -2985,7 +3166,8 @@ const sSuccessMsg = this.i18nModel.getText("registrationSuccess", [
                         PropertyType: sPropertyType || "",
                         top: this.iTop,
                         skip: this.iSkip,
-                        flag: "true"
+                        flag: "true",
+                        priceRange:sPricerange
                     });
                     aBranchesData = response?.data || [];
                     // this.Branchlength = aBranchesData.length || 0;
@@ -6245,17 +6427,20 @@ _applyHostelLanguage: function (sLocale) {
     this._vrRefreshTexts();
 },
 onBuyHealthInsurance:function() {
-              var oRouter = this.getOwnerComponent().getRouter();
-            oRouter.navTo("RouteHealthinsurance",{
+            var oRouter = this.getOwnerComponent().getRouter();
+            var sHash = oRouter.getURL("RouteHealthinsurance", {
                 sPath:"Health"
             });
-    
+            var sUrl = window.location.origin + window.location.pathname + "#" + sHash;
+            sap.m.URLHelper.redirect(sUrl, true);
 },
 onBuyTravelInsurance:function() {
-              var oRouter = this.getOwnerComponent().getRouter();
-            oRouter.navTo("RouteHealthinsurance",{
+                  var oRouter = this.getOwnerComponent().getRouter();
+            var sHash = oRouter.getURL("RouteHealthinsurance", {
                 sPath:"Travel"
             });
+            var sUrl = window.location.origin + window.location.pathname + "#" + sHash;
+            sap.m.URLHelper.redirect(sUrl, true);
     
 },
 

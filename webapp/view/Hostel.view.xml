@@ -23,6 +23,15 @@
                 />
                 <!-- <Title level="H1" text="SHAH HOSTEL" class="custom-text"/> -->
                 <ToolbarSpacer />
+                   <Button
+                    text="{i18n>Registeryourpropertycap}"
+                    id="Vendor"
+                    tooltip="{i18n>Registeryourproperty}"
+                    class="sapUiSmallMarginTop loginButton"
+                    press="onAdminSIGNUP"
+                >
+               
+                </Button>
                 <Button
                     text="{i18n>sIGNINUP}"
                     id="loginButton"
@@ -31,10 +40,12 @@
                     press="onpressLogin"
                     visible="{= !${UIModel>/isLoggedIn} }"
                 >
+               
                     <layoutData>
                         <OverflowToolbarLayoutData priority="NeverOverflow" />
                     </layoutData>
                 </Button>
+               
                 <Avatar
                     visible="{UIModel>/isLoggedIn}"
                     id="ProfileAvatar"
@@ -237,7 +248,9 @@
    width="100%" class="stayDetailsContainer" binding="{view>/currentStay}">
 
         <!-- Left Graphic Card -->
-        <VBox class="hotelPreviewCard">
+        <!-- <VBox class="hotelPreviewCard"> -->
+            <!-- Top Badge -->
+             <VBox class="hotelPreviewCard" visible="{TopModel>/Branch}">
             <!-- Top Badge -->
             <HBox class="hotelCardBadge">
                 <core:Icon src="{view>icon}" class="badgeIcon"/>
@@ -260,10 +273,102 @@
             </VBox>
         </VBox>
 
+            
+                 <l:Grid
+            defaultSpan="XL4 L4 M6 S12"
+            containerQuery="true"
+            hSpacing="1"
+            vSpacing="1"
+            content="{path: 'TopModel>/Branches'}"
+        >
+            <VBox class="BranchCard sapUiLargeMarginTop">
+                <!-- ===== IMAGE CAROUSEL ===== -->
+                <Carousel
+                    height="200px"
+                    width="100%"
+                    loop="true"
+                    showPageIndicator="false"
+                    backgroundDesign="Transparent"
+                >
+                    <pages>
+                        <VBox class="imageWrapper">
+                            <HBox class="areaTagBox">
+                                <core:Icon
+                                    src="sap-icon://building"
+                                    size="0.9rem"
+                                    color="black"
+                                    class="sapUiTinyMarginEnd"
+                                />
+                                <Text text="{TopModel>PropertyType}" />
+                            </HBox>
+                            <Image
+                                src="{TopModel>Image}"
+                                width="100%"
+                                height="200px"
+                                class="BranchCardImage"
+                                decorative="false"
+                            />
+                        </VBox>
+                    </pages>
+                </Carousel>
+
+                <!-- ===== CARD CONTENT ===== -->
+                <VBox class="BranchCardContent">
+                    <Text text="{= ${TopModel>Name} + ' - ' + ${TopModel>LandMark}}" class="BranchCardTitle" />
+                    
+                    <VBox alignItems="Center">
+                        <List
+                            class="ratingList"
+                            showSeparators="None"
+                            backgroundDesign="Transparent"
+                            visible="{= !!${TopModel>TotalFeedbacks} &amp;&amp; Number(${TopModel>TotalFeedbacks}) > 0 }"
+                        >
+                            <CustomListItem type="Active" press=".onRatingPress" tooltip="Tap to See Reviews">
+                                <HBox class="ratingInline" justifyContent="Center" alignItems="Center">
+                                    <RatingIndicator
+                                        value="{= Number(${TopModel>AverageRating}) || 0 }"
+                                        maxValue="5"
+                                        enabled="true"
+                                        editable="false"
+                                        iconSize="1.35rem"
+                                        class="ratingStars"
+                                    />
+                                    <Text text="{= '(' + ${TopModel>TotalFeedbacks} + ')' }" class="ratingCountInline" />
+                                </HBox>
+                            </CustomListItem>
+                        </List>
+                        
+                        <Title
+                            text="{parts: ['TopModel>Currency','TopModel>StartingPrice'], formatter: '.Formatter.formatStartingPrice'}"
+                            visible="{= !(${TopModel>TotalFeedbacks} ? Number(${TopModel>TotalFeedbacks}) > 0 : false) }"
+                            class="branchCardPrice"
+                        />
+                        <Title
+                            text="{parts: ['TopModel>Currency','TopModel>StartingPrice'], formatter: '.Formatter.formatStartingPrice'}"
+                            visible="{= ${TopModel>TotalFeedbacks} ? Number(${TopModel>TotalFeedbacks}) > 0 : false }"
+                        />
+                    </VBox>
+
+                    <HBox justifyContent="Center" alignItems="Center">
+                        <Link
+                            text="{i18n>ViewRooms}"
+                            tooltip="{i18n>ViewRooms}"
+                            press="viewRooms"
+                            class="btnViewDetails"
+                        />
+                    </HBox>
+                </VBox>
+            </VBox>
+        </l:Grid>
+        <!-- </VBox> -->
+
+
         <!-- Right Content Area -->
         <VBox class="hotelDetailsContent" width="100%">
             <!-- Title & Subtitle -->
             <Title text="{view>badge}" level="H2" class="hotelDetailTitle"/>
+            <Title text="{view>Subtitle}" level="H3" class="hotelDetailcardsubTitle"/>
+
             <Text text="{view>blurb}" class="hotelDetailSubtitle"/>
 
             <!-- BEST FOR Section -->
@@ -274,12 +379,26 @@
 
             <!-- WHAT YOU'LL SEE Section -->
             <Label text="{i18n>WHATYOUSEEBEFOREYOUBOOK}" class="sectionHeaderLabel"/>
-            <VBox class="featureList" items="{view>see}">
-                <HBox alignItems="Center" class="featureItem">
-                    <core:Icon src="sap-icon://accept" class="featureIconround"/>
-                    <Text text="{view>}" class="featureText"/>
-                </HBox>
-            </VBox>
+       <VBox class="featureList" items="{view>see}">
+    <HBox alignItems="Start" class="featureItem">
+        <core:Icon
+            src="sap-icon://accept"
+            class="featureIconround"
+        />
+
+        <Text
+            text="{view>title}"
+            class="featureTitlecard"
+        />
+
+        <Text text="–" class="featureTextcard sapUiTinyMarginBegin sapUiTinyMarginEnd"/>
+
+        <Text
+            text="{view>description}"
+            class="featureTextcard"
+        />
+    </HBox>
+</VBox>
 
             <!-- Action Button -->
             <Button text="{i18n>Browse} {view>badge}" press="onBrowseHotelsPress" class="myUnifiedBtn browscss wrapButtonText"/>
@@ -465,7 +584,7 @@
         </VBox>
 
         <!-- Right Action Button Area -->
-        <HBox class="bannerAction sapUiTinyMarginBottom">
+        <HBox class="bannerAction sapUiMediumMarginBottom sapUiTinyMarginTop">
             <Button 
                 text="{i18n>Registeryourproperty}" 
                 press="onAdminSIGNUP"
@@ -628,6 +747,27 @@
                                 text="{AreaModel>LandMark}"
                             />
                         </ComboBox>
+                    </fb:control>
+                </fb:FilterGroupItem>
+
+                      <fb:FilterGroupItem
+                    name="Pricerange"
+                    label="{i18n>Pricerange}"
+                    groupName="Group1"
+                    visibleInFilterBar="true"
+                >
+                    <fb:control>
+                     <ComboBox
+    id="id_Pricerange"
+    placeholder="{i18n>Choosepriceorder}"
+    showClearIcon="true"
+    enabled="false"
+    selectionChange=".onAreaSelectionChange">
+
+    <core:Item key="Lowest" text="{i18n>LowestCostStays}" />
+    <core:Item key="Highest" text="{i18n>HighestCostStays}" />
+
+</ComboBox>
                     </fb:control>
                 </fb:FilterGroupItem>
             </fb:filterGroupItems>

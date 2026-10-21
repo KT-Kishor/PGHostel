@@ -167,21 +167,7 @@
                             text="{i18n>companyadrress}"/>
                     </VBox>
                 </HBox>
-            </VBox>
-        </HBox>
-
-        <!-- Copyright Bar -->
-        <HBox
-            class="svFooterBottom"
-            alignItems="Center"
-            justifyContent="SpaceBetween"
-            wrap="Wrap">
-
-            <Text text="{i18n>2026StayVriksharightsreserved}" class="bottomtextcolor"/>
-<!-- 
-            <FormattedText
-                htmlText="Developed by &lt;strong&gt;Kalpavriksha Technologies&lt;/strong&gt;"/> -->
-           <HBox class="imagelinkcss">
+                 <HBox class="imagelinkcss">
 
     <Image
         src="../image/HPFooter1.png"
@@ -201,6 +187,21 @@
                          />
 
 </HBox>
+            </VBox>
+        </HBox>
+
+        <!-- Copyright Bar -->
+        <HBox
+            class="svFooterBottom"
+            alignItems="Center"
+            justifyContent="SpaceBetween"
+            >
+
+            <Text text="{i18n>2026StayVriksharightsreserved}" class="bottomtextcolor"/>
+<!-- 
+            <FormattedText
+                htmlText="Developed by &lt;strong&gt;Kalpavriksha Technologies&lt;/strong&gt;"/> -->
+          
 
             <HBox alignItems="Center" class="svLanguageSelector">
                 <core:Icon src="sap-icon://globe" size="1.5rem" class="globecss"/>
