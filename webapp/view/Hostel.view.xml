@@ -660,7 +660,7 @@
             showFilterConfiguration="false"
             filterContainerWidth="100%"
 
-            class="sapUiContentPadding HostelRooms filterBarTheme customFilterBar"
+            class="sapUiContentPadding HostelRooms filterBarTheme"
             busyIndicatorDelay="0"
         >
             <fb:filterGroupItems>

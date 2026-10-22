@@ -1428,6 +1428,8 @@ this._updateStaysData(oResourceBundle);
                     this.byId("id_Area").setBusy(true);
                     this.byId("id_Roomtype").setBusy(true)
                     this.byId("id_PropertyType").setBusy(true)
+                    this.byId("id_Pricerange").setBusy(true)
+
 
 
                     try {
@@ -3001,6 +3003,8 @@ const sSuccessMsg = this.i18nModel.getText("registrationSuccess", [
             this.byId("id_Area").setBusy(true);
             this.byId("id_Roomtype").setBusy(true);
             this.byId("id_PropertyType").setBusy(true);
+            this.byId("id_Pricerange").setBusy(true);
+
 
             const oFooterModel = this.getView().getModel("FooterModel");
 
@@ -3091,6 +3095,8 @@ const sSuccessMsg = this.i18nModel.getText("registrationSuccess", [
                 this.byId("id_Branch").setBusy(false);
                 this.byId("id_Area").setBusy(false);
                 this.byId("id_Roomtype").setBusy(false);
+                this.byId("id_Pricerange").setBusy(false);
+
                 this.byId("id_PropertyType").setBusy(false);
                 // âœ… show ROOMS footer after success OR failure
                 oFooterModel.setProperty("/showRoomsFooter", true);
