@@ -792,6 +792,45 @@
                 </fb:FilterGroupItem>
             </fb:filterGroupItems>
         </fb:FilterBar>
+
+        <!-- ===== Advertisements, same panel and auto-slide as on the booking
+             page and the user manual page, kept under the filter bar ===== -->
+        <VBox
+            id="roomsAdWrap"
+            class="roomsAdWrap sapUiMediumMarginTop"
+            visible="{= ${AdvertisementModel>/Advertisements}.length > 0 }">
+            <Title
+                text="{i18n>advertisements}"
+                class="roomsAdTitle"
+            />
+            <Panel
+                class="adPanel panelbracket"
+            >
+                <VBox class="sapUiTinyMargin">
+                    <Carousel
+                        id="AdvertisementCarousel"
+                        height="215px"
+                        showPageIndicator="true"
+                        arrowsPlacement="Content"
+                        loop="true"
+                        pages="{
+                            path: 'AdvertisementModel>/Advertisements',
+                            templateShareable: false
+                        }"
+                    >
+                        <pages>
+                            <Image
+                                src="{AdvertisementModel>image}"
+                                alt="{AdvertisementModel>title}"
+                                width="100%"
+                                height="170px"
+                                press="onAdvertisementImagePress"
+                            />
+                        </pages>
+                    </Carousel>
+                </VBox>
+            </Panel>
+        </VBox>
     </VBox>
 
     <!-- ===== RIGHT SIDE: ROOMS GRID & CONTENT ===== -->

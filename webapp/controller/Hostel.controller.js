@@ -29,6 +29,12 @@ sap.ui.define([
         Formatter: Formatter,
         onInit: function () {
 
+            // The advertisement panel under the filter bar binds to this model,
+            // so it exists (empty) before the first render and fills in once
+            // the pictures arrive.
+            this._adCarouselPauseResumeHandlers = [];
+            this._setupAdvertisementModel([]);
+
             this.getView().setModel(new JSONModel({
                 showGlobalFooter: false,
                 showRoomsFooter: false,
@@ -409,6 +415,12 @@ this._updateStaysData(oResourceBundle);
                 this.closeBusyDialog();
                 this._forceCloseAllBusyDialogs();
             }
+
+            // The advertisements are read from the service, which needs the
+            // login model of the component. That model only exists once the
+            // route is matched, so the pictures are loaded here and not in
+            // onInit.
+            this._loadAdvertisements();
             const sStoredTab = sessionStorage.getItem("homePageReturnTab") || "idHome";
             const oTabHeader = this.byId("mainTabHeader");
             if (oTabHeader) oTabHeader.setSelectedKey(sStoredTab);
@@ -1410,6 +1422,11 @@ this._updateStaysData(oResourceBundle);
 
             const oFooterModel = this.getView().getModel("FooterModel");
             if (sKey === "idRooms") {
+                // The advertisement carousel only gets its pictures when the
+                // tab is on screen, so the slide is (re)armed here.
+                this._iAdCarouselRetries = 0;
+                this._startAdCarouselAutoSlide();
+
                 if (this._imageInterval) {
                     clearInterval(this._imageInterval);
                 }
@@ -1562,6 +1579,203 @@ this._updateStaysData(oResourceBundle);
                 this._vrSwapTimer = null;
             }
             this._vrBundleRequest = null;
+
+            // The advertisement carousel of the rooms tab must not keep
+            // sliding when the view is gone.
+            this._stopAdCarouselAutoSlide();
+        },
+
+        /* ------------------------------------------------------------
+         *  Advertisements
+         *
+         *  The panel under the filter bar reuses the advertisement carousel of
+         *  the booking page and of the user manual page: the same service, the
+         *  same picture transformation and the same auto-slide with
+         *  pause/resume.
+         *  ------------------------------------------------------------ */
+
+        _loadAdvertisements: async function () {
+            let aCarouselItems = [];
+
+            try {
+                const oResponse = await this.ajaxReadWithJQuery("HM_Advertisement");
+                aCarouselItems = this._transformAdvertisementData(oResponse?.data || []);
+            } catch (oError) {
+                aCarouselItems = [];
+            }
+
+            // The model is filled outside the try, so a problem in the slide
+            // setup can never empty the pictures again.
+            this._setupAdvertisementModel(aCarouselItems);
+        },
+
+        _transformAdvertisementData: function (aAdvertisements) {
+            const aCarouselItems = [];
+            const that = this;
+
+            aAdvertisements.forEach(function (oAd) {
+                // Every advertisement carries up to three pictures, and each of
+                // them becomes a slide of the carousel.
+                for (let i = 1; i <= 3; i++) {
+                    const sPhotoField = `Photo${i}`;
+                    const sNameField = `Photo${i}Name`;
+                    const sTypeField = `Photo${i}Type`;
+
+                    if (oAd[sPhotoField]) {
+                        const sImageSrc = that._prepareImageData(oAd[sPhotoField], oAd[sTypeField]);
+
+                        if (sImageSrc) {
+                            aCarouselItems.push({
+                                id: oAd.ID + '-' + i,
+                                image: sImageSrc,
+                                title: oAd[sNameField] || `Advertisement ${i}`,
+                                url: oAd.URL,
+                                originalAd: oAd
+                            });
+                        }
+                    }
+                }
+            });
+
+            return aCarouselItems;
+        },
+
+        _prepareImageData: function (sImageData, sImageType) {
+            if (!sImageData) {
+                return null;
+            }
+
+            // The service sends the base64 part with white spaces in it.
+            const sCleanData = sImageData.replace(/\s/g, '');
+
+            if (sCleanData.startsWith('data:')) {
+                return sCleanData;
+            }
+
+            let sType = sImageType || 'image/png';
+
+            if (!sType.startsWith('image/')) {
+                sType = 'image/png';
+            }
+
+            return `data:${sType};base64,${sCleanData}`;
+        },
+
+        _setupAdvertisementModel: function (aCarouselItems) {
+            if (!this.getView()) {
+                return;
+            }
+
+            this.getView().setModel(new JSONModel({
+                Advertisements: aCarouselItems,
+                currentPage: 0,
+                itemsPerPage: 1
+            }), "AdvertisementModel");
+
+            if (aCarouselItems.length > 1) {
+                this._startAdCarouselAutoSlide();
+            } else {
+                // A previous visit may have left a slide running for pictures
+                // that are no longer there.
+                this._stopAdCarouselAutoSlide();
+            }
+        },
+
+        _startAdCarouselAutoSlide: function () {
+            const oCarousel = this.byId("AdvertisementCarousel");
+
+            // The pictures are rendered by the binding, so the carousel only
+            // has its pages a moment later. The attempts are capped so a tab
+            // that is never opened cannot keep retrying.
+            if (!oCarousel || oCarousel.getPages().length <= 1) {
+                this._iAdCarouselRetries = (this._iAdCarouselRetries || 0) + 1;
+
+                if (this._iAdCarouselRetries > 40 || !this.getView()) {
+                    return;
+                }
+
+                setTimeout(() => this._startAdCarouselAutoSlide(), 300);
+                return;
+            }
+            this._iAdCarouselRetries = 0;
+
+            this._stopAdCarouselAutoSlide();
+
+            // The carousel of this UI5 version has no auto-play, so the slide
+            // is driven by a timer that moves to the next picture.
+            const fnPauseResume = () => {
+                this._stopAdCarouselAutoSlide();
+
+                // Resume after 3 seconds of inactivity
+                this._iAdCarouselResumeTimer = setTimeout(() => {
+                    this._iAdCarouselResumeTimer = null;
+
+                    if (oCarousel && !oCarousel.bIsDestroyed && oCarousel.getPages().length > 1) {
+                        this._startAdCarouselAutoSlide();
+                    }
+                }, 3000);
+            };
+
+            // Attach events and store references so they are detached on the next start
+            ['touchstart', 'mousedown'].forEach(event => {
+                const handler = fnPauseResume.bind(this);
+                oCarousel.attachBrowserEvent(event, handler);
+                this._adCarouselPauseResumeHandlers.push({
+                    element: oCarousel,
+                    event: event,
+                    fn: handler
+                });
+            });
+
+            this._adCarouselInterval = setInterval(() => {
+                if (oCarousel && !oCarousel.bIsDestroyed) {
+                    oCarousel.next();
+                } else {
+                    this._stopAdCarouselAutoSlide();
+                }
+            }, 3000);
+        },
+
+        _stopAdCarouselAutoSlide: function () {
+            if (this._adCarouselInterval) {
+                clearInterval(this._adCarouselInterval);
+                this._adCarouselInterval = null;
+            }
+
+            if (this._iAdCarouselResumeTimer) {
+                clearTimeout(this._iAdCarouselResumeTimer);
+                this._iAdCarouselResumeTimer = null;
+            }
+
+            if (this._adCarouselPauseResumeHandlers) {
+                this._adCarouselPauseResumeHandlers.forEach(handler => {
+                    if (handler.element && handler.event && handler.fn) {
+                        handler.element.detachBrowserEvent(handler.event, handler.fn);
+                    }
+                });
+            }
+
+            // Always a fresh array, so a first start can safely push into it.
+            this._adCarouselPauseResumeHandlers = [];
+        },
+
+        onAdvertisementImagePress: function (oEvent) {
+            const oImage = oEvent.getSource();
+            const oBindingContext = oImage.getBindingContext("AdvertisementModel");
+            const sMessage = this.i18nModel
+                ? this.i18nModel.getText("advertisementClicked")
+                : "Advertisement clicked";
+
+            if (oBindingContext) {
+                const oAdItem = oBindingContext.getObject();
+                if (oAdItem && oAdItem.url) {
+                    // Open the URL in a new tab
+                    window.open(oAdItem.url, "_blank");
+                    return;
+                }
+            }
+
+            MessageToast.show(sMessage);
         },
 
         onpressFilter: function () {

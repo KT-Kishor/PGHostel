@@ -14619,3 +14619,45 @@ body.svVendorScope .sapMSltPicker .sapMSelectList:focus {
   text-overflow: clip !important;
   overflow-wrap: anywhere;
 }
+
+/* ===== Advertisement panel under the filter bar (rooms tab) ===== */
+/* Same panel as on the booking page and the user manual page, but it lives in
+   the narrow filter column, so it needs the same width guards. */
+.RoomsPage .roomsAdWrap {
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+}
+
+.RoomsPage .roomsAdTitle {
+    margin: 0 0 6px 2px;
+    color: #0098a6 !important;
+    font-size: 15px !important;
+    font-weight: 700 !important;
+}
+
+/* Keep spacing inside the panel content so it fits the narrow column. */
+.RoomsPage .roomsAdWrap .adPanel {
+    margin-bottom: 0 !important;
+    padding: 0 !important;
+    max-width: 100%;
+    box-sizing: border-box;
+}
+
+.RoomsPage .roomsAdWrap .adPanel > .sapMPanelContent {
+    max-width: 100%;
+    box-sizing: border-box;
+    overflow-x: hidden;
+}
+
+/* UI5 gives flex wrappers an inline automatic minimum width. */
+.RoomsPage .roomsAdWrap .sapMFlexItem {
+    min-width: 0 !important;
+    max-width: 100%;
+}
+
+/* The carousel carries a theme minimum width that is wider than this column,
+   so it overflowed its flex item and pushed the picture off centre. */
+.RoomsPage .roomsAdWrap .sapMCrsl {
+    min-width: 0 !important;
+}
