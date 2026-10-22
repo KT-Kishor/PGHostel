@@ -14565,3 +14565,57 @@ body.svVendorScope .sapMSltPicker .sapMSelectList:focus {
         max-width: 100% !important;
     }
 }
+/* UI5 renders this header's overflow popover outside the view. Scope its
+   content-sized menu to the generated owner ID, leaving other popovers alone. */
+.sapMPopover.sapTntToolHeaderPopover[id$="--hostelTopHeader-popover"] {
+  border-radius: 14px !important;
+  box-shadow: 0 10px 26px rgba(0, 0, 0, 0.22) !important;
+  max-width: calc(100vw - 2rem) !important;
+  overflow: visible !important;
+}
+
+.sapMPopover.sapTntToolHeaderPopover[id$="--hostelTopHeader-popover"] .sapMPopoverCont {
+  width: max-content !important;
+  max-width: calc(100vw - 2rem) !important;
+  border-radius: 14px !important;
+  box-sizing: border-box;
+}
+
+.sapMPopover.sapTntToolHeaderPopover[id$="--hostelTopHeader-popover"] .sapMPopoverScroll {
+  width: max-content !important;
+  max-width: 100%;
+  padding: 0.375rem !important;
+  box-sizing: border-box;
+}
+
+.sapMPopover.sapTntToolHeaderPopover[id$="--hostelTopHeader-popover"] .loginButton.sapMBtn {
+  height: auto !important;
+  min-height: 1.625rem;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.sapMPopover.sapTntToolHeaderPopover[id$="--hostelTopHeader-popover"] .loginButton + .loginButton {
+  margin-top: 0.375rem !important;
+}
+
+.sapMPopover.sapTntToolHeaderPopover[id$="--hostelTopHeader-popover"] .loginButton .sapMBtnInner {
+  height: auto !important;
+  min-height: 1.625rem;
+  padding: 0.125rem 0.5rem !important;
+  border-radius: px !important;
+  align-items: center;
+  justify-content: flex-start;
+  box-sizing: border-box;
+}
+
+.sapMPopover.sapTntToolHeaderPopover[id$="--hostelTopHeader-popover"] .loginButton .sapMBtnContent {
+  height: auto !important;
+  min-width: 0;
+  line-height: 1.25rem !important;
+  font-size: 0.9375rem !important;
+  white-space: normal !important;
+  overflow: visible !important;
+  text-overflow: clip !important;
+  overflow-wrap: anywhere;
+}

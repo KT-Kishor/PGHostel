@@ -55,6 +55,12 @@ sap.ui.define([
         },
 
         onBeforeRendering: function () {
+            // ToolHeader hides its native popover pointer on phones by default.
+            const oHeaderPopover = this.byId("hostelTopHeader").getAggregation("_popover");
+            if (oHeaderPopover) {
+                oHeaderPopover.setShowArrow(true);
+            }
+
             // The signup date picker is calendar-only. The delegate has to be
             // registered before the control renders, otherwise its
             // onAfterRendering hook never runs.

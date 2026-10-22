@@ -14,9 +14,10 @@
 >
     <tnt:ToolPage class="sapUiTinyMarginTop">
         <tnt:header>
-            <tnt:ToolHeader>
+            <tnt:ToolHeader id="hostelTopHeader">
     <Image
         src="./image/3 log 1.0.png"
+        width="110px"
         height="110px"
         tooltip="{i18n>companyLogo}"
         class="sapUiSmallMarginTop"
@@ -29,12 +30,15 @@
         text="{i18n>Registeryourpropertycap}"
         id="Vendor"
         tooltip="{i18n>Registeryourproperty}"
-        class="sapUiTinyMarginTop loginButton"
+        class="loginButton"
         press="onAdminSIGNUP"
     >
         <layoutData>
-            <!-- High priority means it stays visible longer, but will hide into '3 dots' on small screens -->
-            <OverflowToolbarLayoutData priority="High" />
+            <!-- Phones always use the overflow menu, including the first load. -->
+            <OverflowToolbarLayoutData
+                priority="{= ${device>/system/phone} ? 'AlwaysOverflow' : 'High' }"
+                shrinkable="false"
+            />
         </layoutData>
     </Button>
 
@@ -43,13 +47,15 @@
         text="{i18n>sIGNINUP}"
         id="loginButton"
         tooltip="{i18n>signInorSignUp}"
-        class="sapUiTinyMarginTop loginButton"
+        class="loginButton"
         press="onpressLogin"
         visible="{= !${UIModel>/isLoggedIn} }"
     >
         <layoutData>
-            <!-- Changed from 'NeverOverflow' to 'High' so it collapses into 3 dots when needed -->
-            <OverflowToolbarLayoutData priority="High" />
+            <OverflowToolbarLayoutData
+                priority="{= ${device>/system/phone} ? 'AlwaysOverflow' : 'High' }"
+                shrinkable="false"
+            />
         </layoutData>
     </Button>
 
@@ -92,7 +98,7 @@
                             key="idVendor"
                             tooltip="{i18n>vrTabTitle}"
                             text="{i18n>vrTabTitle}"
-                            visible="true"
+                            visible="false"
                         />
                         <!-- <IconTabFilter key="idFacilities" text="Facilities" /> -->
                         <IconTabFilter
