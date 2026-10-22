@@ -468,6 +468,11 @@ sap.ui.define([
                 Photo1Type: "",
                 Photo1Name: ""
             });
+                const oTopBranchModel = oView.getModel("TopBranchs");
+
+                const aAllPriorities = oTopBranchModel.getProperty("/values")
+                oView.setModel(new sap.ui.model.json.JSONModel({values: aAllPriorities}),"FilteredTopBranchs");
+
 
             oView.getModel("tokenModel").setData({
                 tokens: []
