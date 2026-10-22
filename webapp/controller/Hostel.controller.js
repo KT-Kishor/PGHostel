@@ -572,10 +572,12 @@ this._updateStaysData(oResourceBundle);
             
         },
   onStayTypePress:async function (oEvent) {
-    var oButton = oEvent.getSource();
-    // Retrieve the stable, non-translated ID from custom data
-    var sSelectedId = oButton.data("stayId"); 
-   
+var oButton = 
+    typeof oEvent?.getSource === "function"
+        ? oEvent.getSource()
+        : null;
+
+var sSelectedId = oButton?.data("stayId") || "Hotels";
 
     var oModel = this.getView().getModel("view");
     var aStays = oModel.getProperty("/staysList");
@@ -606,10 +608,11 @@ this._updateStaysData(oResourceBundle);
     });
 
     // 3. Add 'selected-stay-btn' ONLY to the currently clicked button
-    oButton.addStyleClass("selected-stay-btn");
+    oButton?.addStyleClass("selected-stay-btn");
         if(sSelectedId==="Hostels"){
                 sSelectedId="Hostel"
             }else if(sSelectedId==="Hotels"){
+                this.getView().byId("btnHotels").toggleStyleClass("selected-stay-btn", true)
                 sSelectedId="Hotel"
 
             }else if(sSelectedId==="Service Apartments"){
@@ -1496,6 +1499,8 @@ this._updateStaysData(oResourceBundle);
             } else {
                 oFooterModel.setProperty("/showGlobalFooter", true);
                 oFooterModel.setProperty("/showRoomsFooter", false);
+                 this.onStayTypePress("");
+
             }
             if (sKey === "idContact") {
                 if (this._imageInterval) {

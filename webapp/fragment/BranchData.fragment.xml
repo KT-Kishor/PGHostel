@@ -294,6 +294,22 @@
                         text="{i18n>Inactive}"
                     />
 				</Select>
+                <Label
+                 id="Bd_id_TopBranch"
+                 text="{i18n>PriorityListing}"
+                />
+				<ComboBox
+    id="Bd_id_TopBranches"
+    selectedKey="{MDmodel>/TopBranch}"
+    placeholder="{i18n>selectPriorityListing}"
+    width="100%"
+    items="{FilteredTopBranchs>/values}"
+>
+    <core:Item
+        key="{FilteredTopBranchs>key}"
+        text="{FilteredTopBranchs>text}"
+    />
+</ComboBox>
 
                 <Label
                     text="{i18n>startingPrice}"

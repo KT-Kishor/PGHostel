@@ -76,6 +76,11 @@
         "uri": "model/MonthYear.json",
         "preload": true
       },
+       "TopBranchs": {
+        "type": "sap.ui.model.json.JSONModel",
+        "uri": "model/TopBranchs.json",
+        "preload": true
+      },
       "AmenitiType": {
         "type": "sap.ui.model.json.JSONModel",
         "uri": "model/AmenitiType.json",

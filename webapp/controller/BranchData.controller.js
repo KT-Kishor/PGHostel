@@ -519,6 +519,11 @@ sap.ui.define([
             if (this.getView().getModel("LoginModel").getProperty("/Role") === "SuperAdmin") {
                 this.getView().byId("Bd_id_Active").setVisible(true)
                 this.getView().byId("Bd_id_Mode_Label").setVisible(true)
+                this.getView().byId("Bd_id_TopBranches").setVisible(true)
+                this.getView().byId("Bd_id_TopBranch").setVisible(true)
+            }else{
+                this.getView().byId("Bd_id_TopBranches").setVisible(false)
+                this.getView().byId("Bd_id_TopBranch").setVisible(false)
             }
 
             this.setDefaultTimesOnCreate();
@@ -568,9 +573,52 @@ _setDefaultCountryIndiaBranch: function() {
             utils._LCstrictValidationComboBox(oEvent.getSource(), "ID");
         },
 
-        onPropertyTypeChange: function(oEvent) {
-            utils._LCstrictValidationComboBox(oEvent.getSource(), "ID");
-        },
+  onPropertyTypeChange: function (oEvent) {
+    utils._LCstrictValidationComboBox(oEvent.getSource(), "ID");
+
+    const oView = this.getView();
+    const oMDModel = oView.getModel("MDmodel");
+    const oTopBranchModel = oView.getModel("TopBranchs");
+
+    const sPropertyType = oMDModel.getProperty("/PropertyType");
+    const sCurrentBranchID = oMDModel.getProperty("/BranchID");
+    const vCurrentPriority = oMDModel.getProperty("/TopBranch");
+    const vCity = oMDModel.getProperty("/baseLocation");
+
+
+    const aAllPriorities = oTopBranchModel.getProperty("/values") || [];
+    const aAllBranches = oView.getModel("mainModel").getData();
+
+    // Find priorities already assigned to the selected property type
+    const aAssignedPriorities = aAllBranches
+        .filter(branch =>
+            branch.PropertyType === sPropertyType &&
+            branch.City === vCity &&
+            String(branch.BranchID) !== String(sCurrentBranchID) &&
+            branch.TopBranch !== null &&
+            branch.TopBranch !== undefined &&
+            branch.TopBranch !== ""
+        )
+        .map(branch => Number(branch.TopBranch));
+
+    // Keep available priorities and the current branch's priority
+    const aAvailablePriorities = aAllPriorities.filter(item =>
+        !aAssignedPriorities.includes(Number(item.key)) ||
+        Number(item.key) === Number(vCurrentPriority)
+    );
+
+    oView.setModel(
+        new sap.ui.model.json.JSONModel({
+            values: aAvailablePriorities
+        }),
+        "FilteredTopBranchs"
+    );
+
+    // Clear priority if it is already assigned to another branch
+    if (aAssignedPriorities.includes(Number(vCurrentPriority))) {
+        oMDModel.setProperty("/TopBranch", "");
+    }
+},
 
         MD_onSaveButtonPress: async function() {
             var oView = this.getView();
@@ -713,7 +761,7 @@ _setDefaultCountryIndiaBranch: function() {
             const oGstInput = sap.ui.getCore().byId(oView.createId("MC_id_CustomGst"));
             const sGSTIN = ((oGstInput ? oGstInput.getValue() : Payload.GSTIN) || "").trim().toUpperCase();
             const bHasGSTIN = !!sGSTIN;
-
+                
             var oData = {
                 Name: Payload.Name,
                 UserID: this.getOwnerComponent().getModel("LoginModel").getData().EmployeeID,
@@ -744,7 +792,12 @@ _setDefaultCountryIndiaBranch: function() {
                 AttachmentName: oImage.AttachmentName,
                 CheckinTime: this.convert24ToAmPm(Payload.CheckinTime),
                 CheckoutTime: this.convert24ToAmPm(Payload.CheckoutTime)
-            };
+            };  
+            if(this.getView().getModel("LoginModel").getProperty("/Role") !== "SuperAdmin"){
+                        oData.TopBranch=11
+                  }else{
+                    oData.TopBranch=Payload.TopBranch
+                  }
 
             this.getBusyDialog()
             try {
@@ -1248,6 +1301,7 @@ _setDefaultCountryIndiaBranch: function() {
         },
 
         MD_UpdateTableRow: async function() {
+         
             var oView = this.getView();
             var oTable = this.byId("id_MD_Table");
             var oSelected = oTable.getSelectedItems();
@@ -1268,7 +1322,36 @@ _setDefaultCountryIndiaBranch: function() {
             var oContext = oSelectedItem.getBindingContext("mainModel");
             var oData = oContext.getObject();
             var oBranchImages = {};
+// ---------- TOP BRANCH PRIORITY FILTER ----------
+const aAllPriorities =
+    this.getView().getModel("TopBranchs").getProperty("/values") || [];
 
+const aAllBranches =
+    oView.getModel("mainModel").getData();
+
+const aAssignedPriorities = aAllBranches
+    .filter(branch =>
+        branch.PropertyType === oData.PropertyType &&
+        branch.City === oData.City &&
+        String(branch.BranchID) !== String(oData.BranchID) &&
+        branch.TopBranch !== null &&
+        branch.TopBranch !== undefined &&
+        branch.TopBranch !== ""
+    )
+    .map(branch => Number(branch.TopBranch));
+
+// Keep available priorities and the current branch's assigned priority
+const aAvailablePriorities = aAllPriorities.filter(item =>
+    !aAssignedPriorities.includes(Number(item.key)) ||
+    Number(item.key) === Number(oData.TopBranch)
+);
+
+this.getView().setModel(
+    new sap.ui.model.json.JSONModel({
+        values: aAvailablePriorities
+    }),
+    "FilteredTopBranchs"
+);
             this.getBusyDialog();
             try {
                 oBranchImages = await this._readBranchImages(oData.BranchID);
@@ -1351,6 +1434,13 @@ _setDefaultCountryIndiaBranch: function() {
                 this.getView().byId("Bd_id_Active").setVisible(true);
                 this.getView().byId("Bd_id_Mode_Label").setVisible(true);
             }
+                 if (this.getView().getModel("LoginModel").getProperty("/Role") === "SuperAdmin") {
+                this.getView().byId("Bd_id_TopBranches").setVisible(true)
+                this.getView().byId("Bd_id_TopBranch").setVisible(true)
+            }else{
+                this.getView().byId("Bd_id_TopBranches").setVisible(false)
+                this.getView().byId("Bd_id_TopBranch").setVisible(false)
+            }
 
             // ------------------ MAIN MODEL ------------------
             var oMDmodel = oView.getModel("MDmodel");
@@ -1377,7 +1467,8 @@ _setDefaultCountryIndiaBranch: function() {
                 CheckoutTime: this.convert24ToAmPm(oData.CheckoutTime),
                 Penalty: oData.Penalty,
                 StartingPrice: oData.StartingPrice,
-                EditBefore: oData.EditBefore
+                EditBefore: oData.EditBefore,
+                TopBranch:oData.TopBranch
             });
 
             this.isEdit = true;
@@ -1672,32 +1763,78 @@ _setDefaultCountryIndiaBranch: function() {
             ]);
         },
 
-        MC_onChangeCity: function(oEvent) {
-            const oCity = oEvent.getSource();
-            const oModel = this.getView().getModel("MDmodel");
+      MC_onChangeCity: function (oEvent) {
+    const oCity = oEvent.getSource();
+    const oModel = this.getView().getModel("MDmodel");
 
-            let sValue = oCity.getValue().replace(/[^a-zA-Z\s]/g, "");
-            if (sValue.length > 50) {
-                sValue = sValue.substring(0, 50);
-            }
-            oCity.setValue(sValue);
+    let sValue = oCity.getValue().replace(/[^a-zA-Z\s]/g, "");
+    if (sValue.length > 50) {
+        sValue = sValue.substring(0, 50);
+    }
+    oCity.setValue(sValue);
 
-            const oCountry = this.byId("MC_id_Country");
-            const oState = this.byId("MC_id_State");
-            const hasCountry = !!oCountry.getSelectedItem();
-            const hasState = !!oState.getSelectedItem() || !!oState.getValue();
+    const oCountry = this.byId("MC_id_Country");
+    const oState = this.byId("MC_id_State");
 
-            if (!hasCountry || !hasState) {
-                oCity.setValue("");
-                oCity.setSelectedKey(null);
-                oCity.getBinding("items")?.filter([new sap.ui.model.Filter("cityName", "EQ", "__NONE__")]);
-                oCity.setValueState("None");
-                return;
-            }
+    const hasCountry = !!oCountry.getSelectedItem();
+    const hasState = !!oState.getSelectedItem() || !!oState.getValue();
 
-            utils._LCvalidateMandatoryField(oEvent);
-            oModel.setProperty("/baseLocation", sValue);
-        },
+    if (!hasCountry || !hasState) {
+        oCity.setValue("");
+        oCity.setSelectedKey(null);
+        oCity.getBinding("items")?.filter([
+            new sap.ui.model.Filter("cityName", "EQ", "__NONE__")
+        ]);
+        oCity.setValueState("None");
+
+        oModel.setProperty("/baseLocation", "");
+        return;
+    }
+
+    utils._LCvalidateMandatoryField(oEvent);
+    oModel.setProperty("/baseLocation", sValue);
+
+    // ---------- TOP BRANCH PRIORITY FILTER ----------
+    const oView = this.getView();
+
+    const aAllPriorities =
+        oView.getModel("TopBranchs").getProperty("/values") || [];
+
+    const aAllBranches =
+        oView.getModel("mainModel").getData();
+
+    const sPropertyType = oModel.getProperty("/PropertyType");
+    const sBranchID = oModel.getProperty("/BranchID");
+    const vCurrentPriority = oModel.getProperty("/TopBranch");
+
+    const aAssignedPriorities = aAllBranches
+        .filter(branch =>
+            branch.PropertyType === sPropertyType &&
+            branch.City === sValue &&
+            String(branch.BranchID) !== String(sBranchID) &&
+            branch.TopBranch !== null &&
+            branch.TopBranch !== undefined &&
+            branch.TopBranch !== ""
+        )
+        .map(branch => Number(branch.TopBranch));
+
+    const aAvailablePriorities = aAllPriorities.filter(item =>
+        !aAssignedPriorities.includes(Number(item.key)) ||
+        Number(item.key) === Number(vCurrentPriority)
+    );
+
+    oView.setModel(
+        new sap.ui.model.json.JSONModel({
+            values: aAvailablePriorities
+        }),
+        "FilteredTopBranchs"
+    );
+
+    // Clear the selected priority if another branch already uses it
+    if (aAssignedPriorities.includes(Number(vCurrentPriority))) {
+        oModel.setProperty("/TopBranch", "");
+    }
+},
 
         onSTDChange: function() {
             const oSTD = this.byId("MC_id_codeModel");
