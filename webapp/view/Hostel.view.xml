@@ -131,7 +131,7 @@
                         <pages>
                              <Page
                                 id="idHome"
-
+                                class="hostelHomePage"
                                 showHeader="false"
                                 enableScrolling="true"
                             >
@@ -1001,7 +1001,6 @@
                                 </VBox>
                                 <VBox
                                     visible="{FooterModel>/showGlobalFooter}"
-                                    class="sapUiMediumMarginTop"
                                 >
                                     <core:Fragment
                                         fragmentName="sap.ui.com.project1.fragment.quicklinks"
