@@ -14142,7 +14142,7 @@ text-transform: none !important;
 
     .svPage .svWrap .svStep::before { display: none; }
     .svPage .svWrap .svFlow { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-    .svPage .svWrap .svFlowStep::after { display: none; }
+    .svPage .svWrap .svFlowStep:not(:last-child)::after { display: none; }
 }
 
 @media (max-width: 900px) {
@@ -14183,6 +14183,19 @@ text-transform: none !important;
     .svPage .svWrap .svBenefits,
     .svPage .svWrap .svSteps {
         grid-template-columns: minmax(0, 1fr);
+    }
+
+    .svPage .svWrap .svFlowStep:not(:last-child)::after {
+        content: "";
+        display: block;
+        left: 50%;
+        top: calc(100% + 15px);
+        bottom: auto;
+        width: 24px;
+        height: 18px;
+        background: var(--sv-teal-1);
+        clip-path: polygon(0 0, 50% 55%, 100% 0, 100% 45%, 50% 100%, 0 45%);
+        transform: translate(-50%, -50%);
     }
 
     .svPage .svWrap .svStem,
