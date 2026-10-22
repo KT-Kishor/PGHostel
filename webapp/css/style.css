@@ -135,31 +135,78 @@
 }
 
 /* Base Style */
+.loginButton.sapMBtn {
+  border-radius: 10px !important;
+  overflow: hidden !important;
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+  background: transparent !important;
+}
+
+/* Base Style - Inner Container */
 .loginButton .sapMBtnInner {
   background: linear-gradient(135deg, #02e0fd, #008b96) !important;
   color: #ffffff !important;
   font-size: 1rem !important;
   border-radius: 10px !important;
+  box-shadow: none !important;
+  border: none !important;
+  outline: none !important;
   transition: all 0.2s ease-in-out;
 }
 
-/* Active */
-.loginButton:active .sapMBtnInner {
-  background: linear-gradient(135deg, #02d0ed, #007f89) !important;
-  color: #ffffff !important;
-}
-
-/* Hover */
+/* Hover State */
 .loginButton:hover .sapMBtnInner {
   background: linear-gradient(135deg, #02d0ed, #007f89) !important;
   color: #ffffff !important;
+  box-shadow: none !important;
+  border: none !important;
+  outline: none !important;
 }
 
-/* Focus */
+/* Active & Click States (Fixes sharp rectangular background overlay) */
+.loginButton:active,
+.loginButton:focus,
+.loginButton:focus-visible,
+.loginButton.sapMBtnActive,
+.loginButton.sapMBtnPressed,
+.loginButton.sapMBtnDown,
+.loginButton.sapMBtnFocus {
+  border-radius: 10px !important;
+  outline: none !important;
+  box-shadow: none !important;
+  border: none !important;
+  background: transparent !important;
+}
+
+.loginButton:active .sapMBtnInner,
+.loginButton:focus .sapMBtnInner,
+.loginButton:focus-visible .sapMBtnInner,
+.loginButton.sapMBtnActive .sapMBtnInner,
+.loginButton.sapMBtnPressed .sapMBtnInner,
+.loginButton.sapMBtnDown .sapMBtnInner,
 .loginButton.sapMBtnFocus .sapMBtnInner {
+  background: linear-gradient(135deg, #02d0ed, #007f89) !important;
   color: #ffffff !important;
+  border-radius: 10px !important;
+  outline: none !important;
+  box-shadow: none !important;
+  border: none !important;
 }
 
+/* Pseudo-elements cleanup */
+.loginButton::before,
+.loginButton::after,
+.loginButton .sapMBtnInner::before,
+.loginButton .sapMBtnInner::after {
+  display: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+  border: none !important;
+}
+
+/* Content Text Color */
 .loginButton .sapMBtnContent,
 .loginButton .sapMBtnContent bdi {
   color: #ffffff !important;
@@ -14623,11 +14670,15 @@ body.svVendorScope .sapMSltPicker .sapMSelectList:focus {
   box-sizing: border-box;
 }
 
+
+/* Popover Specific Overrides */
 .sapMPopover.sapTntToolHeaderPopover[id$="--hostelTopHeader-popover"] .loginButton.sapMBtn {
   height: auto !important;
   min-height: 1.625rem;
   margin: 0 !important;
   padding: 0 !important;
+  border-radius: 10px !important;
+  overflow: hidden !important;
 }
 
 .sapMPopover.sapTntToolHeaderPopover[id$="--hostelTopHeader-popover"] .loginButton + .loginButton {
@@ -14638,10 +14689,13 @@ body.svVendorScope .sapMSltPicker .sapMSelectList:focus {
   height: auto !important;
   min-height: 1.625rem;
   padding: 0.125rem 0.5rem !important;
-  border-radius: px !important;
+  border-radius: 10px !important;
   align-items: center;
   justify-content: flex-start;
   box-sizing: border-box;
+  box-shadow: none !important;
+  border: none !important;
+  outline: none !important;
 }
 
 .sapMPopover.sapTntToolHeaderPopover[id$="--hostelTopHeader-popover"] .loginButton .sapMBtnContent {
