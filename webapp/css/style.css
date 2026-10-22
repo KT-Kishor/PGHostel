@@ -14750,3 +14750,8 @@ body.svVendorScope .sapMSltPicker .sapMSelectList:focus {
 .RoomsPage .roomsAdWrap .sapMCrsl {
     min-width: 0 !important;
 }
+.cardwidth{
+       width: 280px !important;
+    min-width: 280px;
+    max-width: 280px;
+}

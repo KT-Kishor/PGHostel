@@ -615,12 +615,6 @@ var sSelectedId = oButton?.data("stayId") || "Hotels";
                 this.getView().byId("btnHotels").toggleStyleClass("selected-stay-btn", true)
                 sSelectedId="Hotel"
 
-            }else if(sSelectedId==="Service Apartments"){
-                sSelectedId="Service Apartment"
-
-            }else if(sSelectedId==="Rented Apartments"){
-                sSelectedId="Rented Apartment"
-
             }
             this.getBusyDialog()
           await  this.Topproperty(sSelectedId)

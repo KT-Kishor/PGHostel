@@ -301,7 +301,7 @@
             class="stayBranchesGrid"
             content="{path: 'TopModel>/Branches'}"
         >
-            <VBox class="BranchCard sapUiLargeMarginTop">
+            <VBox class="BranchCard sapUiLargeMarginTop cardwidth">
                 <!-- ===== IMAGE CAROUSEL ===== -->
                 <Carousel
                     height="200px"
