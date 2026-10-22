@@ -12119,6 +12119,7 @@ text-transform: none !important;
     --sv-shadow: 0 3px 12px rgba(16, 37, 42, .06);
     --sv-shadow-lg: 0 8px 24px rgba(16, 37, 42, .08);
     --sv-font: Roboto, "Segoe UI", Arial, sans-serif;
+    --sv-text-gap: 12px;
 
     /* Property type card geometry. Shared by the card and its fill overlay so the
        two stay in step: an absolutely positioned overlay with inset:0 spans the
@@ -12167,12 +12168,31 @@ text-transform: none !important;
 .svPage .svWrap .sapMTitle {
     height: auto;
     margin: 0;
+    line-height: 1.3;
     white-space: normal;
     overflow-wrap: anywhere;
 }
 
 .svPage .svWrap .sapMFlexBox {
     min-width: 0;
+}
+
+/* Bare text stacks own their spacing so adjacent margins cannot add up. */
+.svPage .svWrap .svHeroInner,
+.svPage .svWrap .svDetail,
+.svPage .svWrap .svPoints,
+.svPage .svWrap .svBenefit,
+.svPage .svWrap .svFlowStep,
+.svPage .svWrap .svStep > .sapMVBox,
+.svPage .svWrap .svHelp,
+.svPage .svWrap .svFileMeta,
+.svPage .svWrap .svSuccess {
+    row-gap: var(--sv-text-gap);
+}
+
+.svPage .svWrap .svStepTitle,
+.svPage .svWrap .svStepT {
+    line-height: 1.3;
 }
 
 /* Bare HBoxes expose controls as grid items; inline flex sizing is ignored. */
@@ -12220,7 +12240,7 @@ text-transform: none !important;
     color: var(--sv-ink);
     font-size: clamp(26px, 4vw, 38px);
     font-weight: 700;
-    line-height: 1.15;
+    line-height: 1.3;
     text-align: center;
 }
 
@@ -12252,6 +12272,12 @@ text-transform: none !important;
 
 .svPage:lang(kn) .svWrap .svH2,
 .svPage:lang(hi) .svWrap .svH2,
+.svPage:lang(kn) .svWrap .sapMTitle,
+.svPage:lang(hi) .svWrap .sapMTitle,
+.svPage:lang(kn) .svWrap .svStepTitle,
+.svPage:lang(hi) .svWrap .svStepTitle,
+.svPage:lang(kn) .svWrap .svStepT,
+.svPage:lang(hi) .svWrap .svStepT,
 .svPage:lang(kn) .svWrap .svH3,
 .svPage:lang(hi) .svWrap .svH3,
 .svPage:lang(kn) .svWrap .svHeroTitle,
@@ -12262,7 +12288,7 @@ text-transform: none !important;
 .svPage .svWrap .svSub {
     display: block;
     max-width: 62ch;
-    margin: 6px auto 24px;
+    margin: var(--sv-text-gap) auto calc(2 * var(--sv-text-gap));
     color: var(--sv-muted);
     text-align: center;
 }
@@ -12271,7 +12297,7 @@ text-transform: none !important;
 .svPage .svWrap .svPtTagline {
     display: block;
     max-width: 80ch;
-    margin: 8px auto 10px;
+    margin: var(--sv-text-gap) auto 0;
     color: #007a86;
     font-size: clamp(18px, 2.4vw, 24px);
     font-weight: 400;
@@ -12280,14 +12306,13 @@ text-transform: none !important;
     text-align: center;
 }
 
-/* Property types: description keeps its paragraph break from the bundle */
+/* Intro copy uses normal leading instead of expanding bundle blank lines. */
 .svPage .svWrap .svPtDescription {
     width: 70%;
     max-width: 70%;
     margin-left: auto;
     margin-right: auto;
-    margin-bottom: 26px;
-    white-space: pre-line;
+    white-space: normal;
 }
 
 .svPage:lang(kn) .svWrap .svPtTagline,
@@ -12443,7 +12468,6 @@ text-transform: none !important;
 
 .svPage .svWrap .svEyebrow {
     display: block;
-    margin-bottom: 6px;
     color: #fff;
     font-size: 13px;
     font-weight: 700;
@@ -12453,7 +12477,6 @@ text-transform: none !important;
 
 .svPage .svWrap .svHeroTitle {
     max-width: 100%;
-    margin: 0 0 10px;
     color: #fff;
     font-size: clamp(28px, 4.8vw, 46px);
     font-weight: 700;
@@ -12471,18 +12494,14 @@ text-transform: none !important;
     display: block;
     width: 70%;
     max-width: 70%;
-    margin-bottom: 20px;
     color: #fff;
     font-size: 18px;
-    /* The lead copy carries a paragraph break (a real blank line from the
-       bundle), which is only honoured with pre-line. */
-    white-space: pre-line;
+    white-space: normal;
 }
 
 .svPage .svWrap .svChips {
     flex-wrap: wrap;
-    gap: 8px;
-    margin-bottom: 22px;
+    gap: var(--sv-text-gap) 8px;
 }
 
 .svPage .svWrap .svChip {
@@ -12543,7 +12562,7 @@ text-transform: none !important;
     width: 40px;
     height: 40px;
     min-height: 40px;
-    margin: 0 auto 10px;
+    margin: 0 auto;
     border-radius: 50%;
     background: var(--sv-grad);
     color: #fff;
@@ -12561,7 +12580,6 @@ text-transform: none !important;
 }
 
 .svPage .svWrap .svStepTitle {
-    margin-bottom: 4px;
     color: var(--sv-ink);
     font-size: 17px;
     font-weight: 700;
@@ -13029,7 +13047,6 @@ text-transform: none !important;
 }
 
 .svPage .svWrap .svH3 {
-    margin-bottom: 6px;
     color: var(--sv-teal-dark);
     font-size: 24px;
     font-weight: 700;
@@ -13037,7 +13054,6 @@ text-transform: none !important;
 
 .svPage .svWrap .svWho {
     display: block;
-    margin-bottom: 12px;
     color: var(--sv-teal-dark);
     font-size: 13.5px;
     font-weight: 700;
@@ -13045,7 +13061,6 @@ text-transform: none !important;
 
 .svPage .svWrap .svBlurb {
     display: block;
-    margin-bottom: 12px;
     color: var(--sv-muted);
 }
 
@@ -13073,19 +13088,13 @@ text-transform: none !important;
         height: 21rem;
         justify-content: flex-start;
     }
-
-    /* Match the card's bottom padding to center the note vertically. */
-    .svPage .svWrap .svPtypes .svNote {
-        margin-top: 40px;
-    }
 }
 
 
 .svPage .svWrap .svPath {
     flex-wrap: wrap;
     align-items: center;
-    gap: 6px;
-    margin-bottom: 14px;
+    gap: var(--sv-text-gap) 6px;
 }
 
 .svPage .svWrap .svPathItem {
@@ -13106,7 +13115,6 @@ text-transform: none !important;
 }
 
 .svPage .svWrap .svHeadline {
-    margin: 2px 0 8px;
     color: #007a86;
     font-size: 19px;
     font-weight: 400;
@@ -13118,7 +13126,7 @@ text-transform: none !important;
 }
 
 .svPage .svWrap .svPointsTitle {
-    margin: 2px 0 2px;
+    margin: 0;
     color: var(--sv-teal-dark);
     font-size: 13.5px;
     font-weight: 700;
@@ -13128,13 +13136,12 @@ text-transform: none !important;
 
 .svPage .svWrap .svPoints {
     width: 100%;
-    margin-bottom: 18px;
 }
 
 .svPage .svWrap .svPoint {
     position: relative;
     display: block;
-    margin: 7px 0;
+    margin: 0;
     padding-left: 32px;
     color: var(--sv-ink);
     font-size: 15.5px;
@@ -13157,9 +13164,13 @@ text-transform: none !important;
     line-height: 1;
 }
 
+.svPage .svWrap .svPtypes {
+    padding-bottom: var(--sv-text-gap);
+}
+
 .svPage .svWrap .svNote {
     display: block;
-    margin-top: 18px;
+    margin-top: var(--sv-text-gap);
     color: var(--sv-muted);
     font-size: 14.5px;
     text-align: center;
@@ -13172,7 +13183,7 @@ text-transform: none !important;
 }
 
 .svPage .svWrap .svWhy .svH2Row { margin: 0 clamp(8px, 2vw, 16px); }
-.svPage .svWrap .svWhy .svSub { max-width: 60ch; margin-bottom: 22px; }
+.svPage .svWrap .svWhy .svSub { max-width: 60ch; }
 
 .svPage .svWrap .svBenefits {
     display: grid;
@@ -13192,7 +13203,6 @@ text-transform: none !important;
     display: block;
     width: 64px;
     height: 64px;
-    margin-bottom: 10px;
     object-fit: contain;
     transition: transform .2s;
 }
@@ -13201,7 +13211,6 @@ text-transform: none !important;
 
 .svPage .svWrap .svBenefitTitle {
     width: 100%;
-    margin-bottom: 4px;
     color: var(--sv-ink);
     font-size: 20px;
     font-weight: 700;
@@ -13209,7 +13218,6 @@ text-transform: none !important;
 }
 
 .svPage .svWrap .svBenefitSub {
-    margin-bottom: 10px;
     color: var(--sv-muted);
     font-size: 15px;
     text-align: center;
@@ -13218,7 +13226,7 @@ text-transform: none !important;
 .svPage .svWrap .svPills {
     flex-wrap: wrap;
     justify-content: center;
-    gap: 6px;
+    gap: var(--sv-text-gap) 6px;
 }
 
 .svPage .svWrap .svPill {
@@ -13277,7 +13285,7 @@ text-transform: none !important;
 }
 
 .svPage .svWrap .svSideTitle {
-    margin-bottom: 4px;
+    margin-bottom: var(--sv-text-gap);
     color: #fff;
     font-size: 22px;
     font-weight: 700;
@@ -13285,13 +13293,13 @@ text-transform: none !important;
 
 .svPage .svWrap .svSideSub {
     display: block;
-    margin-bottom: 24px;
+    margin-bottom: calc(2 * var(--sv-text-gap));
     color: #fff;
     font-size: 15px;
     opacity: .95;
 }
 
-.svPage .svWrap .svProgress { width: 100%; margin-bottom: 22px; }
+.svPage .svWrap .svProgress { width: 100%; margin-bottom: calc(2 * var(--sv-text-gap)); }
 .svPage .svWrap .svProgressLabel { color: #fff; font-size: 14px; font-weight: 500; }
 
 .svPage .svWrap .svBar.sapMPI {
@@ -13323,7 +13331,7 @@ text-transform: none !important;
 .svPage .svWrap .svBar .sapMPIBarRemaining { background: transparent; }
 .svPage .svWrap .svBar .sapMPIText { display: none; }
 
-.svPage .svWrap .svSteps { width: 100%; margin-bottom: 26px; }
+.svPage .svWrap .svSteps { width: 100%; margin-bottom: calc(2 * var(--sv-text-gap)); }
 
 .svPage .svWrap .svStep {
     position: relative;
@@ -13415,7 +13423,6 @@ text-transform: none !important;
     color: #007a86;
     font-size: 19px;
     font-weight: 700;
-    line-height: 1.35;
 }
 
 .svPage .svWrap .svSecTitle .sapMTitle > span {
@@ -13716,7 +13723,7 @@ text-transform: none !important;
     position: relative;
     isolation: isolate;
     align-items: center;
-    gap: 6px;
+    gap: var(--sv-text-gap);
     margin-top: 12px;
     padding: 26px 16px;
     border: 2px dashed var(--sv-field-line);
@@ -14096,7 +14103,7 @@ text-transform: none !important;
     place-items: center;
     width: 84px;
     height: 84px;
-    margin: 0 auto 16px;
+    margin: 0 auto;
     border-radius: 50%;
     background: var(--sv-cyan-soft);
     color: var(--sv-ok);
@@ -14105,22 +14112,21 @@ text-transform: none !important;
 }
 
 .svPage .svWrap .svSuccessTitle {
-    margin-bottom: 8px;
     color: var(--sv-teal-dark);
     font-size: 26px;
     font-weight: 700;
     text-align: center;
 }
 
-    .svPage .svWrap .svSuccessText {
+.svPage .svWrap .svSuccessText {
     display: block;
     max-width: 52ch;
-    margin: 0 auto 20px;
+    margin: 0 auto;
     color: var(--sv-muted);
     text-align: center;
     /* The confirmation message carries its own line breaks. */
     white-space: pre-line;
-    }
+}
 
 /* ---------------- responsive ---------------- */
 
@@ -14167,6 +14173,12 @@ text-transform: none !important;
 
 
 @media (max-width: 720px) {
+    .svPage .svWrap .svHeroLead,
+    .svPage .svWrap .svPtDescription {
+        width: 100%;
+        max-width: 100%;
+    }
+
     .svPage .svWrap .svBenefits {
         grid-template-columns: repeat(2, minmax(0, 1fr));
         gap: 12px;

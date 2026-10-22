@@ -7,7 +7,7 @@
             <Text text="{i18n>vrHeroEyebrow}" class="svEyebrow"/>
             <Title text="{i18n>vrHeroTitle}" level="H1" wrapping="true" class="svHeroTitle"/>
             <Text text="{i18n>vrHeroLead}" class="svHeroLead"/>
-
+            <Text text="{i18n>vrHeroLead2}" class="svHeroLead"/>
             <HBox wrap="Wrap" renderType="Bare" class="svChips" items="{path:'pt>/types', templateShareable:false}">
                 <Text text="{pt>name}" class="svChip"/>
             </HBox>
