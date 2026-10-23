@@ -240,7 +240,7 @@
         text="{i18n>cardServiceApartments}"
         icon="sap-icon://building"
         press="onStayTypePress"
-        class="stayTypeButton myUnifiedBtn serviceApartmentsBtn">
+        class="stayTypeButton myUnifiedBtn ">
         <customData>
             <core:CustomData key="stayId" value="Service Apartments" />
         </customData>
@@ -252,7 +252,7 @@
         text="{i18n>stayRentedApartments}"
         icon="sap-icon://key"
         press="onStayTypePress"
-        class="stayTypeButton myUnifiedBtn serviceApartmentsBtn">
+        class="stayTypeButton myUnifiedBtn ">
         <customData>
             <core:CustomData key="stayId" value="Rented Apartments" />
         </customData>
@@ -266,34 +266,75 @@
 
    width="100%" class="stayDetailsContainer" binding="{view>/currentStay}">
 
-        <!-- Left Graphic Card -->
-        <!-- <VBox class="hotelPreviewCard"> -->
-            <!-- Top Badge -->
-             <VBox class="hotelPreviewCard" visible="{TopModel>/Branch}">
-            <!-- Top Badge -->
-            <HBox class="hotelCardBadge">
-                <core:Icon src="{view>icon}" class="badgeIcon"/>
-                <Text text="{view>badge}" class="badgeText"/>
-            </HBox>
+        <VBox class="stayCardStage" renderType="Bare">
+            <customData>
+                <core:CustomData
+                    key="placeholder"
+                    value="{= ${TopModel>/Branch} ? 'true' : 'false' }"
+                    writeToDom="true"
+                />
+            </customData>
+        <!-- Keep both layers mounted so switching cards does not resize the layout. -->
+        <VBox class="stayCardLayer stayCardPlaceholder" renderType="Bare">
+        <l:Grid
+            defaultSpan="XL4 L4 M6 S12"
+            containerQuery="true"
+            hSpacing="1"
+            vSpacing="1"
+            class="stayBranchesGrid"
+        >
+            <VBox class="BranchCard cardwidth">
+                <Carousel
+                    height="200px"
+                    width="100%"
+                    loop="true"
+                    showPageIndicator="false"
+                    backgroundDesign="Transparent"
+                >
+                    <pages>
+                        <VBox class="imageWrapper" height="200px">
+                            <HBox class="areaTagBox">
+                                <core:Icon
+                                    src="sap-icon://building"
+                                    size="0.9rem"
+                                    color="black"
+                                    class="sapUiTinyMarginEnd"
+                                />
+                                <Text text="{view>badge}" />
+                            </HBox>
+                            <VBox height="200px" width="100%" justifyContent="Center" alignItems="Center">
+                                <core:Icon src="{view>icon}" class="hotelCardMainIcon" />
+                            </VBox>
+                        </VBox>
+                    </pages>
+                </Carousel>
 
-            <!-- Center Icon -->
-            <VBox class="hotelCardIconWrapper" justifyContent="Center" alignItems="Center">
-                <core:Icon src="{view>icon}" class="hotelCardMainIcon"/>
+                <VBox class="BranchCardContent">
+                    <VBox class="BranchCardTitle" height="2rem" alignItems="Center" justifyContent="Center">
+                        <VBox class="skeletonLineLong" />
+                        <VBox class="skeletonLineShort sapUiNoMarginBottom" />
+                    </VBox>
+
+                    <VBox alignItems="Center">
+                        <Title text="{i18n>StartingatINR}" class="branchCardPrice" />
+                    </VBox>
+
+                    <HBox justifyContent="Center" alignItems="Center">
+                        <Link
+                            text="{i18n>ViewRooms}"
+                            tooltip="{i18n>ViewRooms}"
+                            enabled="false"
+                            class="btnViewDetails"
+                        />
+                    </HBox>
+                </VBox>
             </VBox>
-
-            <!-- Bottom Graphic Area -->
-            <VBox class="hotelCardBottom" alignItems="Center" justifyContent="Center">
-                <VBox class="skeletonLineLong"/>
-                <VBox class="skeletonLineShort"/>
-
-                <Text text="{i18n>StartingatINR}" class="hotelPriceText"/>
-
-                <Button text="{i18n>ViewRooms}" class="myUnifiedBtn "/>
-            </VBox>
+        </l:Grid>
         </VBox>
+ <!-- Actual graphic card -->
 
-            
-                 <l:Grid
+        <VBox class="stayCardLayer stayCardActual" renderType="Bare">
+                  <l:Grid
             defaultSpan="XL4 L4 M6 S12"
             containerQuery="true"
             hSpacing="1"
@@ -301,7 +342,7 @@
             class="stayBranchesGrid"
             content="{path: 'TopModel>/Branches'}"
         >
-            <VBox class="BranchCard sapUiLargeMarginTop cardwidth">
+            <VBox class="BranchCard cardwidth">
                 <!-- ===== IMAGE CAROUSEL ===== -->
                 <Carousel
                     height="200px"
@@ -374,13 +415,15 @@
                             text="{i18n>ViewRooms}"
                             tooltip="{i18n>ViewRooms}"
                             press="viewRooms"
+                            enabled="{= !${TopModel>/Branch} }"
                             class="btnViewDetails"
                         />
                     </HBox>
                 </VBox>
             </VBox>
         </l:Grid>
-        <!-- </VBox> -->
+        </VBox>
+        </VBox>
 
 
         <!-- Right Content Area -->
@@ -389,7 +432,11 @@
             <Title text="{view>badge}" level="H2" class="hotelDetailTitle"/>
             <Title text="{view>Subtitle}" level="H3" class="hotelDetailcardsubTitle"/>
 
-            <Text text="{view>blurb}" class="hotelDetailSubtitle"/>
+            <Text
+                text="{view>blurb}"
+                width="{= ${device>/system/phone} ? '100%' : '70%' }"
+                class="hotelDetailSubtitle"
+            />
 
             <!-- BEST FOR Section -->
             <Label text="{i18n>BESTFOR}" class="sectionHeaderLabel"/>
@@ -406,17 +453,14 @@
             class="featureIconround"
         />
 
-        <Text
-            text="{view>title}"
+        <FormattedText
+            htmlText="{parts: ['view>title', 'view>description'], formatter: '.formatStayFeatureText'}"
             class="featureTitlecard"
-        />
-
-        <Text text="–" class="featureTextcard sapUiTinyMarginBegin sapUiTinyMarginEnd"/>
-
-        <Text
-            text="{view>description}"
-            class="featureTextcard"
-        />
+        >
+            <layoutData>
+                <FlexItemData growFactor="1" baseSize="0%" minWidth="0" />
+            </layoutData>
+        </FormattedText>
     </HBox>
 </VBox>
 

@@ -7,8 +7,9 @@ sap.ui.define([
     "../model/formatter",
     "sap/ui/model/Filter",
     "sap/ui/model/FilterOperator",
-    "sap/ui/core/Fragment"
-], function (BaseController, JSONModel, MessageToast, MessageBox, utils, Formatter, Filter, FilterOperator, Fragment) {
+    "sap/ui/core/Fragment",
+    "sap/base/security/encodeXML"
+], function (BaseController, JSONModel, MessageToast, MessageBox, utils, Formatter, Filter, FilterOperator, Fragment, encodeXML) {
     "use strict";
  
     const $C = (id) => sap.ui.getCore().byId(id);
@@ -34,6 +35,8 @@ sap.ui.define([
             // the pictures arrive.
             this._adCarouselPauseResumeHandlers = [];
             this._setupAdvertisementModel([]);
+
+            this.getView().setModel(new JSONModel({ Branch: true, Branches: [] }), "TopModel");
 
             this.getView().setModel(new JSONModel({
                 showGlobalFooter: false,
@@ -163,6 +166,10 @@ sap.ui.define([
 
                 } catch (error) { }
             }, 1200); // 1 request per second (safe for Nominatim)
+        },
+        formatStayFeatureText: function (sTitle, sDescription) {
+            return encodeXML(sTitle || "") +
+                "<span class=\"featureTextcard\"> \u2013 " + encodeXML(sDescription || "") + "</span>";
         },
         _updateStaysData: function (oResourceBundle) {
     var aStays = [
@@ -352,7 +359,9 @@ Topproperty:async function (sPropertyType) {
                     const mimeType = fileType || "image/jpeg";
                     return `data:${mimeType};base64,${sBase64}`;
                 };
-              var oVisibilityModel = new JSONModel({ NoData: false, ShowViewMore: false });
+              // Retain the outgoing card while its layer fades behind the placeholder.
+              var aPreviousBranches = this.getView().getModel("TopModel").getProperty("/Branches");
+              var oVisibilityModel = new JSONModel({ NoData: false, ShowViewMore: false, Branch: true, Branches: aPreviousBranches });
                 this.getView().setModel(oVisibilityModel, "TopModel");
                  let response = await this.ajaxReadWithJQuery("HM_GetBranchImage", {
                         City: "Kalaburagi",
@@ -386,12 +395,10 @@ aBranchesData = aBranchesData.map((branch) => ({
     )
 }));
 
-            oVisibilityModel.setProperty("/Branches", aBranchesData)
-             if(aBranchesData.length>0){
-              oVisibilityModel.setProperty("/Branch", false)
-             }else{
-              oVisibilityModel.setProperty("/Branch", true)
-             }
+            oVisibilityModel.setData({
+                Branches: aBranchesData.length ? aBranchesData : aPreviousBranches,
+                Branch: aBranchesData.length === 0
+            }, true);
 
 },
 
@@ -616,9 +623,9 @@ var sSelectedId = oButton?.data("stayId") || "Hotels";
                 sSelectedId="Hotel"
 
             }
-            this.getBusyDialog()
-          await  this.Topproperty(sSelectedId)
-            this.closeBusyDialog()
+             this.getBusyDialog()
+            await this.Topproperty(sSelectedId);
+              this.closeBusyDialog()
 },
 
 

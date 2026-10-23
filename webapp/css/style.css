@@ -6112,7 +6112,7 @@ width: 44px !important;
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  margin-top: 35px;
+  margin-top: 9px;
 }
 
 .BranchCard .sapMCrsl,
@@ -11072,7 +11072,11 @@ text-transform: none !important;
     padding: 3.5rem 1rem  ;
     background-color: #e6f7f9;
 }
-
+@media (max-width: 600px) {
+.stayDetailsContainer {
+ padding: 1rem 1rem  ;
+    }
+  }
 /* ================= LEFT PREVIEW CARD ================= */
 .hotelPreviewCard {
     width: 400px;
@@ -11189,7 +11193,7 @@ text-transform: none !important;
 .hotelDetailSubtitle {
     color: #4b5563 !important;
     font-size: 1rem !important;
-    margin-bottom: 1.5rem !important;
+    margin-bottom: 1.35rem !important;
 
 }
 
@@ -11229,6 +11233,7 @@ text-transform: none !important;
     font-weight: 600 !important;
     color: #fff !important;
     box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    margin-top: 10px;
 }
 
 /* Checklist Styling */
@@ -11335,6 +11340,42 @@ text-transform: none !important;
     gap: 54px;
     box-sizing: border-box;
     width: 100%;
+}
+
+/* The in-flow placeholder reserves the same space throughout the crossfade. */
+.stayCardStage {
+    position: relative;
+    flex: 0 0 auto;
+    align-self: flex-start;
+    width: max-content;
+    max-width: 100%;
+    min-width: 0;
+}
+
+.stayCardLayer {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity 500ms ease-in-out, visibility 0s linear 500ms;
+}
+
+.stayCardActual {
+    position: absolute;
+    inset: 0;
+}
+
+.stayCardStage[data-placeholder="true"] > .stayCardPlaceholder,
+.stayCardStage[data-placeholder="false"] > .stayCardActual {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    transition-delay: 0s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .stayCardLayer {
+        transition: none;
+    }
 }
 
 /* Left card */
