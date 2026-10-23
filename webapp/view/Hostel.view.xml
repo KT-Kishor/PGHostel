@@ -587,7 +587,7 @@
     alignItems="Center"
     justifyContent="Start"
     wrap="Wrap" >
-                    <Button text="{i18n>Learnmore}" type="Emphasized" class="btnPrimary" press="onUsermanualPress"/>
+                    <Button text="{i18n>Learnmore}" type="Emphasized" class="myUnifiedBtn btnPrimary" press="onUsermanualPress"/>
                     <Button text="{i18n>cardContactus}" type="Default" class="btnOutline" press="onfootercontacttabselect"/>
                 </HBox>
             </VBox>
