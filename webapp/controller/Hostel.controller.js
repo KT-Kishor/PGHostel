@@ -637,12 +637,6 @@ var sSelectedId = oButton?.data("stayId") || "Hotels";
             }else if(sCurrentId==="Hotels"){
                 sCurrentId="Hotel"
 
-            }else if(sCurrentId==="Service Apartments"){
-                sCurrentId="Service Apartment"
-
-            }else if(sCurrentId==="Rented Apartments"){
-                sCurrentId="Rented Apartment"
-
             }
             // Add your navigation or action logic here
               var oTabHeader = this.getView().byId("mainTabHeader");
