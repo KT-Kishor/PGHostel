@@ -179,8 +179,9 @@
                             
 <!-- Find the Right Stay - Single Card -->
 
+<VBox class="homeUnifiedContent" width="100%" renderType="Bare">
 
-<VBox class="stayTypesMainCard" width="100%">
+<VBox class="homeUnifiedSection stayTypesMainCard" width="100%">
 
   
    <FormattedText
@@ -471,7 +472,7 @@
     </HBox>
 </VBox>
 
-<VBox class="whyBookMainCard" width="100%">
+<VBox class="homeUnifiedSection whyBookMainCard" width="100%">
 
     <!-- Header Section -->
     <FormattedText htmlText="{i18n>whyBookWith}"  class="stayTypesTitle"/>
@@ -520,7 +521,7 @@
     </FlexBox>
 
 </VBox>
-<VBox class="bookingStepsSection" width="100%">
+<VBox class="homeUnifiedSection bookingStepsSection" width="100%">
 
     <!-- Heading -->
     <VBox class="bookingStepsHeader" alignItems="Center">
@@ -570,7 +571,7 @@
 
     </HBox>
 </VBox>
-<VBox class="aboutUsContainer" width="100%">
+<VBox class="homeUnifiedSection aboutUsContainer" width="100%">
         
         <!-- Inner Responsive Splitter / Container using HBox with wrap -->
         <HBox class="aboutUsInner" width="100%" justifyContent="SpaceBetween" alignItems="Center" wrap="Wrap">
@@ -633,7 +634,7 @@
 
         </HBox>
     </VBox>
-    <HBox class="listPropertyBanner" width="100%" justifyContent="SpaceBetween" alignItems="Center" wrap="Wrap">
+    <HBox class="homeUnifiedSection listPropertyBanner" width="100%" justifyContent="SpaceBetween" alignItems="Center" wrap="Wrap">
         
         <!-- Left Content Area -->
         <VBox class="bannerContent">
@@ -656,9 +657,9 @@
         </HBox>
 
     </HBox>
-            <!-- </VBox> -->
+</VBox>
 
-                               <VBox class="sapUiTinyMarginTop">
+                               <VBox class="">
                                                     <core:Fragment
                                                         fragmentName="sap.ui.com.project1.fragment.quicklinks"
                                                         type="XML"
@@ -878,7 +879,7 @@
     </VBox>
 
     <!-- ===== RIGHT SIDE: ROOMS GRID & CONTENT ===== -->
-    <VBox width="100%" class="sapUiTinyMarginBegin roomsContentContainer">
+    <VBox width="100%" class=" roomsContentContainer">
         <!-- Rooms Grid -->
         <l:Grid
             id="idBedTypeFlex"
@@ -1022,22 +1023,6 @@
                                 class="svPage"
                             >
                                 <VBox class="svWrap" width="100%" renderType="Bare">
-                                    <core:Fragment
-                                        fragmentName="sap.ui.com.project1.fragment.VendorHero"
-                                        type="XML"
-                                    />
-                                    <core:Fragment
-                                        fragmentName="sap.ui.com.project1.fragment.VendorPropertyTypes"
-                                        type="XML"
-                                    />
-                                    <core:Fragment
-                                        fragmentName="sap.ui.com.project1.fragment.VendorAdminModules"
-                                        type="XML"
-                                    />
-                                    <core:Fragment
-                                        fragmentName="sap.ui.com.project1.fragment.VendorHowItWorks"
-                                        type="XML"
-                                    />
                                     <core:Fragment
                                         fragmentName="sap.ui.com.project1.fragment.VendorRegistration"
                                         type="XML"

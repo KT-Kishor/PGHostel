@@ -1,67 +1,227 @@
 <core:FragmentDefinition xmlns="sap.m" xmlns:core="sap.ui.core">
-    <VBox id="register" class="svReg" renderType="Bare">
-        <HBox class="svRegCard" renderType="Bare">
-            <VBox class="svRegHeader" renderType="Bare">
-                <HBox justifyContent="Center" wrap="Wrap" renderType="Bare" class="svH2Row">
-                    <FormattedText htmlText="{i18n>vrRegHeading}" class="svH2"/>
+    <VBox class="svVendorContent" width="100%" renderType="Bare">
+        <VBox class="svVendorSection svHero" renderType="Bare">
+            <VBox class="svHeroInner" renderType="Bare" alignItems="Start">
+                <Text text="{i18n>vrHeroEyebrow}" class="svEyebrow"/>
+                <Title text="{i18n>vrHeroTitle}" level="H1" wrapping="true" class="svHeroTitle"/>
+                <Text text="{i18n>vrHeroLead}" class="svHeroLead"/>
+                <Text text="{i18n>vrHeroLead2}" class="svHeroLead"/>
+                <HBox wrap="Wrap" renderType="Bare" class="svChips sapUiSmallMarginTop" items="{path:'pt>/types', templateShareable:false}">
+                    <Text text="{pt>name}" class="svChip"/>
                 </HBox>
-                <Text text="{i18n>vrRegSub}" textAlign="Center" class="svSub"/>
+
+                <Button text="{i18n>vrHeroCta}"
+                        icon="sap-icon://slim-arrow-down"
+                        iconFirst="false"
+                        type="Emphasized"
+                        class="svBtn svBtnLight sapUiSmallMarginTop"
+                        press=".onScrollToRegister"/>
             </VBox>
-            <VBox class="svSide" renderType="Bare">
-                <VBox class="svSideInner" renderType="Bare">
-                    <Title text="{i18n>vrSideTitle}" level="H3" wrapping="true" class="svSideTitle"/>
-                    <Text text="{i18n>vrSideSub}" class="svSideSub"/>
-                    <VBox class="svProgress" renderType="Bare">
-                        <HBox justifyContent="SpaceBetween" renderType="Bare">
-                            <Text text="{i18n>vrSideProgressLabel}" class="svProgressLabel"/>
-                            <Text text="{= (${AdminSignupModel>/Progress} || 0) + '%' }" class="svProgressLabel"/>
-                        </HBox>
-                        <ProgressIndicator percentValue="{AdminSignupModel>/Progress}" showValue="false"
-                                           height="8px" displayValue="{= (${AdminSignupModel>/Progress} || 0) + '%' }"
-                                           class="svBar"/>
-                    </VBox>
-                    <VBox class="svSteps" renderType="Bare">
-                        <HBox class="svStep" renderType="Bare">
-                            <Text text="1" textAlign="Center" class="svStepN"/>
-                            <VBox renderType="Bare">
-                                <Text text="{i18n>vrSideStep1Title}" class="svStepT"/>
-                                <Text text="{i18n>vrSideStep1Desc}" class="svStepD"/>
+        </VBox>
+
+        <VBox class="svVendorSection svPtypes" renderType="Bare">
+            <HBox justifyContent="Center" wrap="Wrap" renderType="Bare" class="svH2Row">
+                <FormattedText htmlText="{i18n>vrPtHeading}" class="svH2"/>
+            </HBox>
+            <Text text="{i18n>vrPtTagline}" textAlign="Center" class="svPtTagline"/>
+            <Text text="{i18n>vrPtSub}" textAlign="Center" class="svSub svPtDescription"/>
+            <MessageStrip text="{pt>/loadError}" type="Error" showIcon="true" visible="{= !!${pt>/loadError} }"/>
+
+            <HBox id="vendorTypeTabs" class="svTabs" renderType="Bare" width="100%" items="{path:'pt>/types', templateShareable:false}">
+                <ToggleButton text="{pt>name}"
+                              icon="{pt>icon}"
+                              tooltip="{pt>name}"
+                              width="100%"
+                              pressed="{= ${pt>id} === ${ptState>/selectedId} }"
+                              type="Transparent"
+                              class="svTab"
+                              press=".onSelectPropertyType">
+                    <customData>
+                        <core:CustomData key="vendor-selected" writeToDom="true"
+                                         value="{= ${pt>id} === ${ptState>/selectedId} ? 'true' : 'false' }"/>
+                    </customData>
+                </ToggleButton>
+            </HBox>
+
+            <HBox id="vendorTypePanel" class="svPanel" renderType="Bare">
+                <VBox class="svTreeCol" renderType="Bare">
+                    <!-- Each property type starts in the mode configured in vendorPropertyTypes.json. -->
+                    <HBox id="vendorModeToggle" class="svSeg" renderType="Bare" justifyContent="Center">
+                        <ToggleButton text="{i18n>vrPtSegSingle}"
+                                      type="Transparent"
+                                      class="svSegBtn"
+                                      pressed="{= ${ptState>/mode} === 'single' }"
+                                      press=".onModeSingle"/>
+                        <ToggleButton text="{i18n>vrPtSegMulti}"
+                                      type="Transparent"
+                                      class="svSegBtn"
+                                      pressed="{= ${ptState>/mode} === 'multi' }"
+                                      press=".onModeMulti"/>
+                    </HBox>
+
+                    <VBox class="svTree" renderType="Bare" alignItems="Center">
+                        <Text text="{i18n>vrPtRootNode}" textAlign="Center" class="svNode svRoot"/>
+                        <VBox class="svStem" renderType="Bare" width="2px" height="16px"/>
+                        <HBox class="svBranches" renderType="Bare" width="100%"
+                              items="{path:'ptState>/nodes', templateShareable:false}">
+                            <customData>
+                                <core:CustomData key="vendor-single" writeToDom="true"
+                                                 value="{= ${ptState>/isSingle} ? 'true' : 'false' }"/>
+                            </customData>
+                            <VBox class="svBranch" renderType="Bare">
+                                <Text text="{ptState>name}" textAlign="Center" width="100%" class="svNode"/>
+                                <VBox renderType="Bare" width="100%" items="{path:'ptState>leaves', templateShareable:false}">
+                                    <Text text="{ptState>}" textAlign="Center" width="100%" class="svLeaf"/>
+                                </VBox>
                             </VBox>
                         </HBox>
-                        <HBox class="svStep" renderType="Bare">
-                            <Text text="2" textAlign="Center" class="svStepN"/>
-                            <VBox renderType="Bare">
-                                <Text text="{i18n>vrSideStep2Title}" class="svStepT"/>
-                                <Text text="{i18n>vrSideStep2Desc}" class="svStepD"/>
-                            </VBox>
-                        </HBox>
-                        <HBox class="svStep" renderType="Bare">
-                            <Text text="3" textAlign="Center" class="svStepN"/>
-                            <VBox renderType="Bare">
-                                <Text text="{i18n>vrSideStep3Title}" class="svStepT"/>
-                                <Text text="{i18n>vrSideStep3Desc}" class="svStepD"/>
-                            </VBox>
-                        </HBox>
-                    </VBox>
-                    <VBox class="svHelp" renderType="Bare">
-                        <Text text="{i18n>vrSideHelp}"/>
-                        <Link text="admin@stayvriksha.in" href="mailto:admin@stayvriksha.in"
-                              class="tealTextLink"/>
+                        <Text text="{ptState>/more}" textAlign="Center" class="svMore"/>
                     </VBox>
                 </VBox>
-            </VBox>
-            <VBox class="svFormWrap" renderType="Bare">
-                <VBox id="formBox" renderType="Bare" visible="{= !${AdminSignupModel>/Submitted} }">
-                    <core:Fragment fragmentName="sap.ui.com.project1.fragment.AdminSignup" type="XML"/>
+
+                <VBox class="svDetail" renderType="Bare" alignItems="Start">
+                    <Title text="{ptState>/name}" level="H3" wrapping="true" class="svH3"/>
+                    <Text text="{ptState>/who}" class="svWho"/>
+                    <Title
+                        text="{ptState>/headline}"
+                        level="H4"
+                        wrapping="true"
+                        class="svHeadline"
+                        visible="{= !!${ptState>/headline} }"/>
+                    <Text text="{ptState>/blurb}" class="svBlurb"/>
+                    <HBox class="svPath" wrap="Wrap" renderType="Bare" items="{path:'ptState>/path', templateShareable:false}">
+                        <Text text="{ptState>}" class="svPathItem"/>
+                    </HBox>
+                    <Label
+                        text="{i18n>vrPtWhatYouCanManage}"
+                        class="svPointsTitle"
+                        visible="{= ${ptState>/points}.length > 0 }"/>
+                    <VBox class="svPoints" renderType="Bare" items="{path:'ptState>/points', templateShareable:false}">
+                        <FormattedText htmlText="{path:'ptState>', formatter:'.formatVendorPointText'}" class="svPoint"/>
+                    </VBox>
+                    <Button id="ptCta" text="{ptState>/ctaText}" class="svBtn" type="Emphasized" press=".onPtCtaPress"/>
                 </VBox>
-                <VBox id="successBox" class="svSuccess" renderType="Bare"
-                      visible="{AdminSignupModel>/Submitted}" alignItems="Center">
-                    <core:Icon src="sap-icon://accept" class="svSuccessIcon"/>
-                    <Title text="{i18n>vrSuccessTitle}" level="H3" wrapping="true" class="svSuccessTitle"/>
-                    <Text text="{AdminSignupModel>/SuccessMessage}" textAlign="Center" class="svSuccessText"/>
-                    <Button text="{i18n>vrSuccessBack}" class="svBtn" type="Emphasized" press=".onBackHome"/>
+            </HBox>
+
+            <Text text="{i18n>vrPtNote}" textAlign="Center" class="svNote"/>
+        </VBox>
+
+        <VBox class="svVendorSection svWhy" renderType="Bare">
+            <HBox justifyContent="Center" wrap="Wrap" renderType="Bare" class="svH2Row">
+                <FormattedText htmlText="{i18n>vrWhyHeading}" class="svH2"/>
+            </HBox>
+            <Text text="{i18n>vrWhySub}" textAlign="Center" class="svSub"/>
+
+            <HBox class="svBenefits" renderType="Bare" items="{path:'pt>/benefits', templateShareable:false}">
+                <VBox class="svBenefit" renderType="Bare" alignItems="Center">
+                    <Image src="{pt>icon}" width="64px" height="64px" decorative="true" class="svBenefitIcon"/>
+                    <Title text="{pt>title}" level="H3" wrapping="true" textAlign="Center" class="svBenefitTitle"/>
+                    <Text text="{pt>subtitle}" width="100%" textAlign="Center" class="svBenefitSub"/>
+                    <HBox wrap="Wrap" renderType="Bare" justifyContent="Center" class="svPills" items="{path:'pt>items', templateShareable:false}">
+                        <Text text="{pt>}" textAlign="Center" class="svPill"/>
+                    </HBox>
                 </VBox>
-            </VBox>
-        </HBox>
+            </HBox>
+
+            <HBox justifyContent="Center" renderType="Bare" class="svWhyCta" visible="false">
+                <Button text="{i18n>vrWhyCta}" class="svBtn" type="Emphasized" press=".onScrollToRegister"/>
+            </HBox>
+        </VBox>
+
+        <VBox class="svVendorSection svHow" renderType="Bare">
+            <HBox justifyContent="Center" wrap="Wrap" renderType="Bare" class="svH2Row">
+                <FormattedText htmlText="{i18n>vrHowHeading}" class="svH2"/>
+            </HBox>
+            <Text text="{i18n>vrHowSub}" textAlign="Center" class="svSub"/>
+
+            <HBox class="svFlow" wrap="Wrap" renderType="Bare">
+                <VBox class="svFlowStep" renderType="Bare" alignItems="Center">
+                    <Text text="1" textAlign="Center" class="svStepNum"/>
+                    <Text text="{i18n>vrHowStep1Title}" textAlign="Center" width="100%" class="svStepTitle"/>
+                    <Text text="{i18n>vrHowStep1Desc}" textAlign="Center" width="100%" class="svStepDesc"/>
+                </VBox>
+                <VBox class="svFlowStep" renderType="Bare" alignItems="Center">
+                    <Text text="2" textAlign="Center" class="svStepNum"/>
+                    <Text text="{i18n>vrHowStep2Title}" textAlign="Center" width="100%" class="svStepTitle"/>
+                    <Text text="{i18n>vrHowStep2Desc}" textAlign="Center" width="100%" class="svStepDesc"/>
+                </VBox>
+                <VBox class="svFlowStep" renderType="Bare" alignItems="Center">
+                    <Text text="3" textAlign="Center" class="svStepNum"/>
+                    <Text text="{i18n>vrHowStep3Title}" textAlign="Center" width="100%" class="svStepTitle"/>
+                    <Text text="{i18n>vrHowStep3Desc}" textAlign="Center" width="100%" class="svStepDesc"/>
+                </VBox>
+                <VBox class="svFlowStep" renderType="Bare" alignItems="Center">
+                    <Text text="4" textAlign="Center" class="svStepNum"/>
+                    <Text text="{i18n>vrHowStep4Title}" textAlign="Center" width="100%" class="svStepTitle"/>
+                    <Text text="{i18n>vrHowStep4Desc}" textAlign="Center" width="100%" class="svStepDesc"/>
+                </VBox>
+            </HBox>
+        </VBox>
+
+        <VBox id="register" class="svVendorSection svReg" renderType="Bare">
+            <HBox class="svRegCard" renderType="Bare">
+                <VBox class="svRegHeader" renderType="Bare">
+                    <HBox justifyContent="Center" wrap="Wrap" renderType="Bare" class="svH2Row">
+                        <FormattedText htmlText="{i18n>vrRegHeading}" class="svH2"/>
+                    </HBox>
+                    <Text text="{i18n>vrRegSub}" textAlign="Center" class="svSub"/>
+                </VBox>
+                <VBox class="svSide" renderType="Bare">
+                    <VBox class="svSideInner" renderType="Bare">
+                        <Title text="{i18n>vrSideTitle}" level="H3" wrapping="true" class="svSideTitle"/>
+                        <Text text="{i18n>vrSideSub}" class="svSideSub"/>
+                        <VBox class="svProgress" renderType="Bare">
+                            <HBox justifyContent="SpaceBetween" renderType="Bare">
+                                <Text text="{i18n>vrSideProgressLabel}" class="svProgressLabel"/>
+                                <Text text="{= (${AdminSignupModel>/Progress} || 0) + '%' }" class="svProgressLabel"/>
+                            </HBox>
+                            <ProgressIndicator percentValue="{AdminSignupModel>/Progress}" showValue="false"
+                                               height="8px" displayValue="{= (${AdminSignupModel>/Progress} || 0) + '%' }"
+                                               class="svBar"/>
+                        </VBox>
+                        <VBox class="svSteps" renderType="Bare">
+                            <HBox class="svStep" renderType="Bare">
+                                <Text text="1" textAlign="Center" class="svStepN"/>
+                                <VBox renderType="Bare">
+                                    <Text text="{i18n>vrSideStep1Title}" class="svStepT"/>
+                                    <Text text="{i18n>vrSideStep1Desc}" class="svStepD"/>
+                                </VBox>
+                            </HBox>
+                            <HBox class="svStep" renderType="Bare">
+                                <Text text="2" textAlign="Center" class="svStepN"/>
+                                <VBox renderType="Bare">
+                                    <Text text="{i18n>vrSideStep2Title}" class="svStepT"/>
+                                    <Text text="{i18n>vrSideStep2Desc}" class="svStepD"/>
+                                </VBox>
+                            </HBox>
+                            <HBox class="svStep" renderType="Bare">
+                                <Text text="3" textAlign="Center" class="svStepN"/>
+                                <VBox renderType="Bare">
+                                    <Text text="{i18n>vrSideStep3Title}" class="svStepT"/>
+                                    <Text text="{i18n>vrSideStep3Desc}" class="svStepD"/>
+                                </VBox>
+                            </HBox>
+                        </VBox>
+                        <VBox class="svHelp" renderType="Bare">
+                            <Text text="{i18n>vrSideHelp}"/>
+                            <Link text="admin@stayvriksha.in" href="mailto:admin@stayvriksha.in"
+                                  class="tealTextLink"/>
+                        </VBox>
+                    </VBox>
+                </VBox>
+                <VBox class="svFormWrap" renderType="Bare">
+                    <VBox id="formBox" renderType="Bare" visible="{= !${AdminSignupModel>/Submitted} }">
+                        <core:Fragment fragmentName="sap.ui.com.project1.fragment.AdminSignup" type="XML"/>
+                    </VBox>
+                    <VBox id="successBox" class="svSuccess" renderType="Bare"
+                          visible="{AdminSignupModel>/Submitted}" alignItems="Center">
+                        <core:Icon src="sap-icon://accept" class="svSuccessIcon"/>
+                        <Title text="{i18n>vrSuccessTitle}" level="H3" wrapping="true" class="svSuccessTitle"/>
+                        <Text text="{AdminSignupModel>/SuccessMessage}" textAlign="Center" class="svSuccessText"/>
+                        <Button text="{i18n>vrSuccessBack}" class="svBtn" type="Emphasized" press=".onBackHome"/>
+                    </VBox>
+                </VBox>
+            </HBox>
+        </VBox>
     </VBox>
 </core:FragmentDefinition>

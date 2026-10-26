@@ -6673,9 +6673,9 @@ onBuyTravelInsurance:function() {
         /* ==================================================================
          *  VENDOR REGISTRATION ("List your property")
          *
-         *  Rendered by the five Vendor*.fragment.xml fragments from a Page
-         *  inside Hostel.view.xml. The explorer uses pt/ptState; the inline
-         *  signup uses the existing AdminSignupModel and HM_Login contract.
+         *  Rendered by VendorRegistration.fragment.xml inside Hostel.view.xml.
+         *  The explorer uses pt/ptState; the separate AdminSignup fragment uses
+         *  the existing AdminSignupModel and HM_Login contract.
          * ================================================================== */
 
         /* ---------------------------------------------------------------- */
@@ -6839,6 +6839,16 @@ onBuyTravelInsurance:function() {
         /* ---------------------------------------------------------------- */
         /*  PROPERTY TYPE EXPLORER                                          */
         /* ---------------------------------------------------------------- */
+
+        formatVendorPointText: function (sText) {
+            sText = sText || "";
+            var iSeparator = sText.indexOf("\u2013");
+
+            if (iSeparator === -1) { return encodeXML(sText); }
+
+            return encodeXML(sText.slice(0, iSeparator)) +
+                "<span class=\"svPointDescription\">" + encodeXML(sText.slice(iSeparator)) + "</span>";
+        },
 
         _vrShowPropertyType: function (iIndex, sMode, bRefreshTexts) {
             var oPt    = this.getView().getModel("pt"),
