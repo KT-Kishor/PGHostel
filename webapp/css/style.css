@@ -12188,7 +12188,15 @@ text-transform: none !important;
 }
 
 .hostelHomePage .homeUnifiedSection + .homeUnifiedSection {
-    border-top: 1px solid #dce9e7 !important;
+    border-top: 1.5px solid #E3F8FB !important;
+}
+
+@media (max-width: 767px) {
+    .hostelHomePage .aboutUsContainer.homeUnifiedSection {
+        /* padding-bottom: clamp(12px, 2vw, 24px) !important; */
+                padding-bottom: clamp(6px, 1.2vw, 16px) !important;
+
+    }
 }
 
 /* ==================================================================
@@ -12336,7 +12344,7 @@ text-transform: none !important;
 }
 
 .svPage .svWrap .svVendorSection + .svVendorSection {
-    border-top: 1px solid #dce9e7;
+    border-top: 1.5px solid #E3F8FB;
 }
 
 .svPage .svWrap .svVendorSection.svHero,
@@ -14816,7 +14824,17 @@ body.svVendorScope .sapMSltPicker .sapMSelectList:focus {
     min-width: 0 !important;
 }
 .cardwidth{
-       width: 280px !important;
+    width: 280px !important;
     min-width: 280px;
     max-width: 280px;
+}
+
+@media (max-width: 767px) {
+    .hostelHomePage .stayBranchesGrid .cardwidth {
+        width: 100% !important;
+        min-width: 0;
+        max-width: 100%;
+        margin-inline: auto;
+        box-sizing: border-box;
+    }
 }

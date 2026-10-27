@@ -1029,6 +1029,7 @@
                                     />
                                 </VBox>
                                 <VBox
+                                    class="sapUiSmallMarginTop"
                                     visible="{FooterModel>/showGlobalFooter}"
                                 >
                                     <core:Fragment
