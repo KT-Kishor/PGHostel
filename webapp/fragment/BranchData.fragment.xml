@@ -302,6 +302,8 @@
     id="Bd_id_TopBranches"
     selectedKey="{MDmodel>/TopBranch}"
     placeholder="{i18n>selectPriorityListing}"
+    valueStateText="{i18n>selectPriorityListing}"
+    change="onTopBranchChange"
     width="100%"
     items="{FilteredTopBranchs>/values}"
 >

@@ -578,6 +578,19 @@ _setDefaultCountryIndiaBranch: function() {
             utils._LCstrictValidationComboBox(oEvent.getSource(), "ID");
         },
 
+        _validateTopBranch: function(oComboBox) {
+            if (!String(oComboBox.getValue() || "").trim()) {
+                oComboBox.setValueState("None");
+                return true;
+            }
+
+            return utils._LCstrictValidationComboBox(oComboBox, "ID");
+        },
+
+        onTopBranchChange: function(oEvent) {
+            this._validateTopBranch(oEvent.getSource());
+        },
+
   onPropertyTypeChange: function (oEvent) {
     utils._LCstrictValidationComboBox(oEvent.getSource(), "ID");
 
@@ -645,7 +658,8 @@ _setDefaultCountryIndiaBranch: function() {
                 utils._LCstrictValidationComboBox(sap.ui.getCore().byId(oView.createId("MC_id_codeModel")), "ID") &&
                 utils._LCvalidateMandatoryField(sap.ui.getCore().byId(oView.createId("BD_id_CheckInTime")), "ID") &&
                 utils._LCvalidateMandatoryField(sap.ui.getCore().byId(oView.createId("BD_id_CheckOutTime")), "ID") &&
-                utils._LCstrictValidationComboBox(sap.ui.getCore().byId(oView.createId("Bd_id_DepositCurrency")), "ID")
+                utils._LCstrictValidationComboBox(sap.ui.getCore().byId(oView.createId("Bd_id_DepositCurrency")), "ID") &&
+                this._validateTopBranch(sap.ui.getCore().byId(oView.createId("Bd_id_TopBranches")))
             );
 
             if (!isMandatoryValid) {
@@ -798,11 +812,11 @@ _setDefaultCountryIndiaBranch: function() {
                 CheckinTime: this.convert24ToAmPm(Payload.CheckinTime),
                 CheckoutTime: this.convert24ToAmPm(Payload.CheckoutTime)
             };  
-            if(this.getView().getModel("LoginModel").getProperty("/Role") !== "SuperAdmin"){
-                        oData.TopBranch=11
-                  }else{
-                    oData.TopBranch=Payload.TopBranch
-                  }
+            const bHasTopBranch = Payload.TopBranch !== null &&
+                Payload.TopBranch !== undefined &&
+                String(Payload.TopBranch).trim() !== "";
+
+            oData.TopBranch = this.isEdit && bHasTopBranch ? Payload.TopBranch : 11;
 
             this.getBusyDialog()
             try {

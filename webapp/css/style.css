@@ -6616,13 +6616,17 @@ html, body {
 .sapMVBox.facilityServiceCard.serviceCardSelected .facilityImageContainer {
   outline: 1px solid rgba(14, 165, 183, 0.45) !important;
   outline-offset: -1px !important;
+  border-radius: 16px !important;
+  overflow: hidden !important;
 }
 
 .facilityImageContainer {
   position: relative;
   overflow: hidden !important;
-  border-radius: 18px !important;
-  background: #dceff2;
+  border: 0 !important;
+  border-radius: 16px !important;
+  background: #dceff2 !important;
+  box-sizing: border-box;
 }
 
 .facilityImageContainer::after {
@@ -6633,11 +6637,15 @@ html, body {
   pointer-events: none;
 }
 
-.facilityServiceImage,
-.facilityImageContainer img {
+.facilityServiceCard .facilityImageContainer .facilityServiceImage,
+.facilityServiceCard .facilityImageContainer img,
+.facilityServiceCard.serviceCardSelected .facilityImageContainer .facilityServiceImage,
+.facilityServiceCard.serviceCardSelected .facilityImageContainer img {
   width: 100% !important;
   height: 190px !important;
-  border-radius: 18px !important;
+  display: block !important;
+  margin: 0 !important;
+  border-radius: 16px !important;
   object-fit: cover !important;
 }
 
@@ -6855,11 +6863,6 @@ html, body {
     min-height: 21.5rem;
     border-radius: 18px !important;
     scroll-snap-align: start;
-  }
-
-  .facilityServiceImage,
-  .facilityImageContainer img {
-    height: 160px !important;
   }
 
   .facilityCardTitle,
@@ -12193,9 +12196,7 @@ text-transform: none !important;
 
 @media (max-width: 767px) {
     .hostelHomePage .aboutUsContainer.homeUnifiedSection {
-        /* padding-bottom: clamp(12px, 2vw, 24px) !important; */
-                padding-bottom: clamp(6px, 1.2vw, 16px) !important;
-
+      padding-bottom: clamp(12px, 2vw, 24px) !important;
     }
 }
 
