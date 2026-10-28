@@ -153,6 +153,7 @@ sap.ui.define([
 
                     if (data && data.address) {
                         this.City = data.address.city || data.address.town || data.address.village || "";
+                        // this.City = "Raayachuru";
                         this.State = data.address.state || "";
                         this.Country = data.address.country || "";
                         this.CountryCode = data.address.country_code?.toUpperCase() || "";
@@ -162,6 +163,11 @@ sap.ui.define([
                         // have loaded. Re-apply the prefill so a late location still
                         // fills the address in.
                         this._applyGeoPrefill();
+
+                        // Refresh Home cards when the city arrives after the initial load.
+                        if (this.City && !this._vrExited) {
+                            await this.Topproperty(this._sHomePropertyType || "Hotel");
+                        }
                     }
 
                 } catch (error) { }
@@ -349,6 +355,7 @@ _getResourceBundle: function () {
     return oI18nModel.getResourceBundle();
 },
 Topproperty:async function (sPropertyType) {
+     this._sHomePropertyType = sPropertyType || "";
      const convertBase64ToImage = (base64String, fileType) => {
                     if (!base64String) return "./image/Fallback.png";
 
@@ -364,7 +371,7 @@ Topproperty:async function (sPropertyType) {
               var oVisibilityModel = new JSONModel({ NoData: false, ShowViewMore: false, Branch: true, Branches: aPreviousBranches });
                 this.getView().setModel(oVisibilityModel, "TopModel");
                  let response = await this.ajaxReadWithJQuery("HM_GetBranchImage", {
-                        City: "Kalaburagi",
+                        City: this.City || "Kalaburagi",
                         PropertyType: sPropertyType || "",
                         top: 1,
                         skip: 0,
