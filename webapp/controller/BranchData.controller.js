@@ -939,7 +939,7 @@ _setDefaultCountryIndiaBranch: function() {
             if (sRawValue !== sValue) {
                 oInput.setValue(sValue);
                 oInput.setValueState("Error");
-                oInput.setValueStateText("SpacesarenotallowedinGeolocation");
+                oInput.setValueStateText(this.i18nModel.getText("SpacesarenotallowedinGeolocation"));
                 return;
             }
 

@@ -11197,6 +11197,7 @@ text-transform: none !important;
     color: #4b5563 !important;
     font-size: 1rem !important;
     margin-bottom: 1.35rem !important;
+    line-height: 1.5 !important;
 
 }
 
@@ -12377,7 +12378,7 @@ text-transform: none !important;
 
 .svPage .svWrap .svWhy .svH2,
 .svPage .svWrap .svWhy .svH2 strong {
-    color: #007a86;
+    color: #fff;
 }
 
 .svPage .svWrap .svHow .svH2,
@@ -12387,7 +12388,7 @@ text-transform: none !important;
 
 .svPage .svWrap .svRegHeader .svH2,
 .svPage .svWrap .svRegHeader .svH2 strong {
-    color: #007a86;
+    color: #fff;
 }
 
 .svPage .svWrap .svH2 strong {
@@ -13301,6 +13302,18 @@ text-transform: none !important;
 
 /* ---------------- benefits ---------------- */
 
+.svPage .svWrap .svWhy,
+.svPage .svWrap .svRegHeader {
+    --sv-ink: #fff;
+    --sv-muted: #fff;
+    color: #fff;
+}
+
+.svPage .svWrap .svWhy,
+.svPage .svWrap .svRegCard {
+    background: linear-gradient(135deg, var(--sv-teal-1), var(--sv-teal-2) 60%, #00798a);
+}
+
 .svPage .svWrap .svWhy .svH2Row { margin: 0 clamp(8px, 2vw, 16px); }
 .svPage .svWrap .svWhy .svSub { max-width: 60ch; }
 
@@ -13351,8 +13364,8 @@ text-transform: none !important;
 .svPage .svWrap .svPill {
     padding: 3px 11px;
     border-radius: 999px;
-    background: linear-gradient(135deg, #00b7c7, #008b96) !important;
-    color: #fff;
+    background: var(--sv-paper) !important;
+    color: var(--sv-teal-dark);
     font-size: 13.5px;
     font-weight: 500;
     text-align: center;
@@ -13373,8 +13386,7 @@ text-transform: none !important;
     grid-template-columns: 340px minmax(0, 1fr);
     align-items: stretch;
     border: 0;
-    border-radius: 0;
-    background: var(--sv-paper);
+    border-radius: clamp(24px, 3vw, 40px) 0 0 0;
     box-shadow: none;
     overflow: visible;
 }
@@ -13393,7 +13405,7 @@ text-transform: none !important;
 .svPage .svWrap .svSide {
     position: relative;
     padding: 34px 30px;
-    background: linear-gradient(170deg, var(--sv-teal-1), #007c8c);
+    background: transparent;
     color: #fff;
 }
 
@@ -13518,7 +13530,11 @@ text-transform: none !important;
     opacity: .82;
 }
 
-.svPage .svWrap .svFormWrap { min-width: 0; }
+.svPage .svWrap .svFormWrap {
+    min-width: 0;
+    border-radius: clamp(24px, 3vw, 40px) 0 0 0;
+    background: var(--sv-paper);
+}
 
 /* ---------------- inline AdminSignup form ---------------- */
 

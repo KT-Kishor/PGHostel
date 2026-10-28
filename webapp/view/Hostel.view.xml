@@ -247,7 +247,7 @@
         </customData>
     </Button>
 
-    <!-- 5. Rented Apartments Button (Added missing customData) -->
+    <!-- 5. Rented Properties Button (Added missing customData) -->
     <Button
         id="btnRentedApartments"
         text="{i18n>stayRentedApartments}"
@@ -255,7 +255,7 @@
         press="onStayTypePress"
         class="stayTypeButton myUnifiedBtn ">
         <customData>
-            <core:CustomData key="stayId" value="Rented Apartments" />
+            <core:CustomData key="stayId" value="Rented Properties" />
         </customData>
     </Button>
 

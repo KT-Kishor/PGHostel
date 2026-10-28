@@ -280,7 +280,7 @@ sap.ui.define([
 ]
         },
         { 
-            id: "Rented Apartments", 
+            id: "Rented Properties",
             badge: oResourceBundle.getText("stayRentedApartments"), 
             icon: "sap-icon://key",
             blurb: oResourceBundle.getText("blurbRentedApartments"),
