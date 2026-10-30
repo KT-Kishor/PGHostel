@@ -4417,6 +4417,7 @@ const sSuccessMsg = this.i18nModel.getText("registrationSuccess", [
                 oLoginModel.setProperty("/UserName", user.UserName);
                 oLoginModel.setProperty("/EmailID", user.EmailID);
                 oLoginModel.setProperty("/Role", user.Role);
+                oLoginModel.setProperty("/Subscription_Role", user.Subscription_Role);
                 oLoginModel.setProperty("/BranchCode", user.BranchCode || "");
                 oLoginModel.setProperty("/STDCode", user.STDCode || "");
                 oLoginModel.setProperty("/MobileNo", user.MobileNo || "");
@@ -6455,74 +6456,74 @@ const sSuccessMsg = this.i18nModel.getText("registrationSuccess", [
                 MemberID: "MDAwMDM="
             });
         },
-        
- onPrivacyPolicyPress: function () {
-                var oView = this.getView();
 
-                if (!this._pTermsDialog) {
-                    this._pTermsDialog = Fragment.load({
-                        id: oView.getId(),
-                        name: "sap.ui.com.project1.fragment.TermsandCondition",
-                        controller: this
-                    }).then(function (oDialog) {
-                        oView.addDependent(oDialog);
+        onPrivacyPolicyPress: function () {
+            var oView = this.getView();
 
-                        var oHtml = Fragment.byId(
-                            oView.getId(),
-                            "termsPdfFrame"
+            if (!this._pTermsDialog) {
+                this._pTermsDialog = Fragment.load({
+                    id: oView.getId(),
+                    name: "sap.ui.com.project1.fragment.TermsandCondition",
+                    controller: this
+                }).then(function (oDialog) {
+                    oView.addDependent(oDialog);
+
+                    var oHtml = Fragment.byId(
+                        oView.getId(),
+                        "termsPdfFrame"
+                    );
+
+                    if (!oHtml) {
+                        throw new Error(
+                            "termsPdfFrame was not found."
                         );
+                    }
 
-                        if (!oHtml) {
-                            throw new Error(
-                                "termsPdfFrame was not found."
+                    oHtml.addEventDelegate({
+                        onAfterRendering: function () {
+                            var oIframe = oHtml
+                                .getDomRef()
+                                .querySelector("iframe");
+
+                            if (!oIframe) {
+                                return;
+                            }
+
+                            oIframe.src = sap.ui.require.toUrl(
+                                "sap/ui/com/project1/Documents/TermsAndConditions.pdf"
                             );
                         }
+                    });
 
-                        oHtml.addEventDelegate({
-                            onAfterRendering: function () {
-                                var oIframe = oHtml
-                                    .getDomRef()
-                                    .querySelector("iframe");
+                    return oDialog;
+                }.bind(this));
+            }
 
-                                if (!oIframe) {
-                                    return;
-                                }
+            this._pTermsDialog.then(function (oDialog) {
+                oDialog.open();
+            });
+        },
 
-                                oIframe.src = sap.ui.require.toUrl(
-                                    "sap/ui/com/project1/Documents/TermsAndConditions.pdf"
-                                );
-                            }
-                        });
-
-                        return oDialog;
-                    }.bind(this));
-                }
-
-                this._pTermsDialog.then(function (oDialog) {
-                    oDialog.open();
-                });
-            },
-
-            onTermsDialogClose: function () {
-                var oDialog = Fragment.byId(
-                    this.getView().getId(),
-                    "termsDialog"
-                );
+        onTermsDialogClose: function () {
+            var oDialog = Fragment.byId(
+                this.getView().getId(),
+                "termsDialog"
+            );
 
                 if (oDialog) {
                     oDialog.close();
                 }
             },
 
-            onTermsDialogClose: function () {
-                this.byId("termsDialog").close();
-            },
+        onTermsDialogClose: function () {
+            this.byId("termsDialog").close();
+        },
 
-        
-onUsermanualPress: function () {
-    this.getOwnerComponent()
-        .getRouter()
-        .navTo("RouteUserManual", {
+
+        onUsermanualPress: function () {
+            this.getOwnerComponent()
+                .getRouter()
+                .navTo("RouteUserManual", {
             flag: "hostel",
             branchId:"branchid"
         });
@@ -6577,37 +6578,37 @@ onPoliciesPress: function () {
 
                 return oItem;
             }, this);
-        },
+                },
 
         // for 3dot on mobile device footer menu
-      onFooterMenuPress: function (oEvent) {
+        onFooterMenuPress: function (oEvent) {
 
-    if (!this._oFooterMenu) {
+            if (!this._oFooterMenu) {
 
-        this._oFooterMenu = new sap.m.Menu({
-            items: [
+                this._oFooterMenu = new sap.m.Menu({
+                    items: [
 
-                new sap.m.MenuItem({
-                    text: "User Manual",
-                    icon: "sap-icon://visits",
-                    press: this.onUsermanualPress.bind(this)
-                }),
-                new sap.m.MenuItem({
-                    text: "Policies",
-                    icon: "sap-icon://shield",
-                    press: this.onPoliciesPress.bind(this)
-                })
+                        new sap.m.MenuItem({
+                            text: "User Manual",
+                            icon: "sap-icon://visits",
+                            press: this.onUsermanualPress.bind(this)
+                        }),
+                        new sap.m.MenuItem({
+                            text: "Policies",
+                            icon: "sap-icon://shield",
+                            press: this.onPoliciesPress.bind(this)
+                        })
             ].concat(this._policyMenuItems()).concat([
-                new sap.m.MenuItem({
-                    text: "Vendor Registration",
-                    icon: "sap-icon://employee",
-                    press: this.onAdminSIGNUP.bind(this)
-                })
-            ])
-        });
+                        new sap.m.MenuItem({
+                            text: "Vendor Registration",
+                            icon: "sap-icon://employee",
+                            press: this.onAdminSIGNUP.bind(this)
+                        })
+                    ])
+                });
 
-        this.getView().addDependent(this._oFooterMenu);
-    }
+                this.getView().addDependent(this._oFooterMenu);
+            }
 
     this._oFooterMenu.openBy(oEvent.getSource());
 },

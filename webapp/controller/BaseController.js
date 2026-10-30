@@ -755,11 +755,11 @@ sap.ui.define([
       dialog.open();
     },
 
-   CommonLogoutFunction: function () {
+    CommonLogoutFunction: function () {
       var oLoginModel = this.getOwnerComponent().getModel("LoginModel");
-        const oUIModel = this.getOwnerComponent().getModel("UIModel");
-        oUIModel.setProperty("/isLoggedIn", false);
-        if (oLoginModel) {
+      const oUIModel = this.getOwnerComponent().getModel("UIModel");
+      oUIModel.setProperty("/isLoggedIn", false);
+      if (oLoginModel) {
         oLoginModel.setProperty("/EmployeeID", "");
         oLoginModel.setProperty("/UserID", "");
         oLoginModel.setProperty("/UserName", "");
@@ -800,8 +800,8 @@ sap.ui.define([
 
     initializeLoginModel: function () {
       let oLoginModel = this.getOwnerComponent().getModel("LoginModel");
-        if (!oLoginModel) {
-          oLoginModel = new JSONModel({
+      if (!oLoginModel) {
+        oLoginModel = new JSONModel({
           // Database connection
           url: "https://rest.kalpavrikshatechnologies.com/stayvriksha/",
           headers: {
@@ -922,6 +922,7 @@ sap.ui.define([
         oLoginModel.setProperty("/EmailID", user.EmailID || "");
         oLoginModel.setProperty("/Role", user.Role || "");
         oLoginModel.setProperty("/Type", user.Type || "");
+        oLoginModel.setProperty("/Subscription_Role", user.Subscription_Role || "");
         oLoginModel.setProperty("/BranchCode", user.BranchCode || "");
         oLoginModel.setProperty("/STDCode", user.STDCode || "");
         oLoginModel.setProperty("/MobileNo", user.MobileNo || "");
@@ -1517,33 +1518,33 @@ sap.ui.define([
       }
     },
 
-     getStyledGroupHeader: function (oGroup) {
+    getStyledGroupHeader: function (oGroup) {
 
-        if (!oGroup) {
-            return new sap.m.GroupHeaderListItem({
-                title: ""
-            });
-        }
-
-        const defaultStyle = {
-            background: "#00b6c6",
-            textColor: "#f8f3f3"
-        };
-
-        const oHeader = new sap.m.GroupHeaderListItem({
-            title: oGroup.key
+      if (!oGroup) {
+        return new sap.m.GroupHeaderListItem({
+          title: ""
         });
+      }
 
-        oHeader.addEventDelegate({
-            onAfterRendering: function () {
-                this.$().css({
-                    "background": defaultStyle.background,
-                    "color": defaultStyle.textColor
-                });
-            }
-        }, oHeader);
+      const defaultStyle = {
+        background: "#00b6c6",
+        textColor: "#f8f3f3"
+      };
 
-        return oHeader;
+      const oHeader = new sap.m.GroupHeaderListItem({
+        title: oGroup.key
+      });
+
+      oHeader.addEventDelegate({
+        onAfterRendering: function () {
+          this.$().css({
+            "background": defaultStyle.background,
+            "color": defaultStyle.textColor
+          });
+        }
+      }, oHeader);
+
+      return oHeader;
     },
    _forceCloseAllBusyDialogs: function () {
 
