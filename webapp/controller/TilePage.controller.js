@@ -3,7 +3,7 @@ sap.ui.define([
     "sap/ui/model/json/JSONModel",
     "sap/m/MessageToast",
     "sap/m/MessageBox",
-     "../utils/validation",
+    "../utils/validation",
     "../model/formatter",
 ], function (BaseController, JSONModel, MessageToast, MessageBox, utils, Formatter) {
     "use strict";
@@ -42,18 +42,21 @@ sap.ui.define([
             this.getBusyDialog()
             var LoginFUnction = await this.commonLoginFunction("TilePage");
             if (!LoginFUnction) return;
+            this.LoginModel = this.getOwnerComponent().getModel("LoginModel");
             this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
-             this.getView().setModel(
+            if (this.LoginModel.getProperty("/Role").includes("Admin")) this.SubscriptionReadCall();
+
+            this.getView().setModel(
                 new JSONModel({
                     tokens: []
                 }),
                 "tokenModel"
             );
-             const oUploaderData = new JSONModel({
+            const oUploaderData = new JSONModel({
                 attachments: []
             });
             this.getView().setModel(oUploaderData, "UploaderData");
-             var model = new JSONModel({
+            var model = new JSONModel({
                 AppName: "",
                 BugDescription: "",
                 RaisedBy: "",
@@ -78,14 +81,133 @@ sap.ui.define([
             }
         },
 
+        // Application name (from DB) -> TileVisibility model property (used in XML)
+        _featureToTileMap: {
+            "Manage Branch": "ManageBranch",
+            "Manage Bed Template": "ManageBedType",
+            "Manage Room": "ManageRooms",
+            "Manage Facilities": "ManageFacility",
+            "Manage Amenities": "ManageAmenities",
+            "Manage Coupon": "ManageCoupon",
+            "Manage Staff": "ManageStaff",
+            "Manage Booking": "ManageCustomer",          // used for id3roomTile "Inbox/assign rooms"
+            "Generate invoice": "ManageInvoice",
+            "Deposite Details": "ManageSecurityDeposit",
+            "Payment History": "ManagePaymentHistory",
+            "Damage Details": "ManageDamage",
+            "Complain Details": "ManageComplainTracking",
+            "Customer review": "ManageCustomerReview",
+            "Booking Dashboard": "ManageBookingDashboard",
+            "Payment Dashboard": "ManagePaymentDashboard",
+            "Complain Dashboard": "ManageComplaintDashboard",
+            "Damage Dashboard": "DamageDashboard"
+        },
+
+        // Converts "Basic Package" -> "Basic", "Silver Package" -> "Silver", etc.
+        _normalizePackageTier: function (sPackageName) {
+            if (!sPackageName) return "";
+            return sPackageName.replace(/\s*Package\s*$/i, "").trim();
+        },
+
+        SubscriptionReadCall: async function () {
+            try {
+                this.getBusyDialog();
+
+                let filter = { UserID: this.LoginModel.getProperty("/UserID") };
+                const oData = await this.ajaxReadWithJQuery("Subscription", filter);
+                let aData = oData?.data || [];
+                
+                let oToday = new Date();
+                oToday.setHours(0, 0, 0, 0);
+
+                // FIND THE ACTIVE, NON-EXPIRED SUBSCRIPTION ROW (not just a boolean)
+                let oActiveSub = aData.find(function (oItem) {
+                    let oEndDate = new Date(oItem.EndDate);
+                    oEndDate.setHours(0, 0, 0, 0);
+                    return oItem.SubscriptionStatus === "Active" && oEndDate >= oToday;
+                });
+
+                if (!oActiveSub) {
+                    sap.m.MessageBox.information(
+                        "You don't have an active subscription. Please subscribe to continue.",
+                        {
+                            title: "Subscription Required",
+                            actions: ["Apply", sap.m.MessageBox.Action.CLOSE],
+                            emphasizedAction: "Apply",
+                            onClose: function (sAction) {
+                                if (sAction === "Apply") {
+                                    this.getOwnerComponent().getRouter().navTo("RouteSubscription",{sPath:"ApplySunscription"});
+                                } else {
+                                    this.CommonLogoutFunction();
+                                    this.getOwnerComponent().getRouter().navTo("RouteHostel");
+                                }
+                            }.bind(this)
+                        });
+                    return;
+                }
+
+                // NEW: RESOLVE THE PACKAGE NAME FOR THIS SUBSCRIPTION
+                const oPackageData = await this.ajaxReadWithJQuery("Package", { PackageID: oActiveSub.PackageID });
+                let aPackage = oPackageData?.data || [];
+                if (!aPackage.length) {
+                    sap.m.MessageToast.show("Package details not found for your subscription.");
+                    return;
+                }
+                let sPackageName = aPackage[0].PackageName; // expected: "Basic" | "Silver" | "Gold" | "Platinum"
+                let sPackageTier = this._normalizePackageTier(sPackageName);
+                // NEW: FETCH FEATURE FLAGS AND BUILD TILE VISIBILITY MODEL
+                await this.buildTileVisibility(sPackageTier);
+
+            } catch (err) {
+                sap.m.MessageToast.show(err.message || err.responseText);
+            } finally {
+                this.closeBusyDialog();
+            }
+        },
+
+        buildTileVisibility: async function (sPackageTier) {
+            try {
+                const oFeatureData = await this.ajaxReadWithJQuery("Package_Feature_Comparison", {});
+                let aFeatures = oFeatureData?.data || [];
+
+                let aValidTiers = ["Basic", "Silver", "Gold", "Platinum"];
+                if (aValidTiers.indexOf(sPackageTier) === -1) {
+                    sap.m.MessageToast.show("Unknown package tier: " + sPackageTier);
+                    return;
+                }
+
+                // READ role flags from the model AppVisibilityReadCall already set (unchanged logic)
+                let oRoleModel = this.getOwnerComponent().getModel("TileVisibility");
+                let oRoleFlags = oRoleModel ? oRoleModel.getData() : {};
+
+                let oFinal = Object.assign({}, oRoleFlags);
+
+                aFeatures.forEach(function (oFeature) {
+                    let sTileKey = this._featureToTileMap[oFeature.Application];
+                    if (!sTileKey) return;
+
+                    let bPackageAllowed = oFeature[sPackageTier] === true || oFeature[sPackageTier] === 1;
+                    let bRoleAllowed = oRoleFlags[sTileKey] === 1;
+
+                    oFinal[sTileKey] = (bPackageAllowed && bRoleAllowed) ? 1 : 0;
+                }.bind(this));
+
+                let oTileModel = new JSONModel(oFinal);
+                this.getView().setModel(oTileModel, "TileVisibility");
+
+            } catch (err) {
+                sap.m.MessageToast.show(err.message || err.responseText);
+            }
+        },
+
         onMyBookingsPress: function () {
             this.getOwnerComponent().getRouter().navTo("RouteMyBookings");
         },
 
         TileV_onpressInbox: function () {
             var oRouter = this.getOwnerComponent().getRouter();
-            oRouter.navTo("RouteAdmin",{
-                sPath:"TilePage"
+            oRouter.navTo("RouteAdmin", {
+                sPath: "TilePage"
             });
         },
 
@@ -100,17 +222,17 @@ sap.ui.define([
 
         TileV_onpressbeddetails: function () {
             var oRouter = this.getOwnerComponent().getRouter();
-            oRouter.navTo("RouteBedDetails",{
-                sPath:"Tile Page"
+            oRouter.navTo("RouteBedDetails", {
+                sPath: "Tile Page"
             });
         },
 
         TileV_onpressextrafacilities: function () {
             var oRouter = this.getOwnerComponent().getRouter();
-            oRouter.navTo("RouteFacilitis", { 
+            oRouter.navTo("RouteFacilitis", {
                 value: "Facilities",
                 sPath: "TilePage"
-               });
+            });
         },
 
         TileV_onpressBedImages: function () {
@@ -146,8 +268,8 @@ sap.ui.define([
 
         TileV_onpressManageInvoice: function () {
             var oRouter = this.getOwnerComponent().getRouter();
-            oRouter.navTo("RouteManageInvoice",{
-                sPath:"TilePage"
+            oRouter.navTo("RouteManageInvoice", {
+                sPath: "TilePage"
             });
         },
 
@@ -163,8 +285,8 @@ sap.ui.define([
 
         TileV_onpressManageVendor: function () {
             var oRouter = this.getOwnerComponent().getRouter();
-            oRouter.navTo("RouteManageVendor",{
-                sPath:"TilePage"
+            oRouter.navTo("RouteManageVendor", {
+                sPath: "TilePage"
             });
         },
 
@@ -175,10 +297,10 @@ sap.ui.define([
 
         TileV_onpressDeposit: function () {
             var oRouter = this.getOwnerComponent().getRouter();
-             oRouter.navTo("RouteDeposit", {
-        from: "Tile",
+            oRouter.navTo("RouteDeposit", {
+                from: "Tile",
         BookingID:"TilePage"   
-    });
+            });
         },
 
         TileV_onpressdashboard: function () {
@@ -209,8 +331,8 @@ sap.ui.define([
 
         TileV_onpressdamage: function () {
             var oRouter = this.getOwnerComponent().getRouter();
-            oRouter.navTo("RouteDamage",{
-                sPath:"TilePage"
+            oRouter.navTo("RouteDamage", {
+                sPath: "TilePage"
             });
         },
 
@@ -218,49 +340,18 @@ sap.ui.define([
             var oRouter = this.getOwnerComponent().getRouter();
             oRouter.navTo("RouteDamageDashboard");
         },
-          TileV_onpressSupportVendor: function () {
+        TileV_onpressSupportVendor: function () {
             var oRouter = this.getOwnerComponent().getRouter();
             oRouter.navTo("RouteSupportDetails");
         },
-          TileV_onpressBugRaiseVendor: function () {
+        TileV_onpressBugRaiseVendor: function () {
             var oRouter = this.getOwnerComponent().getRouter();
             oRouter.navTo("RouteBugDetails");
         },
-          TileV_onpressManageAds: function () {
+        TileV_onpressManageAds: function () {
             var oRouter = this.getOwnerComponent().getRouter();
             oRouter.navTo("RouteManageAds");
         },
-
-        // onStartGuide: function () {
-        //     if (!this._oGuideDialog) {
-        //         this._oGuideDialog = new sap.m.Dialog({
-        //             title: "Steps to Know",
-        //             contentWidth: "60vw",
-        //             contentHeight: "36.8vw",
-        //             resizable: true,
-        //             draggable: true,
-        //             verticalScrolling: false,
-        //             horizontalScrolling: false,
-        //             content: [
-        //                 new sap.m.Image({
-        //                     src: "image/Guide.jpg",
-        //                     width: "100%",
-        //                     height: "100%",
-        //                     decorative: false,
-        //                     densityAware: false
-        //                 }).addStyleClass("PG-fitImage") 
-        //             ],
-        //             endButton: new sap.m.Button({
-        //                 text: "Close",
-        //                 press: function () {
-        //                     this._oGuideDialog.close();
-        //                 }.bind(this)
-        //             }).addStyleClass("myUnifiedBtn")
-        //         }).addStyleClass("barheader PG-noPaddingDialog"); 
-        //         this.getView().addDependent(this._oGuideDialog);
-        //     }
-        //     this._oGuideDialog.open();
-        // },
 
         Tile_onHomePress: function () {
             var oRouter = this.getOwnerComponent().getRouter();
@@ -422,7 +513,7 @@ sap.ui.define([
                     accessItems: [
                         { icon: "sap-icon://supplier", color: "#008b96", label: "Vendor Management", detail: "Full access to create and manage  vendors" },
                         { icon: "sap-icon://customer", color: "#008b96", label: "Customer Support", detail: "Review and manage customer support requests." },
-               
+
                     ]
                 }
             };
@@ -735,7 +826,7 @@ sap.ui.define([
 
         // Raise Bug
 
-           onSupportrequestChange: async function (oEvent) {
+        onSupportrequestChange: async function (oEvent) {
 
             const oFiles = oEvent.getParameter("files");
             if (!oFiles || oFiles.length === 0) return;
@@ -871,16 +962,16 @@ sap.ui.define([
             oTokenModel.setProperty("/tokens", aTokens);
         },
 
-           onAppnamechanges:function(oEvent){
- utils._LCstrictValidationComboBox(oEvent)
+        onAppnamechanges: function (oEvent) {
+            utils._LCstrictValidationComboBox(oEvent)
         },
-        onBugdescriptionchnages:function(oEvent){
-              utils._LCvalidateMandatoryField(oEvent)
+        onBugdescriptionchnages: function (oEvent) {
+            utils._LCvalidateMandatoryField(oEvent)
         },
-      
-      
 
-        onBugSubmit: async function(){
+
+
+        onBugSubmit: async function () {
             const oView = this.getView();
             const oBugModel = oView.getModel("RaiseBugModel").getData();
             const oUploaderData = oView.getModel("UploaderData");
@@ -954,7 +1045,7 @@ sap.ui.define([
             this.closeBusyDialog()
             MessageToast.show(this.getView().getModel("i18n").getResourceBundle().getText("bugSubmittedSuccessfully"));
 
-          this.RB_onCancelButtonPress()
+            this.RB_onCancelButtonPress()
         },
 
 
@@ -1303,13 +1394,13 @@ sap.ui.define([
                 oModel.setProperty("/Rooms", Object.values(oUnique));
                 this._sAdminBookingRoomsBranch = sBranchCode;
 
-            // If the admin is in "Existing Customer" mode, changing branch must
-            // clear only the selected customer. Existing customer lookup is global.
-            if (oModel.getProperty("/CustomerType") === "Existing") {
-                oModel.setProperty("/EC", this._getEmptyExistingCustomer());
-                this._clearAdminBookingCustomerEmailToken();
-                this._prefillAdminBookingECSuggestions();
-            }
+                // If the admin is in "Existing Customer" mode, changing branch must
+                // clear only the selected customer. Existing customer lookup is global.
+                if (oModel.getProperty("/CustomerType") === "Existing") {
+                    oModel.setProperty("/EC", this._getEmptyExistingCustomer());
+                    this._clearAdminBookingCustomerEmailToken();
+                    this._prefillAdminBookingECSuggestions();
+                }
             } catch (err) {
                 MessageToast.show(err.message || err.responseText);
             } finally {
@@ -1318,60 +1409,60 @@ sap.ui.define([
         },
 
         // Room changed → build the available plan options from the room's prices
-        onAdminBookingRoomChange:async function (oEvent) {
+        onAdminBookingRoomChange: async function (oEvent) {
             var oModel = this.getView().getModel("AdminBookingModel");
             var oRoomCtrl = this.byId("AB_id_Room");
             var sRoomKey = oEvent.getParameter("selectedItem") ?
                 oEvent.getParameter("selectedItem").getKey() : "";
 
-               var sBranchCode=oModel.getProperty("/Branches").find((item)=>{ return item.BranchID===oModel.getProperty("/BranchCode")})
-               const bedName = sRoomKey.replace(/\s*-\s*(AC|NON-AC)$/i, "").trim();
-                const acType = sRoomKey.includes("NON-AC") ? "NON-AC" : "AC";
-                
-                // this.getBusyDialog();
+            var sBranchCode = oModel.getProperty("/Branches").find((item) => { return item.BranchID === oModel.getProperty("/BranchCode") })
+            const bedName = sRoomKey.replace(/\s*-\s*(AC|NON-AC)$/i, "").trim();
+            const acType = sRoomKey.includes("NON-AC") ? "NON-AC" : "AC";
 
-                // try {
-                //     const filter = {
-                //         BranchCode: oModel.getProperty("/BranchCode") || "",
-                //         ACType: acType || "",
-                //         Name: bedName || "",
-                //         PropertyType: sBranchCode.PropertyType || ""
-                //     };
+            // this.getBusyDialog();
 
-                //     const response = await this.ajaxReadWithJQuery(
-                //         "HM_AvailableRooms",
-                //         filter
-                //     );
+            // try {
+            //     const filter = {
+            //         BranchCode: oModel.getProperty("/BranchCode") || "",
+            //         ACType: acType || "",
+            //         Name: bedName || "",
+            //         PropertyType: sBranchCode.PropertyType || ""
+            //     };
 
-                //     // API returned an error response
-                //     if (response?.success === false) {
-                //         sap.m.MessageBox.error(
-                //             response.message || "Something went wrong."
-                //         );
+            //     const response = await this.ajaxReadWithJQuery(
+            //         "HM_AvailableRooms",
+            //         filter
+            //     );
 
-                //         return; // STOP HERE
-                //     }
+            //     // API returned an error response
+            //     if (response?.success === false) {
+            //         sap.m.MessageBox.error(
+            //             response.message || "Something went wrong."
+            //         );
+
+            //         return; // STOP HERE
+            //     }
 
 
-                // } catch (error) {
+            // } catch (error) {
 
-                //     const message =
-                //         error?.responseJSON?.message ||
-                //         error?.response?.data?.message ||
-                //         error?.message ||
-                //         "Something went wrong.";
+            //     const message =
+            //         error?.responseJSON?.message ||
+            //         error?.response?.data?.message ||
+            //         error?.message ||
+            //         "Something went wrong.";
 
-                //     sap.m.MessageBox.error(message);
+            //     sap.m.MessageBox.error(message);
 
-                //       oRoomCtrl.setSelectedKey("");
-                //       oRoomCtrl.setValue("");
+          //       oRoomCtrl.setSelectedKey("");
+          //       oRoomCtrl.setValue("");
 
-                //     return; // STOP HERE
+            //     return; // STOP HERE
 
-                // } finally {
+            // } finally {
 
-                //     this.closeBusyDialog();
-                // }
+            //     this.closeBusyDialog();
+            // }
 
             oModel.setProperty("/RoomKey", sRoomKey);
             oModel.setProperty("/SelectedPlan", "");
@@ -2167,7 +2258,7 @@ sap.ui.define([
             MessageBox.confirm(sMsg, {
                 title: this.i18nModel.getText("adminBookingEmailExistsTitle"),
                 styleClass: "myUnifiedBtn",
-                contentWidth: "500px",                
+                contentWidth: "500px",
                 onClose: function (sAction) {
                     if (sAction === MessageBox.Action.OK) {
                         var oHostelModel = sap.ui.getCore().getModel("HostelModel");
@@ -2280,14 +2371,14 @@ sap.ui.define([
             }
         },
 
-        onPressbugs:function(){
-       var oLoginData = this.getOwnerComponent().getModel("LoginModel").getData();
-       var oRaiseBugModel = this.getView().getModel("RaiseBugModel");
+        onPressbugs: function () {
+            var oLoginData = this.getOwnerComponent().getModel("LoginModel").getData();
+            var oRaiseBugModel = this.getView().getModel("RaiseBugModel");
 
-    // Set logged-in user details
-    oRaiseBugModel.setProperty("/RaisedBy", oLoginData.UserName || "");
-    oRaiseBugModel.setProperty("/Email", oLoginData.EmailID || "");
-             if (!this._RaiseBugDialog) {
+            // Set logged-in user details
+            oRaiseBugModel.setProperty("/RaisedBy", oLoginData.UserName || "");
+            oRaiseBugModel.setProperty("/Email", oLoginData.EmailID || "");
+            if (!this._RaiseBugDialog) {
 
                 sap.ui.core.Fragment.load({
                     id: this.getView().getId(),
@@ -2298,13 +2389,13 @@ sap.ui.define([
                     this._RaiseBugDialog = oDialog;
                     this.getView().addDependent(oDialog);
                     oDialog.open();
-                     this.byId("RB_id_comments").setVisible(false);
+                    this.byId("RB_id_comments").setVisible(false);
 
 
                     this._RaiseBugDialog.attachAfterClose(() => {
-                 
-                    this.RB_onCancelButtonPress();
-                });
+
+                        this.RB_onCancelButtonPress();
+                    });
 
                 }.bind(this));
 
@@ -2312,55 +2403,55 @@ sap.ui.define([
                 this._RaiseBugDialog.open();
             }
         },
-        RB_onCancelButtonPress:function(){
-             const oView = this.getView();
+        RB_onCancelButtonPress: function () {
+            const oView = this.getView();
 
-    // 1️⃣ Clear model data
-    const oBugModel = oView.getModel("RaiseBugModel");
-    if (oBugModel) {
-        oBugModel.setData({
-            AppName: "",
-            BugDescription: "",
-            RaisedBy: "",
-            Email: ""
-        });
-    }
+            // 1️⃣ Clear model data
+            const oBugModel = oView.getModel("RaiseBugModel");
+            if (oBugModel) {
+                oBugModel.setData({
+                    AppName: "",
+                    BugDescription: "",
+                    RaisedBy: "",
+                    Email: ""
+                });
+            }
 
-    //  Clear uploaded images
-    const oUploaderData = oView.getModel("UploaderData");
-    if (oUploaderData) {
-        oUploaderData.setProperty("/attachments", []);
-    }
+            //  Clear uploaded images
+            const oUploaderData = oView.getModel("UploaderData");
+            if (oUploaderData) {
+                oUploaderData.setProperty("/attachments", []);
+            }
 
-    // 3️⃣ Clear tokens
-    const oTokenModel = oView.getModel("tokenModel");
-    if (oTokenModel) {
-        oTokenModel.setProperty("/tokens", []);
-    }
+            // 3️⃣ Clear tokens
+            const oTokenModel = oView.getModel("tokenModel");
+            if (oTokenModel) {
+                oTokenModel.setProperty("/tokens", []);
+            }
 
-    // 4️⃣ Reset ValueState
-    const aFields = [
-        "RB_id_appname",
-        "RB_id_bugDescription",
-        "RB_id_RaisedBy",
-        "RB_id_Email"
-    ];
+            // 4️⃣ Reset ValueState
+            const aFields = [
+                "RB_id_appname",
+                "RB_id_bugDescription",
+                "RB_id_RaisedBy",
+                "RB_id_Email"
+            ];
 
-    aFields.forEach(id => {
-        const oControl = sap.ui.getCore().byId(oView.createId(id));
-        if (oControl) {
-            oControl.setValueState("None");
-        }
-    });
+            aFields.forEach(id => {
+                const oControl = sap.ui.getCore().byId(oView.createId(id));
+                if (oControl) {
+                    oControl.setValueState("None");
+                }
+            });
 
-    // 5️⃣ Clear file uploader
-    const oUploader = sap.ui.getCore().byId(oView.createId("RB_id_FileUploader1"));
-    if (oUploader) {
-        oUploader.clear();
-    }
+            // 5️⃣ Clear file uploader
+            const oUploader = sap.ui.getCore().byId(oView.createId("RB_id_FileUploader1"));
+            if (oUploader) {
+                oUploader.clear();
+            }
 
-    // 6️⃣ Close dialog
-    this._RaiseBugDialog.close();
+            // 6️⃣ Close dialog
+            this._RaiseBugDialog.close();
         },
 
         // ─────────────────────────────────────────────────────────────────
@@ -2998,6 +3089,12 @@ sap.ui.define([
                 oConfirm.setType("Password");
                 oConfirm.setValueHelpIconSrc("sap-icon://show");
             }
+        },
+
+        TileV_onpressViewSubscription: function () {
+            this.getOwnerComponent().getRouter().navTo("RouteSubscription",{
+                sPath:"ViewSubscrption"
+            });
         },
 
         onAdminUsermanualPress: function () {
