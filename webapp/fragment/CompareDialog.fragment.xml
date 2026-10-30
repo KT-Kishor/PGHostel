@@ -1,0 +1,148 @@
+<core:FragmentDefinition
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core"
+>
+    <Dialog
+        title="Compare Packages"
+        contentWidth="90%"
+        contentHeight="70%"
+        resizable="true"
+        draggable="true"
+    >
+        <content>
+            <VBox class="sapUiSmallMargin">
+                <Title text="Select Packages to Compare" level="H4" class="sapUiTinyMarginBottom"/>
+                <HBox items="{comparisonModel>/allPackages}" wrap="Wrap" class="sapUiSmallMarginBottom">
+                    <items>
+                        <CheckBox text="{comparisonModel>PackageName}" selected="{comparisonModel>Checked}" select="onToggleComparePackage" class="sapUiSmallMarginEnd"/>
+                    </items>
+                </HBox>
+                <Table items="{comparisonModel>/rows}">
+                    <columns>
+                        <Column demandPopin="true">
+                            <Text text="Feature" />
+                        </Column>
+                        <Column visible="{comparisonModel>/selectedTiers/Basic}" demandPopin="true">
+                            <Text text="Basic" />
+                        </Column>
+                        <Column visible="{comparisonModel>/selectedTiers/Silver}" demandPopin="true" minScreenWidth="Tablet">
+                            <Text text="Silver" />
+                        </Column>
+                        <Column visible="{comparisonModel>/selectedTiers/Gold}" demandPopin="true" minScreenWidth="Tablet">
+                            <Text text="Gold" />
+                        </Column>
+                        <Column visible="{comparisonModel>/selectedTiers/Platinum}" demandPopin="true" minScreenWidth="Tablet">
+                            <Text text="Platinum" />
+                        </Column>
+                    </columns>
+                    <items>
+                        <ColumnListItem>
+                            <cells>
+                                <Text text="{comparisonModel>Application}" />
+                                <core:Icon
+                                    src="{= (${comparisonModel>Basic} === 1 || ${comparisonModel>Basic} === true) ? 'sap-icon://accept' : 'sap-icon://decline' }"
+                                    color="{= (${comparisonModel>Basic} === 1 || ${comparisonModel>Basic} === true) ? 'Positive' : 'Negative' }"
+                                />
+                                <core:Icon
+                                    src="{= (${comparisonModel>Silver} === 1 || ${comparisonModel>Silver} === true) ? 'sap-icon://accept' : 'sap-icon://decline' }"
+                                    color="{= (${comparisonModel>Silver} === 1 || ${comparisonModel>Silver} === true) ? 'Positive' : 'Negative' }"
+                                />
+                                <core:Icon
+                                    src="{= (${comparisonModel>Gold} === 1 || ${comparisonModel>Gold} === true) ? 'sap-icon://accept' : 'sap-icon://decline' }"
+                                    color="{= (${comparisonModel>Gold} === 1 || ${comparisonModel>Gold} === true) ? 'Positive' : 'Negative' }"
+                                />
+                                <core:Icon
+                                    src="{= (${comparisonModel>Platinum} === 1 || ${comparisonModel>Platinum} === true) ? 'sap-icon://accept' : 'sap-icon://decline' }"
+                                    color="{= (${comparisonModel>Platinum} === 1 || ${comparisonModel>Platinum} === true) ? 'Positive' : 'Negative' }"
+                                />
+                            </cells>
+                        </ColumnListItem>
+                    </items>
+                </Table>
+            </VBox>
+        </content>
+
+        <!-- <content>
+            <VBox class="sapUiMediumMargin">
+
+                <VBox visible="{PageModeModel>/IsViewSubscription}">
+                    <Title text="My Subscriptions" level="H2" class="sapUiSmallMarginBottom" />
+
+                    <FlexBox wrap="Wrap" justifyContent="SpaceBetween" alignItems="Stretch" renderType="Bare" items="{path: 'CustomerSubscriptionModel>/'}">
+                        <items>
+                            <VBox minHeight="300px" justifyContent="SpaceBetween" class="packageCard sapUiMediumMarginBottom">
+                                <layoutData>
+                                    <FlexItemData growFactor="1" shrinkFactor="1" baseSize="420px" />
+                                </layoutData>
+
+                                <VBox class="packageHeader">
+                                    <HBox justifyContent="SpaceBetween" alignItems="Center">
+                                        <Title text="{CustomerSubscriptionModel>PackageDisplayName}" level="H3" />
+                                        <ObjectStatus
+                                            text="{CustomerSubscriptionModel>StatusText}"
+                                            state="{CustomerSubscriptionModel>StatusState}"
+                                            class="subStatusBadge"
+                                        />
+                                    </HBox>
+                                </VBox>
+
+                                <VBox class="sapUiSmallMargin">
+                                    <HBox justifyContent="SpaceBetween" class="sapUiTinyMarginBottom">
+                                        <Text text="Start Date" />
+                                        <Text text="{CustomerSubscriptionModel>StartDate}" />
+                                    </HBox>
+                                    <HBox justifyContent="SpaceBetween" class="sapUiTinyMarginBottom">
+                                        <Text text="End Date" />
+                                        <Text text="{CustomerSubscriptionModel>EndDate}" />
+                                    </HBox>
+                                    <HBox
+                                        justifyContent="SpaceBetween"
+                                        class="sapUiTinyMarginBottom"
+                                        visible="{CustomerSubscriptionModel>IsCurrentlyActive}"
+                                    >
+                                        <Text text="Days Remaining" />
+                                        <Text text="{CustomerSubscriptionModel>DaysRemaining}" />
+                                    </HBox>
+                                    <HBox justifyContent="SpaceBetween" class="sapUiTinyMarginBottom">
+                                        <Text text="Amount Paid" />
+                                        <ObjectNumber number="{CustomerSubscriptionModel>Amount}" unit="₹" />
+                                    </HBox>
+                                    <HBox justifyContent="SpaceBetween">
+                                        <Text text="Payment Status" />
+                                        <Text text="{CustomerSubscriptionModel>PaymentStatus}" />
+                                    </HBox>
+
+                                    <List
+                                        items="{path: 'CustomerSubscriptionModel>FeaturesArray'}"
+                                        showSeparators="None"
+                                        class="sapUiTinyMarginTop"
+                                    >
+                                        <items>
+                                            <StandardListItem title="{CustomerSubscriptionModel>}" icon="sap-icon://accept" />
+                                        </items>
+                                    </List>
+                                </VBox>
+                            </VBox>
+                        </items>
+                    </FlexBox>
+                </VBox>
+
+                <VBox visible="{PageModeModel>/IsApplySubscription}">
+                    <HBox justifyContent="SpaceBetween" alignItems="Center" class="sapUiSmallMarginBottom">
+                        <Title text="Available Packages" level="H2" />
+                        <Button text="Add Package" type="Emphasized" press="onAddPackage" class="subscribeBtn" />
+                    </HBox>
+
+                    <FlexBox wrap="Wrap" justifyContent="SpaceBetween" alignItems="Stretch" renderType="Bare" items="{path: 'packageModel>/'}">
+                    </FlexBox>
+                </VBox>
+
+            </VBox>
+
+            <Button id="idCompareFloatBtn" icon="sap-icon://compare" text="Compare ({compareModel>/count})" type="Emphasized" visible="{= ${compareModel>/count} > 0 &amp;&amp; ${PageModeModel>/IsApplySubscription} }" press="onOpenCompareDialog" class="compareFloatingBtn"/>
+        </content> -->
+        <beginButton>
+            <Button text="Close" class="subscribeBtn" press="onCloseCompareDialog"/>
+        </beginButton>
+    </Dialog>
+</core:FragmentDefinition>

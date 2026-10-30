@@ -500,26 +500,32 @@
             "targetRaiseBugDetails"
           ]
         },
-           {
+        {
           "name": "RouteUploadDocs",
           "pattern": "UploadDocs/{EncodedCustomerID}/{MemberID}",
           "target": [
             "targetUploadDocs"
           ]
         },
-           {
+        {
           "name": "RouteManageAds",
           "pattern": "ManageAds",
           "target": [
             "targetManageAds"
           ]
-        
         },
-           {
+        {
           "name": "RouteUserManual",
           "pattern": "UserManual/{flag}/{branchId}",
           "target": [
             "targetUserManual"
+          ]
+        },
+        {
+          "name": "RouteSubscription",
+          "pattern": "Subscription/{sPath}",
+          "target": [
+            "targetSubscription"
           ]
         },
            {
@@ -874,26 +880,33 @@
           "viewId": "RaiseBug",
           "viewName": "RaiseBug"
         },
-         "targetUploadDocs": {
+        "targetUploadDocs": {
           "viewType": "XML",
           "transition": "slide",
           "clearControlAggregation": false,
           "viewId": "Document",
           "viewName": "Document"
         },
-         "targetManageAds": {
+        "targetManageAds": {
           "viewType": "XML",
           "transition": "slide",
           "clearControlAggregation": false,
           "viewId": "ManageAds",
           "viewName": "ManageAds"
         },
-         "targetUserManual": {
+        "targetUserManual": {
           "viewType": "XML",
           "transition": "slide",
           "clearControlAggregation": false,
           "viewId": "UserManual",
           "viewName": "UserManual"
+        },
+        "targetSubscription": {
+          "viewType": "XML",
+          "transition": "slide",
+          "clearControlAggregation": false,
+          "viewId": "Subscription",
+          "viewName": "Subscription"
         },
          "targetAdminUserManual": {
           "viewType": "XML",

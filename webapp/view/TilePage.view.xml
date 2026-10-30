@@ -1,15 +1,16 @@
-<mvc:View controllerName="sap.ui.com.project1.controller.TilePage"
-	xmlns:mvc="sap.ui.core.mvc"
+<mvc:View
+    controllerName="sap.ui.com.project1.controller.TilePage"
+    xmlns:mvc="sap.ui.core.mvc"
     displayBlock="true"
-	xmlns="sap.m"
-	xmlns:layout="sap.ui.layout">
-	<Page
+    xmlns="sap.m"
+>
+    <Page
         id="idPageTile"
         class="service-background Tilehome"
         enableScrolling="true"
     >
-		<headerContent>
-			<Text
+        <headerContent>
+            <Text
                 id="idWelcomeUser"
                 text="{= ${i18n>welcomeUser} + ' ' + ${LoginModel>/EmployeeName} }"
                 class="boldBlueText sapUiSmallMarginBegin"
