@@ -1,0 +1,231 @@
+<mvc:View
+    controllerName="sap.ui.com.project1.controller.Subscription"
+    xmlns="sap.m"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns:core="sap.ui.core"
+    displayBlock="true"
+>
+    <Page showHeader="true">
+        <headerContent>
+            <core:Fragment
+                fragmentName="sap.ui.com.project1.fragment.Header"
+                type="XML"
+            />
+        </headerContent>
+        <content>
+            <!-- ==================================================== -->
+            <!-- SECTION 1: AVAILABLE PACKAGES (Apply / Subscribe / Upgrade UI) -->
+            <!-- Visible only when PageModeModel>/IsApplySubscription  -->
+            <!-- ==================================================== -->
+            <VBox
+                class="sapUiMediumMargin"
+                visible="{PageModeModel>/IsApplySubscription}"
+            >
+                <!-- TITLE + BUTTON -->
+                <HBox
+                    justifyContent="SpaceBetween"
+                    alignItems="Center"
+                    class="sapUiSmallMarginBottom"
+                >
+                    <Title
+                        text="{= ${PageModeModel>/IsUpgradeMode} ? 'Upgrade Your Package' : 'Available Packages' }"
+                        level="H2"
+                    />
+                    <Button
+                        text="Add Package"
+                        visible="{= ${LoginModel>/Role} === 'Admin' &amp;&amp; !${PageModeModel>/IsUpgradeMode} }"
+                        type="Emphasized"
+                        press="onAddPackage"
+                        class="subscribeBtn"
+                    />
+                </HBox>
+                <!-- UPGRADE CONTEXT BANNER -->
+                <MessageStrip visible="{PageModeModel>/IsUpgradeMode}" type="Information" showIcon="true" class="sapUiSmallMarginBottom" text="{= 'Upgrading from ' + ${upgradeModel>/OldPackageName} + '. You have \u20B9' + ${upgradeModel>/UnusedValue} + ' unused credit (' + ${upgradeModel>/RemainingDays} + ' days remaining) that will be applied automatically.' }"/>
+                <!-- FLEX -->
+                <FlexBox wrap="Wrap" justifyContent="SpaceBetween" alignItems="Stretch" renderType="Bare" items="{path: 'packageModel>/'}">
+                    <items>
+                        <!-- CARD -->
+                        <VBox minHeight="420px" justifyContent="SpaceBetween" class="packageCard sapUiSmallMarginBottom">
+                            <layoutData>
+                                <FlexItemData growFactor="1" shrinkFactor="1" baseSize="450px"/>
+                            </layoutData>
+                            <VBox>
+                                <!-- HEADER -->
+                                <VBox class="packageHeader">
+                                    <HBox justifyContent="SpaceBetween" alignItems="Start">
+                                        <Title text="{packageModel>PackageName}" level="H3" class="sapUiTinyMarginBottom"/>
+                                        <HBox alignItems="Center">
+                                            <!-- TRIAL BADGE -->
+                                            <HBox visible="{packageModel>IsTrialActive}" alignItems="Center" class="trialBadgeHeader sapUiTinyMarginEnd">
+                                                <core:Icon src="sap-icon://favorite" class="sapUiTinyMarginEnd" />
+                                                <Text text="{= ${packageModel>FreeTrialDays} + ' Days Free' }" class="trialBadgeHeaderText" />
+                                            </HBox>
+                                            <!-- SUBSCRIBED / NOT SUBSCRIBED TAG (hidden during upgrade mode; the banner covers this) -->
+                                            <ObjectStatus visible="{= !${PageModeModel>/IsUpgradeMode} }" text="{packageModel>SubscribedTagText}" state="{packageModel>SubscribedTagState}" class="whiteStatus" />
+                                            <!-- "YOUR CURRENT PLAN" TAG DURING UPGRADE MODE -->
+                                            <ObjectStatus visible="{= ${PageModeModel>/IsUpgradeMode} &amp;&amp; ${packageModel>PackageID} === ${upgradeModel>/OldPackageID} }" text="Current Plan" state="Warning" class="whiteStatus" />
+                                        </HBox>
+                                    </HBox>
+                                    <Text text="Duration: {packageModel>DurationDays} Days" />
+                                </VBox>
+                                <!-- BODY -->
+                                <VBox class="sapUiSmallMargin">
+                                    <Text text="{packageModel>Description}" wrapping="true" class="sapUiTinyMarginBottom"/>
+                                    <List items="{path: 'packageModel>FeaturesArray'}" showSeparators="None" class="sapUiTinyMarginTop">
+                                        <items>
+                                            <StandardListItem title="{packageModel>}" icon="sap-icon://accept" />
+                                        </items>
+                                    </List>
+                                    <!-- PRICE BLOCK -->
+                                    <VBox class="priceBlock sapUiMediumMarginTop">
+                                        <HBox justifyContent="SpaceBetween" alignItems="Center">
+                                            <Text text="Price" class="priceLabel"/>
+                                            <VBox alignItems="End">
+                                                <Text text="{= '₹' + ${packageModel>OriginalPrice} }" visible="{packageModel>HasDiscount}" class="strikePrice"/>
+                                                <Title text="{= '₹' + ${packageModel>FinalPrice} }" level="H3" class="finalPrice" />
+                                            </VBox>
+                                        </HBox>
+                                        <HBox justifyContent="End" visible="{packageModel>HasDiscount}" class="sapUiTinyMarginTop" >
+                                            <HBox class="discountPill" alignItems="Center" >
+                                                <core:Icon src="sap-icon://sales-order-item" class="sapUiTinyMarginEnd" />
+                                                <Text text="{packageModel>DiscountLabel}" />
+                                            </HBox>
+                                        </HBox>
+                                    </VBox>
+                                </VBox>
+                            </VBox>
+                            <!-- BUTTONS -->
+                            <VBox class="sapUiSmallMargin">
+                                <HBox justifyContent="SpaceBetween" renderType="Bare" >
+                                    <!-- COMPARE BUTTON: hidden during upgrade mode -->
+                                    <Button text="{parts: [{path: 'packageModel>PackageID'}, {path: 'compareModel>/items'}],formatter: '.getCompareButtonText'}" width="48%" type="Emphasized" class="subscribeBtn" press="onAddToCompare" visible="{= !${PageModeModel>/IsUpgradeMode} }"/>
+                                    <!-- SUBSCRIBE / UPGRADE / CURRENT PLAN BUTTON -->
+                                    <Button
+                                        text="{= ${PageModeModel>/IsUpgradeMode}
+                                            ? (${packageModel>PackageID} === ${upgradeModel>/OldPackageID} ? 'Your Current Plan' : 'Upgrade to This Plan')
+                                               : (${packageModel>IsSubscribedActive} ? 'Current Plan' : 'Subscribe') }"
+                                        width="{= ${PageModeModel>/IsUpgradeMode} ? '100%' : '48%' }"
+                                        type="Emphasized"
+                                        press="onSubscribe"
+                                        enabled="{= ${PageModeModel>/IsUpgradeMode}
+                                            ? ${packageModel>PackageID} !== ${upgradeModel>/OldPackageID}
+                                            : !${packageModel>IsSubscribedActive} }"
+                                        class="subscribeBtn"
+                                    />
+                                </HBox>
+                            </VBox>
+                        </VBox>
+                    </items>
+                </FlexBox>
+            </VBox>
+            <!-- ==================================================== -->
+            <!-- SECTION 2: MY SUBSCRIPTIONS (tile view)               -->
+            <!-- Visible only when PageModeModel>/IsViewSubscription   -->
+            <!-- ==================================================== -->
+            <FlexBox visible="{PageModeModel>/IsViewSubscription}" wrap="NoWrap" justifyContent="Center" alignItems="Center" renderType="Bare" class="subscriptionContainer" items="{path: 'CustomerSubscriptionModel>/'}">
+                <items>
+                    <VBox width="500px" minHeight="360px" justifyContent="SpaceBetween" class="packageCard" >
+                        <VBox>
+                            <!-- HEADER -->
+                            <VBox class="packageHeader">
+                                <HBox
+                                    justifyContent="SpaceBetween"
+                                    alignItems="Start"
+                                >
+                                    <Title
+                                        text="{CustomerSubscriptionModel>PackageDisplayName}"
+                                        level="H3"
+                                        class="sapUiTinyMarginBottom"
+                                    />
+                                    <ObjectStatus
+                                        text="{CustomerSubscriptionModel>StatusText}"
+                                        state="{CustomerSubscriptionModel>StatusState}"
+                                        class="sapUiTinyMarginBegin"
+                                    />
+                                </HBox>
+                                <Text text="{
+                                    parts: [{
+                                        path: 'CustomerSubscriptionModel>StartDate',
+                                        type: 'sap.ui.model.type.Date',
+                                        formatOptions: {
+                                            pattern: 'dd MMM yyyy'
+                                        }
+                                    }, {
+                                        path: 'CustomerSubscriptionModel>EndDate',
+                                        type: 'sap.ui.model.type.Date',
+                                        formatOptions: {
+                                            pattern: 'dd MMM yyyy'
+                                        }
+                                    }],
+                                    formatter: '.Formatter.DateFormat'
+                                }" />
+                            </VBox>
+                            <!-- BODY -->
+                            <VBox class="sapUiSmallMargin">
+                                <List
+                                    items="{
+                                        path: 'CustomerSubscriptionModel>FeaturesArray'
+                                    }"
+                                    showSeparators="None"
+                                    class="sapUiTinyMarginTop"
+                                >
+                                    <items>
+                                        <StandardListItem
+                                            title="{CustomerSubscriptionModel>}"
+                                            icon="sap-icon://accept"
+                                        />
+                                    </items>
+                                </List>
+                                <!-- DAYS REMAINING -->
+                                <HBox
+                                    alignItems="Center"
+                                    class="sapUiSmallMarginTop"
+                                    visible="{CustomerSubscriptionModel>IsCurrentlyActive}"
+                                >
+                                    <core:Icon
+                                        src="sap-icon://history"
+                                        class="sapUiTinyMarginEnd"
+                                    />
+                                    <Text text="{= ${CustomerSubscriptionModel>DaysRemaining} + ' days remaining' }" />
+                                </HBox>
+                            </VBox>
+                        </VBox>
+                        <!-- ACTIONS -->
+                        <VBox class="sapUiSmallMargin">
+                            <HBox
+                                justifyContent="Center"
+                                renderType="Bare"
+                            >
+                                <Button
+                                    text="Renew"
+                                    width="200px"
+                                    type="Emphasized"
+                                    class="subscribeBtn"
+                                    press="onRenewSubscription"
+                                    visible="{= !${CustomerSubscriptionModel>IsCurrentlyActive} }"
+                                />
+                                <Button
+                                    text="Upgrade Subscription"
+                                    width="200px"
+                                    type="Emphasized"
+                                    class="subscribeBtn"
+                                    press="onUpgradeSubscription"
+                                    visible="{CustomerSubscriptionModel>IsCurrentlyActive}"
+                                />
+                            </HBox>
+                        </VBox>
+                    </VBox>
+                </items>
+            </FlexBox>
+            <!-- FLOATING COMPARE BUTTON (only relevant on the "Apply/Subscribe" page, not during upgrade) -->
+            <Button
+                id="idCompareFloatBtn"
+                icon="sap-icon://compare"
+                text="Compare ({compareModel>/count})"
+                visible="{= ${PageModeModel>/IsApplySubscription} &amp;&amp; !${PageModeModel>/IsUpgradeMode} &amp;&amp; ${compareModel>/count} > 0 }"
+                press="onOpenCompareDialog"
+                class="compareFloatingBtn"
+            />
+        </content>
+    </Page>
+</mvc:View>

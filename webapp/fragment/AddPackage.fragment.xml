@@ -1,0 +1,91 @@
+<core:FragmentDefinition xmlns="sap.m"
+    xmlns:core="sap.ui.core"
+    xmlns:f="sap.ui.layout.form">
+
+    <Dialog id="idAddPackageDialog"
+            title="Create Package"
+            contentWidth="30rem"
+            stretch="{device>/system/phone}"
+            resizable="true"
+            draggable="true">
+
+        <content>
+
+            <f:SimpleForm id="idCreatePackageForm" editable="true" layout="ColumnLayout" labelSpanXL="12" labelSpanL="12" labelSpanM="12" labelSpanS="12" adjustLabelSpan="false" emptySpanXL="0" emptySpanL="0" emptySpanM="0" emptySpanS="0" columnsXL="2" columnsL="2" columnsM="1">
+
+                <Label text="Package Name" required="true"/>
+                <Input id="idPackageName" value="{createPackageModel>/PackageName}" liveChange="onPackageNameInputLiveChange"/>
+
+                <Label text="Description" required="true"/>
+                <TextArea id="idDescription" value="{createPackageModel>/Description}" rows="3" liveChange="onPackageNameInputLiveChange"/>
+
+                <Label text="Price" required="true"/>
+                <Input id="idPrice" type="Number" value="{createPackageModel>/Price}" liveChange="onPackageNameInputLiveChange"/>
+
+                <Label text="Duration Days" required="true"/>
+                <Input id="idDurationDays" type="Number" value="{createPackageModel>/DurationDays}" liveChange="onPackageNameInputLiveChange"/>
+
+                <Label text="Features" required="true"/>
+                <TextArea id="idFeatures" value="{createPackageModel>/Features}" placeholder="Feature1, Feature2, Feature3" rows="3" liveChange="onPackageNameInputLiveChange"/>
+
+                <Label text="Role Name" required="true"/>
+                <Input id="idRoleName" value="{createPackageModel>/RoleName}" liveChange="onPackageNameInputLiveChange"/>
+
+                <Label text="Is Active"/>
+                <Switch state="{createPackageModel>/IsActive}" />
+
+                <!-- ===== FREE TRIAL SECTION ===== -->
+                <Label text="Free Trial Available"/>
+                <Switch id="idIsFreeTrialAvailable" state="{createPackageModel>/IsFreeTrialAvailable}" />
+
+                <Label required="true" text="Free Trial Days" visible="{createPackageModel>/IsFreeTrialAvailable}"/>
+                <Input id="idFreeTrialDays"
+                       type="Number"
+                       value="{createPackageModel>/FreeTrialDays}"
+                       visible="{createPackageModel>/IsFreeTrialAvailable}"
+                       liveChange="onPackageNameInputLiveChange"/>
+
+                <!-- ===== DISCOUNT SECTION ===== -->
+                <Label required="true" text="Discount Type"/>
+                <Select id="idDiscountType" selectedKey="{createPackageModel>/DiscountType}">
+                    <core:Item key="None" text="None"/>
+                    <core:Item key="Percentage" text="Percentage"/>
+                    <core:Item key="Flat" text="Flat"/>
+                </Select>
+
+                <Label required="true" text="Discount Value" visible="{= ${createPackageModel>/DiscountType} !== 'None' }"/>
+                <Input id="idDiscountValue"
+                       type="Number"
+                       value="{createPackageModel>/DiscountValue}"
+                       visible="{= ${createPackageModel>/DiscountType} !== 'None' }"
+                       liveChange="onPackageNameInputLiveChange"/>
+
+                <Label required="true" text="Discount Valid From" visible="{= ${createPackageModel>/DiscountType} !== 'None' }"/>
+                <DatePicker id="idDiscountValidFrom"
+                            value="{path: 'createPackageModel>/DiscountValidFrom', type: 'sap.ui.model.type.Date', formatOptions: { pattern: 'dd-MM-yyyy' }}"
+                            valueFormat="yyyy-MM-dd"
+                            displayFormat="dd MMM yyyy"
+                            visible="{= ${createPackageModel>/DiscountType} !== 'None' }"/>
+
+                <Label required="true" text="Discount Valid To" visible="{= ${createPackageModel>/DiscountType} !== 'None' }"/>
+                <DatePicker id="idDiscountValidTo"
+                            value="{path: 'createPackageModel>/DiscountValidTo', type: 'sap.ui.model.type.Date', formatOptions: { pattern: 'dd-MM-yyyy' }}"
+                            valueFormat="yyyy-MM-dd"
+                            displayFormat="dd MMM yyyy"
+                            visible="{= ${createPackageModel>/DiscountType} !== 'None' }"/>
+
+            </f:SimpleForm>
+
+        </content>
+
+        <beginButton>
+            <Button text="Submit" class="subscribeBtn" type="Emphasized" press="onCreatePackage"/>
+        </beginButton>
+
+        <endButton>
+            <Button text="Cancel" class="subscribeBtn" press="onClosePackageDialog"/>
+        </endButton>
+
+    </Dialog>
+
+</core:FragmentDefinition>
