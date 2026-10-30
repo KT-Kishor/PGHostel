@@ -31,13 +31,13 @@
                     text="{i18n>Buyhealthinsurance}"
                     icon="sap-icon://heart"
                     press="onBuyHealthInsurance"
-                    class="myUnifiedBtn insuranceBuyBtn insuranceIconGap"/>
+                    class="myUnifiedBtn insuranceBuyBtn insuranceIconGap healthInsuranceFooterButton"/>
 
                 <Button
                     text="{i18n>Buytravelinsurance}"
                     icon="sap-icon://shield"
                     press="onBuyTravelInsurance"
-                    class="insuranceBuyBtn insuranceIconGap traveltest"/>
+                    class="insuranceBuyBtn insuranceIconGap traveltest travelInsuranceFooterButton"/>
             </HBox>
         </HBox>
 

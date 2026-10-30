@@ -2,500 +2,365 @@
     controllerName="sap.ui.com.project1.controller.Healthinsurance"
     xmlns:mvc="sap.ui.core.mvc"
     xmlns="sap.m"
-    xmlns:f="sap.ui.layout.form"
     xmlns:core="sap.ui.core"
-    xmlns:uxap="sap.uxap"
-    displayBlock="true"
     xmlns:u="sap.ui.unified"
-    xmlns:m="sap.m"
->
-		<Page
-			showHeader="true"
-              navButtonPress="onNavBack"
-        showNavButton="true"
-        class="myUnifiedBtn"
-        title="{i18n>InsuranceApplication}"
-			>
-                <!-- <headerContent>
-            <core:Fragment
-                fragmentName="sap.ui.com.project1.fragment.Header"
-                type="XML"
-            />
-        </headerContent> -->
-    <uxap:ObjectPageLayout
-        id="insuranceObjectPage"
-        showTitleInHeaderContent="true"
-        useIconTabBar="false"
-        showAnchorBar="true"
-        showFooter="true"
-        upperCaseAnchorBar="false"
+    displayBlock="true"
+    height="100%">
+    <Page id="insurancePage" class="insurancePage svPage"
+          showHeader="true" enableScrolling="true">
+        <headerContent>
+            <core:Fragment fragmentName="sap.ui.com.project1.fragment.BookingHeader" type="XML"/>
+        </headerContent>
+        <content>
+            <VBox class="svWrap insuranceWrap" width="100%" renderType="Bare">
+                <VBox class="svVendorSection svReg" renderType="Bare">
+                    <HBox class="svRegCard" renderType="Bare">
+                        <VBox class="svRegHeader insuranceBanner" renderType="Bare">
+                            <Title
+                                text="{= ${HealthInsuranceModel>/sPath} === 'Health' ? ${i18n>insuranceHealthBannerTitle} : ${i18n>insuranceTravelBannerTitle} }"
+                                level="H1" wrapping="true" textAlign="Center" class="svH2"/>
+                            <Text
+                                text="{= ${HealthInsuranceModel>/sPath} === 'Health' ? ${i18n>insuranceHealthBannerLead} : ${i18n>insuranceTravelBannerLead} }"
+                                textAlign="Center" class="svSub"/>
+                            <Text text="{i18n>InsuranceisofferedbyourlicensedpartnersStayVrikshaisnotaninsurer}"
+                                  textAlign="Center" class="insuranceDisclaimer"/>
+                        </VBox>
 
-    >
-        <uxap:headerTitle>
-            <uxap:ObjectPageDynamicHeaderTitle>
-                <uxap:expandedHeading>
-                    <Title
-                        text="{= (${HealthInsuranceModel>/sPath} === 'Health' ? ${i18n>Health} : ${i18n>Travel}) + ' ' + ${i18n>insurence} }"
-                        level="H1"
-                    />
-                </uxap:expandedHeading>
-                <uxap:snappedHeading>
-                    <Title
-                        text="{= (${HealthInsuranceModel>/sPath} === 'Health' ? ${i18n>Health} : ${i18n>Travel}) + ' ' + ${i18n>insurence} }"
-                        level="H2"
-                    />
-                </uxap:snappedHeading>
-            </uxap:ObjectPageDynamicHeaderTitle>
-        </uxap:headerTitle>
-
-        <!-- HEALTH INSURANCE -->
-        <uxap:sections>
-            <uxap:ObjectPageSection
-                id="personalInfoSection"
-                title="{i18n>personalInformation}"
-                visible="{= ${HealthInsuranceModel>/sPath} === 'Health' }"
-            >
-                <uxap:subSections>
-                    <uxap:ObjectPageSubSection title="">
-                        <uxap:blocks>
-                            <!-- Your existing Personal Information SimpleForm -->
-                            <f:SimpleForm
-                                editable="true"
-                                layout="ColumnLayout"
-                                columnsXL="2"
-                                columnsL="2"
-                                columnsM="1"
-                                labelSpanXL="3"
-                                labelSpanL="3"
-                                labelSpanM="4"
-                                labelSpanS="12"
-                                singleContainerFullSize="false"
-                                class="sapUiMediumMarginBottom sapUiSmallMarginTop"
-                            >
-                                <f:content>
-                                    <Label
-                                        text="{i18n>adminBookingNCFullName}"
-                                        required="true"
-                                    />
-                                    <Input
-                                        id="Id_fullName"
-                                        value="{HealthInsuranceModel>/fullName}"
-                                        placeholder="{i18n>enterFullName}"
-                                        maxLength="100"
-                                        liveChange="onInputChange"
-                                        valueStateText="{i18n>enterFullName}"
-                                    />
-
-                                    <Label
-                                        text="{i18n>emailId}"
-                                        required="true"
-                                    />
-                                    <Input
-                                        id="Id_email"
-                                        type="Email"
-                                        value="{HealthInsuranceModel>/email}"
-                                        placeholder="{i18n>enterEmailId}"
-                                        liveChange="onEmailliveChange"
-                                        valueStateText="Enter the mail"
-                                    />
-
-                                    <Label
-                                        text="{i18n>mobileNo}"
-                                        required="true"
-                                    />
-                                    <Input
-                                        id="ID_mobileNumber"
-                                        type="Tel"
-                                        value="{HealthInsuranceModel>/mobileNumber}"
-                                        maxLength="10"
-                                        placeholder="{i18n>Enterthemobilenumber}"
-                                        liveChange="onInputMobileChange"
-                                        valueStateText="{i18n>Enterthemobilenumber}"
-                                    />
-
-                                    <Label
-                                        text="{i18n>InsurancePlan}"
-                                        required="true"
-                                    />
-                                    <ComboBox
-                                        id="insurancePlan"
-                                        selectedKey="{HealthInsuranceModel>/insurancePlan}"
-                                        placeholder="{i18n>Selectinsuranceplan}"
-                                        change="onInsurancePlanChange"
-                                        valueStateText="{i18n>Selectinsuranceplan}"
-                                    >
-                                        <core:Item
-                                            key="Individual"
-                                            text="{i18n>IndividualHealthInsurance}"
-                                        />
-                                        <core:Item
-                                            key="Family"
-                                            text="{i18n>FamilyHealthInsurance}"
-                                        />
-                                    </ComboBox>
-
-                                    <Label
-                                        text="{i18n>Doyouhaveanypreviousdiseases}"
-                                        required="true"
-                                    />
-                                    <TextArea
-                                        id="ID_diseases"
-                                        value="{HealthInsuranceModel>/diseases}"
-                                        placeholder="{i18n>Enteryouhaveanypreviousdiseases}"
-                                        valueStateText="{i18n>Enteryouhaveanypreviousdiseases}"
-                                        liveChange="onInputChange"
-                                        maxLength="200"
-                                    />
-
-                                    <Label
-                                        text="{i18n>Weight}"
-                                        required="true"
-                                    />
-
-                                    <Input
-                                        id="ID_Weight"
-                                        value="{HealthInsuranceModel>/Weight}"
-                                        maxLength="3"
-                                        placeholder="{i18n>EnteryourWeightinkgs}"
-                                        liveChange="onInputMobileChange"
-                                        valueStateText="{i18n>EnteryourWeightinkgs}"
-                                    />
-
-                                    <Label
-                                        text="{i18n>BloodGroup}"
-                                        required="true"
-                                    />
-                                    <ComboBox
-                                        id="ID_BloodGroup"
-                                        selectedKey="{HealthInsuranceModel>/BloodGroup}"
-                                        placeholder="{i18n>SelectBloodGroup}"
-                                        change="onBloodGroupChange"
-                                        valueStateText="{i18n>SelectBloodGroup}"
-                                        width="100%"
-                                    >
-                                        <core:Item
-                                            key="A+"
-                                            text="A+"
-                                        />
-                                        <core:Item
-                                            key="A-"
-                                            text="A-"
-                                        />
-                                        <core:Item
-                                            key="B+"
-                                            text="B+"
-                                        />
-                                        <core:Item
-                                            key="B-"
-                                            text="B-"
-                                        />
-                                        <core:Item
-                                            key="AB+"
-                                            text="AB+"
-                                        />
-                                        <core:Item
-                                            key="AB-"
-                                            text="AB-"
-                                        />
-                                        <core:Item
-                                            key="O+"
-                                            text="O+"
-                                        />
-                                        <core:Item
-                                            key="O-"
-                                            text="O-"
-                                        />
-                                    </ComboBox>
-                                </f:content>
-                            </f:SimpleForm>
-                        </uxap:blocks>
-                    </uxap:ObjectPageSubSection>
-                </uxap:subSections>
-            </uxap:ObjectPageSection>
-
-            <!-- Section 2: Member Information -->
-            <uxap:ObjectPageSection
-                id="memberInfoSection"
-                title="{i18n>MemberInformation}"
-                visible="{= ${HealthInsuranceModel>/sPath} === 'Health' }"
-            >
-                <uxap:subSections>
-                    <uxap:ObjectPageSubSection title="">
-                        <uxap:blocks>
-                            <!-- Keep your existing Member Information content here -->
-                            <VBox class="sapUiMediumMarginBottom">
-                                <HBox
-                                    alignItems="Center"
-                                    justifyContent="SpaceBetween"
-                                    class="sapUiSmallMarginBottom"
-                                >
-                                    <VBox>
-                                        <Title
-                                            text="{i18n>documentDetails}"
-                                            level="H4"
-                                        />
-                                        <Text
-                                            text="{i18n>Adddateofbirthforeachinsuredmember}"
-                                        />
-                                    </VBox>
-
-                                    <ObjectStatus
-                                        text="{i18n>Required}"
-                                        state="Information"
-                                    />
-                                </HBox>
-
-                          <FlexBox
-    alignItems="Center"
-    wrap="Wrap"
-    width="100%"
-    class="sapUiSmallMarginBottom memberCountRow">
-
-    <core:Icon
-        src="sap-icon://group"
-        size="1.5rem"
-        />
-
-    <Label
-        text="{i18n>NumberofMembers}"
-         class="memberlabel"/>
-
-    <StepInput
-        id="memberCount"
-        min="1"
-        max="6"
-        value="1"
-        step="1"
-        change="onMemberCountChange"
-        width="8rem" />
-
-</FlexBox>
-
-                                <VBox
-                                    id="memberDobContainer"
-                                    width="100%"
-                                    class="memberDobContainer"
-                                />
+                        <VBox class="svSide" renderType="Bare">
+                            <VBox class="svSideInner" renderType="Bare">
+                                <Title
+                                    text="{= ${HealthInsuranceModel>/sPath} === 'Health' ? ${i18n>insuranceHealthSideTitle} : ${i18n>insuranceTravelSideTitle} }"
+                                    level="H2" wrapping="true" class="svSideTitle"/>
+                                <Text text="{i18n>insuranceSideIntro}" class="svSideSub"/>
+                                <VBox class="svProgress" renderType="Bare">
+                                    <HBox justifyContent="SpaceBetween" renderType="Bare">
+                                        <Text text="{i18n>vrSideProgressLabel}" class="svProgressLabel"/>
+                                        <Text text="{= (${InsuranceUI>/progress} || 0) + '%' }" class="svProgressLabel"/>
+                                    </HBox>
+                                    <ProgressIndicator percentValue="{InsuranceUI>/barProgress}" showValue="false"
+                                                       height="8px" class="svBar"
+                                                       displayValue="{= (${InsuranceUI>/progress} || 0) + '%' }"/>
+                                </VBox>
+                                <VBox class="svSteps" renderType="Bare">
+                                    <HBox class="svStep" renderType="Bare">
+                                        <customData>
+                                            <core:CustomData key="insurance-complete" writeToDom="true"
+                                                             value="{= ${InsuranceUI>/step1Complete} ? 'true' : 'false' }"/>
+                                            <core:CustomData key="insurance-state" writeToDom="true"
+                                                             value="{InsuranceUI>/step1State}"/>
+                                        </customData>
+                                        <VBox class="svStepN" renderType="Bare" alignItems="Center" justifyContent="Center">
+                                            <Text text="1" visible="{= !${InsuranceUI>/step1Complete} }"/>
+                                            <core:Icon src="sap-icon://accept" visible="{InsuranceUI>/step1Complete}"/>
+                                        </VBox>
+                                        <VBox renderType="Bare">
+                                            <Text
+                                                text="{= ${HealthInsuranceModel>/sPath} === 'Health' ? ${i18n>personalInformation} : ${i18n>TripInformation} }"
+                                                class="svStepT"/>
+                                            <Text
+                                                text="{= ${HealthInsuranceModel>/sPath} === 'Health' ? ${i18n>insuranceHealthStep1Desc} : ${i18n>insuranceTravelStep1Desc} }"
+                                                class="svStepD"/>
+                                        </VBox>
+                                    </HBox>
+                                    <HBox class="svStep" renderType="Bare">
+                                        <customData>
+                                            <core:CustomData key="insurance-complete" writeToDom="true"
+                                                             value="{= ${InsuranceUI>/step2Complete} ? 'true' : 'false' }"/>
+                                            <core:CustomData key="insurance-state" writeToDom="true"
+                                                             value="{InsuranceUI>/step2State}"/>
+                                        </customData>
+                                        <VBox class="svStepN" renderType="Bare" alignItems="Center" justifyContent="Center">
+                                            <Text text="2" visible="{= !${InsuranceUI>/step2Complete} }"/>
+                                            <core:Icon src="sap-icon://accept" visible="{InsuranceUI>/step2Complete}"/>
+                                        </VBox>
+                                        <VBox renderType="Bare">
+                                            <Text
+                                                text="{= ${HealthInsuranceModel>/sPath} === 'Health' ? ${i18n>MemberInformation} : ${i18n>insuranceTravellerInformation} }"
+                                                class="svStepT"/>
+                                            <Text
+                                                text="{= ${HealthInsuranceModel>/sPath} === 'Health' ? ${i18n>Adddateofbirthforeachinsuredmember} : ${i18n>insuranceTravelStep2Desc} }"
+                                                class="svStepD"/>
+                                        </VBox>
+                                    </HBox>
+                                    <HBox class="svStep" renderType="Bare">
+                                        <customData>
+                                            <core:CustomData key="insurance-complete" writeToDom="true"
+                                                             value="{= ${InsuranceUI>/step3Complete} ? 'true' : 'false' }"/>
+                                            <core:CustomData key="insurance-state" writeToDom="true"
+                                                             value="{InsuranceUI>/step3State}"/>
+                                        </customData>
+                                        <VBox class="svStepN" renderType="Bare" alignItems="Center" justifyContent="Center">
+                                            <Text text="3" visible="{= !${InsuranceUI>/step3Complete} }"/>
+                                            <core:Icon src="sap-icon://accept" visible="{InsuranceUI>/step3Complete}"/>
+                                        </VBox>
+                                        <VBox renderType="Bare">
+                                            <Text
+                                                text="{= ${HealthInsuranceModel>/sPath} === 'Health' ? ${i18n>insuranceDocumentsOptional} : ${i18n>vrSecDocuments} }"
+                                                class="svStepT"/>
+                                            <Text
+                                                text="{= ${HealthInsuranceModel>/sPath} === 'Health' ? ${i18n>insuranceHealthStep3Desc} : ${i18n>insuranceTravelStep3Desc} }"
+                                                class="svStepD"/>
+                                        </VBox>
+                                    </HBox>
+                                </VBox>
+                                <VBox class="svHelp" renderType="Bare">
+                                    <Text text="{i18n>insuranceHelp}"/>
+                                    <Link text="admin@stayvriksha.in" href="mailto:admin@stayvriksha.in"
+                                          class="tealTextLink"/>
+                                </VBox>
                             </VBox>
-                        </uxap:blocks>
-                    </uxap:ObjectPageSubSection>
-                      
-                </uxap:subSections>
-            </uxap:ObjectPageSection>
-    <uxap:ObjectPageSection
-                title="{i18n>documentinfo}"
-                visible="{= ${HealthInsuranceModel>/sPath} === 'Health' }"
-            >
-                <uxap:subSections>
-             <uxap:ObjectPageSubSection>
-        <uxap:blocks>
-            <VBox
-                width="100%">
+                        </VBox>
 
-                <MessageStrip
-                    text="{i18n>healthinsurencemessagestrip}"
-                    type="Information"
-                    showIcon="true"
-                    showCloseButton="false"
-                    class="sapUiSmallMarginBottom" />
-           
-             
+                        <VBox class="svFormWrap" renderType="Bare">
+                            <VBox id="insuranceFormBox" class="svForm" renderType="Bare"
+                                  visible="{= !${InsuranceUI>/submitted} }">
+                                <VBox id="personalInfoSection" class="svSec" renderType="Bare"
+                                      visible="{= ${HealthInsuranceModel>/sPath} === 'Health' }">
+                                    <HBox class="svSecTitle" renderType="Bare" alignItems="Center">
+                                        <core:Icon src="sap-icon://employee" class="svSecIcon"/>
+                                        <Title text="{i18n>personalInformation}" level="H2" wrapping="true"/>
+                                    </HBox>
+                                    <HBox class="svFormGrid" renderType="Bare">
+                                        <VBox class="svFld svSpan2" renderType="Bare">
+                                            <Label text="{i18n>adminBookingNCFullName}" required="true" labelFor="Id_fullName"/>
+                                            <HBox class="svInputShell" renderType="Bare">
+                                                <core:Icon src="sap-icon://employee" class="svFieldIcon"/>
+                                                <Input id="Id_fullName" value="{HealthInsuranceModel>/fullName}" width="100%"
+                                                       placeholder="{i18n>enterFullName}" maxLength="100"
+                                                       liveChange="onInputChange" valueStateText="{i18n>enterFullName}"/>
+                                            </HBox>
+                                        </VBox>
+                                        <VBox class="svFld" renderType="Bare">
+                                            <Label text="{i18n>emailId}" required="true" labelFor="Id_email"/>
+                                            <HBox class="svInputShell" renderType="Bare">
+                                                <core:Icon src="sap-icon://email" class="svFieldIcon"/>
+                                                <Input id="Id_email" type="Email" value="{HealthInsuranceModel>/email}" width="100%"
+                                                       placeholder="{i18n>enterEmailId}" liveChange="onEmailliveChange"
+                                                       valueStateText="{i18n>enterEmailId}"/>
+                                            </HBox>
+                                        </VBox>
+                                        <VBox class="svFld" renderType="Bare">
+                                            <Label text="{i18n>mobileNo}" required="true" labelFor="ID_mobileNumber"/>
+                                            <HBox class="svInputShell" renderType="Bare">
+                                                <core:Icon src="sap-icon://phone" class="svFieldIcon"/>
+                                                <Input id="ID_mobileNumber" type="Tel" value="{HealthInsuranceModel>/mobileNumber}"
+                                                       valueLiveUpdate="true" width="100%" maxLength="10"
+                                                       placeholder="{i18n>Enterthemobilenumber}"
+                                                       liveChange="onInputMobileChange" change="onInputMobileChange"
+                                                       valueStateText="{i18n>vrErrMobile}"/>
+                                            </HBox>
+                                        </VBox>
+                                        <VBox class="svFld svSpan2" renderType="Bare">
+                                            <Label text="{i18n>InsurancePlan}" required="true" labelFor="insurancePlan"/>
+                                            <HBox class="svInputShell" renderType="Bare">
+                                                <core:Icon src="sap-icon://shield" class="svFieldIcon"/>
+                                                <ComboBox id="insurancePlan" selectedKey="{HealthInsuranceModel>/insurancePlan}"
+                                                          width="100%" placeholder="{i18n>Selectinsuranceplan}"
+                                                          change="onInsurancePlanChange" valueStateText="{i18n>Selectinsuranceplan}">
+                                                    <core:Item key="Individual" text="{i18n>IndividualHealthInsurance}"/>
+                                                    <core:Item key="Family" text="{i18n>FamilyHealthInsurance}"/>
+                                                </ComboBox>
+                                            </HBox>
+                                        </VBox>
+                                        <VBox class="svFld svSpan2" renderType="Bare">
+                                            <Label text="{i18n>Doyouhaveanypreviousdiseases}" required="true"
+                                                   wrapping="true" labelFor="ID_diseases"/>
+                                            <HBox class="svInputShell svAddressShell" renderType="Bare">
+                                                <core:Icon src="sap-icon://notes" class="svFieldIcon"/>
+                                                <TextArea id="ID_diseases" value="{HealthInsuranceModel>/diseases}" width="100%"
+                                                          rows="3" maxLength="200" placeholder="{i18n>Enteryouhaveanypreviousdiseases}"
+                                                          valueStateText="{i18n>Enteryouhaveanypreviousdiseases}" liveChange="onInputChange"/>
+                                            </HBox>
+                                        </VBox>
+                                        <VBox class="svFld" renderType="Bare">
+                                            <Label text="{i18n>Weight}" required="true" labelFor="ID_Weight"/>
+                                            <HBox class="svInputShell" renderType="Bare">
+                                                 <core:Icon src="sap-icon://measure" class="svFieldIcon"/>
+                                                <Input id="ID_Weight" value="{HealthInsuranceModel>/Weight}"
+                                                       valueLiveUpdate="true" width="100%" maxLength="6"
+                                                       placeholder="{i18n>EnteryourWeightinkgs}"
+                                                       liveChange="onWeightLiveChange" change="onWeightLiveChange"
+                                                       valueStateText="{i18n>insuranceInvalidWeight}"/>
+                                            </HBox>
+                                        </VBox>
+                                        <VBox class="svFld" renderType="Bare">
+                                            <Label text="{i18n>BloodGroup}" required="true" labelFor="ID_BloodGroup"/>
+                                            <HBox class="svInputShell" renderType="Bare">
+                                                <core:Icon src="sap-icon://heart" class="svFieldIcon"/>
+                                                <ComboBox id="ID_BloodGroup" selectedKey="{HealthInsuranceModel>/BloodGroup}"
+                                                          width="100%" placeholder="{i18n>SelectBloodGroup}"
+                                                          change="onBloodGroupChange" valueStateText="{i18n>SelectBloodGroup}">
+                                                    <core:Item key="A+" text="A+"/>
+                                                    <core:Item key="A-" text="A-"/>
+                                                    <core:Item key="B+" text="B+"/>
+                                                    <core:Item key="B-" text="B-"/>
+                                                    <core:Item key="AB+" text="AB+"/>
+                                                    <core:Item key="AB-" text="AB-"/>
+                                                    <core:Item key="O+" text="O+"/>
+                                                    <core:Item key="O-" text="O-"/>
+                                                </ComboBox>
+                                            </HBox>
+                                        </VBox>
+                                    </HBox>
+                                </VBox>
 
-<VBox width="100%" class="aadhaarUploadContainer">
-    <HBox
-        width="100%"
-        alignItems="Center"
-        class="aadhaarAttachmentRow">
+                                <VBox id="memberInfoSection" class="svSec" renderType="Bare"
+                                      visible="{= ${HealthInsuranceModel>/sPath} === 'Health' }">
+                                    <HBox class="svSecTitle" renderType="Bare" alignItems="Center">
+                                        <core:Icon src="sap-icon://group" class="svSecIcon"/>
+                                        <Title text="{i18n>MemberInformation}" level="H2" wrapping="true"/>
+                                    </HBox>
+                                    <Text text="{i18n>Adddateofbirthforeachinsuredmember}" class="insuranceSectionLead"/>
+                                    <VBox class="svFld insuranceCountField" renderType="Bare">
+                                        <Label text="{i18n>NumberofMembers}" labelFor="memberCount"/>
+                                        <StepInput id="memberCount" min="1" max="6"
+                                                   value="{HealthInsuranceModel>/memberCount}" step="1"
+                                                   enabled="true" editable="true" required="true"
+                                                   validationMode="LiveChange" change="onMemberCountChange"
+                                                   width="100%" class="insuranceCounter"/>
+                                    </VBox>
+                                    <VBox id="memberDobContainer" width="100%" renderType="Bare"/>
+                                </VBox>
 
-        <Label
-            text="{i18n>AadhaarCardAttachment}"
-            labelFor="aadhaarUploader"
-            class="aadhaarAttachmentLabel" />
+                                <VBox class="svSec" renderType="Bare"
+                                      visible="{= ${HealthInsuranceModel>/sPath} === 'Health' }">
+                                    <HBox class="svSecTitle" renderType="Bare" alignItems="Center">
+                                        <core:Icon src="sap-icon://document" class="svSecIcon"/>
+                                        <Title text="{i18n>insuranceDocumentsH}" level="H2" wrapping="true"/>
+                                    </HBox>
+                                    <MessageStrip text="{i18n>healthinsurencemessagestrip}" type="Information"
+                                                  showIcon="true" showCloseButton="false" class="insuranceNotice"/>
+                                    <VBox class="svFld" width="100%" renderType="Bare">
+                                        <Label text="{i18n>AadhaarCardAttachment}" labelFor="aadhaarUploader"/>
+                                        <VBox class="insuranceUploadBox insuranceDocumentDrop svDrop" renderType="Bare" alignItems="Center">
+                                            <core:Icon src="sap-icon://upload" class="insuranceUploadIcon"/>
+                                            <Text text="{i18n>ChooseAadhaarcarddocument}" textAlign="Center" class="insuranceUploadTitle"/>
+                                            <Text id="aadhaarUploadHint" text="{i18n>insuranceAadhaarFormats}" textAlign="Center"
+                                                  class="insuranceFileHint insuranceUploadHint"/>
+                                            <Text id="aadhaarTotalLimitHint"
+                                                  text="{i18n>insuranceHealthTotalLimitNotice}"
+                                                  visible="{HealthInsuranceModel>/aadhaarTotalLimitExceeded}"
+                                                  textAlign="Center"
+                                                  class="insuranceFileHint insuranceUploadHint insuranceHealthTotalHint"/>
+                                            <u:FileUploader id="aadhaarUploader" name="aadhaarCard"
+                                                            fileType="pdf,png,jpg,jpeg"
+                                                            mimeType="application/pdf,image/png,image/jpeg,image/jpg"
+                                                            placeholder="{i18n>ChooseAadhaarcarddocument}"
+                                                            buttonOnly="true" buttonText="{i18n>vrDocBrowse}"
+                                                            tooltip="{i18n>vrDocBrowse}" width="100%" multiple="true"
+                                                            change="onAadhaarAttachmentChange"
+                                                            typeMissmatch="onInsuranceFileTypeMismatch"
+                                                            class="insuranceFileUploader insuranceDocumentUploader svUploader"/>
+                                        </VBox>
+                                    </VBox>
+                                    <VBox id="aadhaarUploadedFiles" width="100%" renderType="Bare" class="insuranceFiles svFiles"/>
+                                    <Text text="{i18n>vrDocEmpty}" textAlign="Center" class="svEmpty"
+                                          visible="{= !${HealthInsuranceModel>/hasAadhaarAttachments} }"/>
+                                </VBox>
 
-        <u:FileUploader
-            id="aadhaarUploader"
-            name="aadhaarCard"
-            fileType="pdf,png,jpg,jpeg"
-            mimeType="application/pdf,image/png,image/jpeg"
-            maximumFileSize="5"
-            placeholder="{i18n>ChooseAadhaarcarddocument}"
-            buttonText="Browse"
-            width="100%"
-            multiple="true"
-            change="onAadhaarAttachmentChange">
+                                <VBox class="svSec" renderType="Bare"
+                                      visible="{= ${HealthInsuranceModel>/sPath} !== 'Health' }">
+                                    <HBox class="svSecTitle" renderType="Bare" alignItems="Center">
+                                        <core:Icon src="sap-icon://flight" class="svSecIcon"/>
+                                        <Title text="{i18n>TripInformation}" level="H2" wrapping="true"/>
+                                    </HBox>
+                                    <HBox class="svFormGrid" renderType="Bare">
+                                        <VBox class="svFld" renderType="Bare">
+                                            <Label text="{i18n>TravelType}" required="true" labelFor="idtype"/>
+                                            <HBox class="svInputShell" renderType="Bare">
+                                                <core:Icon src="sap-icon://flight" class="svFieldIcon"/>
+                                                <ComboBox id="idtype" selectedKey="{HealthInsuranceModel>/insurancePlan}" width="100%"
+                                                          placeholder="{i18n>Selecttraveltype}" change="onInsurancePlanChange"
+                                                          valueStateText="{i18n>Selecttraveltype}">
+                                                    <core:Item key="International Trip" text="{i18n>InternationalTrip}"/>
+                                                    <core:Item key="Student Travel" text="{i18n>StudentTravel}"/>
+                                                </ComboBox>
+                                            </HBox>
+                                        </VBox>
+                                        <VBox class="svFld" renderType="Bare">
+                                            <Label text="{i18n>Destination}" required="true" labelFor="id_Destination"/>
+                                            <HBox class="svInputShell insuranceDestinationShell" renderType="Bare">
+                                                <core:Icon src="sap-icon://world" class="svFieldIcon"/>
+                                                <MultiComboBox id="id_Destination" selectedKeys="{HealthInsuranceModel>/destination}"
+                                                               width="100%"
+                                                               placeholder="{= (%{HealthInsuranceModel>/destination} || []).length ? '' : ${i18n>Selectdestination} }"
+                                                               items="{path:'CountryModel>/', length:1000}" change="onDestinationChange"
+                                                               valueStateText="{i18n>Selectdestination}">
+                                                    <core:ListItem key="{CountryModel>countryName}" text="{CountryModel>countryName}"/>
+                                                </MultiComboBox>
+                                            </HBox>
+                                        </VBox>
+                                        <VBox class="svFld" renderType="Bare">
+                                            <Label text="{i18n>startDate}" required="true" labelFor="id_startDate"/>
+                                            <HBox class="svInputShell" renderType="Bare">
+                                                <core:Icon src="sap-icon://calendar" class="svFieldIcon"/>
+                                                <DatePicker id="id_startDate" value="{HealthInsuranceModel>/startDate}"
+                                                            minDate="{HealthInsuranceModel>/minDate}" width="100%"
+                                                            displayFormat="dd/MM/yyyy" valueFormat="yyyy-MM-dd"
+                                                            placeholder="{i18n>selectStartDate}" valueStateText="{i18n>selectStartDate}"
+                                                            change="onDateChange"/>
+                                            </HBox>
+                                        </VBox>
+                                        <VBox class="svFld" renderType="Bare">
+                                            <Label text="{i18n>endDate}" required="true" labelFor="id_endDate"/>
+                                            <HBox class="svInputShell" renderType="Bare">
+                                                <core:Icon src="sap-icon://calendar" class="svFieldIcon"/>
+                                                <DatePicker id="id_endDate" value="{HealthInsuranceModel>/endDate}" width="100%"
+                                                            displayFormat="dd/MM/yyyy" valueFormat="yyyy-MM-dd"
+                                                            placeholder="{i18n>selectEndDate}" valueStateText="{i18n>selectEndDate}"
+                                                            change="onDateChange"/>
+                                            </HBox>
+                                        </VBox>
+                                        <VBox class="svFld insuranceCountField" renderType="Bare">
+                                            <Label text="{i18n>NumberofTravellers}" labelFor="memberCount1"/>
+                                            <StepInput id="memberCount1" min="1" max="10" step="1" width="100%"
+                                                       value="{HealthInsuranceModel>/totalTravellers}"
+                                                       change="onTravellerCountChange" class="insuranceCounter"/>
+                                        </VBox>
+                                    </HBox>
+                                </VBox>
 
-            <u:layoutData>
-                <m:FlexItemData growFactor="0.5" />
-            </u:layoutData>
-        </u:FileUploader>
-    </HBox>
+                                <VBox class="svSec" renderType="Bare"
+                                      visible="{= ${HealthInsuranceModel>/sPath} !== 'Health' }">
+                                    <HBox class="svSecTitle" renderType="Bare" alignItems="Center">
+                                        <core:Icon src="sap-icon://group" class="svSecIcon"/>
+                                        <Title text="{i18n>insuranceTravellerInformation}" level="H2" wrapping="true"/>
+                                    </HBox>
+                                    <Text text="{i18n>insuranceTravelStep2Desc}" class="insuranceSectionLead"/>
+                                    <MessageStrip text="{i18n>insuranceTravelDocumentsNotice}" type="Information"
+                                                  showIcon="true" showCloseButton="false" class="insuranceNotice"/>
+                                    <VBox id="travellerDetailsContainer" width="100%" renderType="Bare"
+                                          class="insuranceTravellerStack"/>
+                                </VBox>
 
-    <!-- Selected files appear below, each with its own Remove button -->
-    <VBox
-        id="aadhaarUploadedFiles"
-        width="100%"
-        class="sapUiSmallMarginTop" />
-</VBox>
-
-
-
-                <Text
-                    text="{i18n>acceptedDocumentFormats}"
-                    class="sapUiTinyMarginTop sapUiSmallMarginBottom" />
-
+                                <HBox class="svActions" renderType="Bare" justifyContent="End" wrap="Wrap">
+                                    <Button text="{i18n>CancelButton}" press="onNavBack" class="svBtn svBtnGhost"/>
+                                    <Button text="{i18n>submit}" type="Emphasized" class="svBtn" press="onSubmitPress"
+                                            visible="{= ${HealthInsuranceModel>/sPath} !== 'Health' }"/>
+                                    <Button text="{i18n>submit}" type="Emphasized" class="svBtn" press="onhealthSubmitPress"
+                                            visible="{= ${HealthInsuranceModel>/sPath} === 'Health' }"/>
+                                </HBox>
+                            </VBox>
+                            <VBox id="insuranceSuccessBox" class="svSuccess" renderType="Bare"
+                                  visible="{InsuranceUI>/submitted}" alignItems="Center">
+                                <core:Icon src="sap-icon://accept" class="svSuccessIcon"/>
+                                <Title text="{i18n>applicationSubmittedTitle}" level="H3"
+                                       wrapping="true" class="svSuccessTitle"/>
+                                <Text text="{InsuranceUI>/successMessage}" textAlign="Center"
+                                      class="svSuccessText"/>
+                                <Button text="{i18n>vrSuccessBack}" class="svBtn"
+                                        type="Emphasized" press="onHome"/>
+                            </VBox>
+                        </VBox>
+                    </HBox>
+                </VBox>
             </VBox>
-        </uxap:blocks>
-    </uxap:ObjectPageSubSection>
-         </uxap:subSections>
-            </uxap:ObjectPageSection>
-
-            <!-- TRAVEL INSURANCE -->
-            <uxap:ObjectPageSection
-                title="{i18n>TravelInsurance}"
-                visible="{= ${HealthInsuranceModel>/sPath} !== 'Health' }"
-            >
-                <uxap:subSections>
-                    <uxap:ObjectPageSubSection title="{i18n>TripInformation}">
-                        <uxap:blocks>
-                            <f:SimpleForm
-                                editable="true"
-                                layout="ColumnLayout"
-                                columnsXL="2"
-                                columnsL="2"
-                                columnsM="1"
-                                labelSpanXL="3"
-                                labelSpanL="3"
-                                labelSpanM="4"
-                                labelSpanS="12"
-                                singleContainerFullSize="false"
-                                class="sapUiMediumMarginBottom sapUiSmallMarginTop"
-                            >
-                                <f:content>
-                                    <Label
-                                        text="{i18n>TravelType}"
-                                        required="true"
-                                    />
-                                    <ComboBox
-                                        id="idtype"
-                                        selectedKey="{HealthInsuranceModel>/insurancePlan}"
-                                        placeholder="{i18n>Selecttraveltype}"
-                                        change="onInsurancePlanChange"
-                                        valueStateText="{i18n>Selecttraveltype}"
-                                    >
-                                        <core:Item
-                                            key="International Trip"
-                                            text="{i18n>InternationalTrip}"
-                                        />
-                                        <core:Item
-                                            key="Student Travel"
-                                            text="{i18n>StudentTravel}"
-                                        />
-                                    </ComboBox>
-
-                                    <Label
-                                        text="{i18n>Destination}"
-                                        required="true"
-                                    />
-                                    <MultiComboBox
-                                        id="id_Destination"
-                                        selectedKeys="{HealthInsuranceModel>/destination}"
-                                        placeholder="{i18n>Selectdestination}"
-                                        items="{path:'CountryModel>/', length:1000}"
-                                        change="onDestinationChange"
-                                        valueStateText="{i18n>Selectdestination}"
-                                    >
-                                        <core:ListItem
-                                            key="{CountryModel>countryName}"
-                                            text="{CountryModel>countryName}"
-                                        />
-                                    </MultiComboBox>
-                                    <Label text="{i18n>NumberofTravellers}" />
-                                    <StepInput
-                                        id="memberCount1"
-                                        min="1"
-                                        max="10"
-                                        value="{HealthInsuranceModel>/totalTravellers}"
-                                        step="1"
-                                        change="onTravellerCountChange"
-                                    />
-                                    <Label
-                                        text="{i18n>startDate}"
-                                        required="true"
-                                    />
-                                    <DatePicker
-                                        id="id_startDate"
-                                        value="{HealthInsuranceModel>/startDate}"
-                                        minDate="{HealthInsuranceModel>/minDate}"
-                                        displayFormat="dd/MM/yyyy"
-                                        valueFormat="yyyy-MM-dd"
-                                        placeholder="{i18n>selectStartDate}"
-                                        valueStateText="{i18n>selectStartDate}"
-                                        change="onDateChange"
-                                    />
-
-                                    <Label
-                                        text="{i18n>endDate}"
-                                        required="true"
-                                    />
-                                    <DatePicker
-                                        id="id_endDate"
-                                        value="{HealthInsuranceModel>/endDate}"
-                                        displayFormat="dd/MM/yyyy"
-                                        valueFormat="yyyy-MM-dd"
-                                        placeholder="{i18n>selectEndDate}"
-                                        valueStateText="{i18n>selectEndDate}"
-                                        change="onDateChange"
-                                    />
-
-                                    <!-- Traveller forms are added here by the controller -->
-                                </f:content>
-                            </f:SimpleForm>
-                        </uxap:blocks>
-                    </uxap:ObjectPageSubSection>
-                </uxap:subSections>
-            </uxap:ObjectPageSection>
-        </uxap:sections>
-
-        <!-- FOOTER -->
-        <uxap:footer>
-            <OverflowToolbar class="footerBtnBarInsurance">
-                <Image
-                    src="../image/TransparentKTlogo.png"
-                    width="30px"
-                    height="30px"
-                />
-
-                <Link
-                    text="{i18n>devlopby}"
-                    href="https://kalpavrikshatechnologies.com/"
-                    target="_blank"
-                    class="customLinkWhiteBg"
-                />
-
-                <ToolbarSpacer />
-
-                <Button
-                    text="{i18n>CancelButton}"
-                    press="onNavBack"
-                    class="myUnifiedBtn"
-                />
-
-                <Button
-                    text="{i18n>submit}"
-                    class="myUnifiedBtn"
-                    press="onSubmitPress"
-                    visible="{= ${HealthInsuranceModel>/sPath} !== 'Health' }"
-                />
-
-                <Button
-                    text="{i18n>submit}"
-                    class="myUnifiedBtn"
-                    press="onhealthSubmitPress"
-                    visible="{= ${HealthInsuranceModel>/sPath} === 'Health' }"
-                />
-            </OverflowToolbar>
-        </uxap:footer>
-    </uxap:ObjectPageLayout>
-    		</Page>
-
+            <VBox class="footer-shell" width="100%" renderType="Bare">
+                <customData>
+                    <core:CustomData key="insurance-mode" value="{HealthInsuranceModel>/sPath}" writeToDom="true"/>
+                </customData>
+                <core:Fragment id="insuranceFooter" fragmentName="sap.ui.com.project1.fragment.quicklinks" type="XML"/>
+            </VBox>
+        </content>
+    </Page>
 </mvc:View>
