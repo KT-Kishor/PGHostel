@@ -43,6 +43,8 @@
                 </ToggleButton>
             </HBox>
 
+            <Text text="{i18n>vrPtNote}" textAlign="Center" class="svNote"/>
+
             <HBox id="vendorTypePanel" class="svPanel" renderType="Bare">
                 <VBox class="svTreeCol" renderType="Bare">
                     <!-- Each property type starts in the mode configured in vendorPropertyTypes.json. -->
@@ -103,7 +105,6 @@
                 </VBox>
             </HBox>
 
-            <Text text="{i18n>vrPtNote}" textAlign="Center" class="svNote"/>
         </VBox>
 
         <VBox class="svVendorSection svWhy" renderType="Bare">

@@ -9927,11 +9927,14 @@ text-transform: none !important;
    scrolling area below it. No fixed offset is applied here: a hard-coded value
    would no longer match the header's measured height. */
 
-/* The quick links footer closes the page, so it is separated from the policy
-   card above it instead of sitting flush against it. */
+/* Keep the quick links footer flush with the policy content. */
+.policyPage .mainWrap {
+    margin-bottom: 0;
+}
+
 .policyPage .quickLinksWrap {
     flex-shrink: 0;
-    margin-top: 32px;
+    margin-top: 0;
 }
 
 .policyPage .quickLinksWrap .svFooter {
@@ -12195,6 +12198,30 @@ text-transform: none !important;
     border-top: 1.5px solid #E3F8FB !important;
 }
 
+.hostelHomePage .whyBookMainCard {
+    background: linear-gradient(135deg, #00a7b5, #0092a0 60%, #00798a);
+}
+
+.hostelHomePage .whyBookMainCard .stayTypesTitle,
+.hostelHomePage .whyBookMainCard .stayTypesTitle strong,
+.hostelHomePage .whyBookMainCard .stayTypesDescription,
+.hostelHomePage .whyBookMainCard .featureGridIcon,
+.hostelHomePage .whyBookMainCard .featureGridTitle,
+.hostelHomePage .whyBookMainCard .featureGridDesc {
+    color: #fff !important;
+}
+
+.hostelHomePage .stayTypesMainCard {
+    padding-bottom: 0 !important;
+}
+
+/* Extend only the details panel through the section's side gutters. */
+.hostelHomePage .stayDetailsContainer {
+    width: calc(100% + 2 * clamp(16px, 4vw, 48px)) !important;
+    margin-inline: calc(-1 * clamp(16px, 4vw, 48px));
+    border-radius: 0;
+}
+
 @media (max-width: 767px) {
     .hostelHomePage .aboutUsContainer.homeUnifiedSection {
       padding-bottom: clamp(12px, 2vw, 24px) !important;
@@ -12716,6 +12743,18 @@ text-transform: none !important;
 
 /* ---------------- property type explorer ---------------- */
 
+/* Keep the intro and tabs inset while the detail panel spans the full width. */
+.svPage .svWrap .svPtypes {
+    display: grid;
+    grid-template-columns: clamp(16px, 4vw, 48px) minmax(0, 1fr) clamp(16px, 4vw, 48px);
+    padding-inline: 0;
+    padding-bottom: 0;
+}
+
+.svPage .svWrap .svPtypes > * {
+    grid-column: 2;
+}
+
 .svPage .svWrap .svTabs {
     display: grid;
     grid-template-columns: repeat(5, minmax(0, 1fr));
@@ -12894,14 +12933,16 @@ text-transform: none !important;
 
 .svPage .svWrap .svPanel {
     display: grid;
+    grid-column: 1 / -1;
     grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
     /* The tree column is centred as one block, the way the reference lays it out.
        Its height stays fixed at the taller (single) variant so centring doesn't
        re-position it when the tree is swapped. */
     align-items: center;
     gap: clamp(18px, 3vw, 36px);
+    margin: 0;
     padding: clamp(16px, 3vw, 30px);
-    border-radius: 18px;
+    border-radius: 0;
     background: var(--sv-cyan-soft);
 }
 
@@ -13294,7 +13335,8 @@ text-transform: none !important;
 
 .svPage .svWrap .svNote {
     display: block;
-    margin-top: var(--sv-text-gap);
+    margin-top: 0;
+    margin-bottom: 22px;
     color: var(--sv-muted);
     font-size: 14.5px;
     text-align: center;
@@ -13386,7 +13428,7 @@ text-transform: none !important;
     grid-template-columns: 340px minmax(0, 1fr);
     align-items: stretch;
     border: 0;
-    border-radius: clamp(24px, 3vw, 40px) 0 0 0;
+    border-radius: 0;
     box-shadow: none;
     overflow: visible;
 }
@@ -14861,8 +14903,12 @@ body.svVendorScope .sapMSltPicker .sapMSelectList:focus {
     background: #f4fffd;
 }
 
-.insurancePage .insuranceWrap {
-    margin-top: clamp(8px, 1vw, 14px);
+/* .insurancePage .insuranceWrap {
+    margin-top: clamp(4px, 0.5vw, 7px);
+} */
+
+.insurancePage .footer-shell {
+    margin-top: 0;
 }
 
 .insurancePage [data-insurance-mode="Health"] .healthInsuranceFooterButton,
