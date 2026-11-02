@@ -2,10 +2,11 @@ sap.ui.define([
   "sap/ui/core/mvc/Controller",
   "sap/ui/model/json/JSONModel",
   "../model/formatter",
+  "sap/m/MessageToast",
   "sap/ui/unified/CalendarLegend",
   "sap/ui/unified/CalendarLegendItem",
   "sap/ui/unified/DateTypeRange"
-], function (Controller, JSONModel, Formatter) {
+], function (Controller, JSONModel, Formatter, MessageToast) {
   "use strict";
 
   return Controller.extend("sap.ui.com.project1.controller.BaseController", {
@@ -344,6 +345,148 @@ sap.ui.define([
       }
     },
 
+    _openAdvertisementPreview: async function (oEvent) {
+      const oView = this.getView();
+      const oSource = oEvent.getSource();
+      const oContext = oSource.getBindingContext("AdvertisementModel");
+      const aPathMatch = oContext?.getPath().match(/\/(\d+)$/);
+      const iPageIndex = aPathMatch ? Number(aPathMatch[1]) : 0;
+      const oAdvertisement = oContext?.getObject();
+
+      try {
+        await this._preloadAdvertisementImage(oAdvertisement?.image, oSource.getDomRef());
+        const oDialog = await this._loadAdvertisementPreviewDialog();
+        if (oView.bIsDestroyed) {
+          oDialog.destroy();
+          this._oAdvertisementPreviewDialog = null;
+          return;
+        }
+
+        const oAdvertisementModel = oView.getModel("AdvertisementModel");
+        const oCarousel = oView.byId("advertisementPreviewCarousel");
+        if (!oAdvertisementModel || !oCarousel || oCarousel.bIsDestroyed) {
+          throw new Error("Advertisement preview is not available");
+        }
+
+        // The dialog is a view dependent, but assigning the current model
+        // explicitly also covers model replacement and hot-reload scenarios.
+        oDialog.setModel(oAdvertisementModel, "AdvertisementModel");
+        const fnActivatePage = function () {
+          const oPage = oCarousel.getPages()[iPageIndex];
+          if (oPage) {
+            oCarousel.setActivePage(oPage.getId());
+          }
+          return !!oPage;
+        };
+
+        if (!fnActivatePage()) {
+          oCarousel.getBinding("pages")?.attachEventOnce("change", fnActivatePage);
+        }
+        oDialog.open();
+      } catch (oError) {
+        this._stopAdvertisementPreviewAutoSlide();
+        if (this._oAdvertisementPreviewDialog && !this._oAdvertisementPreviewDialog.bIsDestroyed) {
+          this._oAdvertisementPreviewDialog.destroy();
+        }
+        this._oAdvertisementPreviewDialog = null;
+        this._pAdvertisementPreviewDialog = null;
+        if (!oView.bIsDestroyed) {
+          console.error("Failed to load advertisement preview:", oError);
+          MessageToast.show(this.getI18nText("errorOccurred"));
+        }
+      }
+    },
+
+    _loadAdvertisementPreviewDialog: function () {
+      if (this._oAdvertisementPreviewDialog && !this._oAdvertisementPreviewDialog.bIsDestroyed) {
+        return Promise.resolve(this._oAdvertisementPreviewDialog);
+      }
+
+      this._oAdvertisementPreviewDialog = null;
+      if (!this._pAdvertisementPreviewDialog) {
+        this._pAdvertisementPreviewDialog = this.loadFragment({
+          name: "sap.ui.com.project1.fragment.AdvertisementPreview"
+        }).then(function (oDialog) {
+          this._oAdvertisementPreviewDialog = oDialog;
+          this._pAdvertisementPreviewDialog = null;
+          return oDialog;
+        }.bind(this), function (oError) {
+          this._pAdvertisementPreviewDialog = null;
+          throw oError;
+        }.bind(this));
+      }
+
+      return this._pAdvertisementPreviewDialog;
+    },
+
+    _preloadAdvertisementImage: function (sSource, oRenderedImage) {
+      if (oRenderedImage?.complete && oRenderedImage.naturalWidth > 0) {
+        return Promise.resolve();
+      }
+
+      return new Promise(function (resolve, reject) {
+        if (!sSource) {
+          reject(new Error("Advertisement image source is missing"));
+          return;
+        }
+
+        const oImage = new window.Image();
+        oImage.onload = resolve;
+        oImage.onerror = function () {
+          reject(new Error("Advertisement image could not be loaded"));
+        };
+        oImage.src = sSource;
+      });
+    },
+
+    onAdvertisementPreviewAfterOpen: function (oEvent) {
+      this._stopAdvertisementPreviewAutoSlide();
+      const oDialog = oEvent.getSource();
+      const oCarousel = this.byId("advertisementPreviewCarousel");
+      if (!oCarousel || oCarousel.getPages().length <= 1) {
+        return;
+      }
+
+      // UI5 1.136 has no native Carousel auto-play property.
+      this._iAdvertisementPreviewTimer = setInterval(function () {
+        if (oDialog.bIsDestroyed || oCarousel.bIsDestroyed || !oDialog.isOpen()) {
+          this._stopAdvertisementPreviewAutoSlide();
+          return;
+        }
+        if (oCarousel.getPages().length > 1) {
+          oCarousel.next();
+        }
+      }.bind(this), 3000);
+    },
+
+    _stopAdvertisementPreviewAutoSlide: function () {
+      clearInterval(this._iAdvertisementPreviewTimer);
+      this._iAdvertisementPreviewTimer = null;
+    },
+
+    onCloseAdvertisementPreview: function () {
+      this._stopAdvertisementPreviewAutoSlide();
+      this._oAdvertisementPreviewDialog?.close();
+    },
+
+    onAdvertisementPreviewAfterClose: function (oEvent) {
+      this._stopAdvertisementPreviewAutoSlide();
+      const oDialog = oEvent.getSource();
+      oDialog.destroy();
+      if (this._oAdvertisementPreviewDialog === oDialog) {
+        this._oAdvertisementPreviewDialog = null;
+      }
+      this._pAdvertisementPreviewDialog = null;
+    },
+
+    onAdvertisementPreviewImagePress: function () {
+      window.open(
+        "https://www.kalpavrikshatechnologies.com/",
+        "_blank",
+        "noopener,noreferrer"
+      );
+    },
+
     /* Stop autoplay for one carousel - using native auto-play properties */
     _pauseCarouselAutoSlide: function (carousel) {
       carousel.setAutoPlay(false);
@@ -382,6 +525,7 @@ sap.ui.define([
 
     /* Auto cleanup with View destruction */
     onExit: function () {
+      this._stopAdvertisementPreviewAutoSlide();
       this._clearAllCarouselTimers();
     },
 

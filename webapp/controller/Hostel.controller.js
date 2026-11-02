@@ -1590,6 +1590,7 @@ var sSelectedId = oButton?.data("stayId") || "Hotels";
             // The advertisement carousel of the rooms tab must not keep
             // sliding when the view is gone.
             this._stopAdCarouselAutoSlide();
+            this._stopAdvertisementPreviewAutoSlide();
         },
 
         /* ------------------------------------------------------------
@@ -1767,22 +1768,7 @@ var sSelectedId = oButton?.data("stayId") || "Hotels";
         },
 
         onAdvertisementImagePress: function (oEvent) {
-            const oImage = oEvent.getSource();
-            const oBindingContext = oImage.getBindingContext("AdvertisementModel");
-            const sMessage = this.i18nModel
-                ? this.i18nModel.getText("advertisementClicked")
-                : "Advertisement clicked";
-
-            if (oBindingContext) {
-                const oAdItem = oBindingContext.getObject();
-                if (oAdItem && oAdItem.url) {
-                    // Open the URL in a new tab
-                    window.open(oAdItem.url, "_blank");
-                    return;
-                }
-            }
-
-            MessageToast.show(sMessage);
+            return this._openAdvertisementPreview(oEvent);
         },
 
         onpressFilter: function () {

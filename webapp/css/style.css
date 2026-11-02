@@ -8643,9 +8643,13 @@ text-transform: none !important;
 }
 
 /* ===== Quick links footer ===== */
+.umPage .mainWrap {
+	margin-bottom: 6px;
+}
+
 .umPage .quickLinksWrap {
 	flex-shrink: 0;
-	margin-top: 32px;
+	margin-top: 0;
 }
 
 .umPage .quickLinksWrap .svFooter {
@@ -8661,7 +8665,7 @@ text-transform: none !important;
 }
 
 /* ===== Advertisement panel under the index ===== */
-/* Top spacing comes from the medium margin class in the view. */
+/* Top spacing comes from the small margin class in the view. */
 .umPage .umAdWrap {
 	width: 100%;
 	min-width: 0;
@@ -8669,7 +8673,7 @@ text-transform: none !important;
 }
 
 .umPage .umAdTitle {
-	margin: 0 0 6px 2px;
+	margin: 0 0 3px 2px;
 	color: var(--um-ink) !important;
 	font-size: 15px !important;
 }
@@ -8683,9 +8687,14 @@ text-transform: none !important;
 }
 
 .umPage .umAdWrap .adPanel > .sapMPanelContent {
+	padding: 0.25rem 0.5rem;
 	max-width: 100%;
 	box-sizing: border-box;
 	overflow-x: hidden;
+}
+
+.umPage .umAdWrap .sapUiTinyMargin {
+	margin: 0.25rem !important;
 }
 
 /* UI5 gives flex wrappers an inline automatic minimum width. */
@@ -14851,7 +14860,7 @@ body.svVendorScope .sapMSltPicker .sapMSelectList:focus {
 }
 
 .RoomsPage .roomsAdTitle {
-    margin: 0 0 6px 2px;
+    margin: 0 0 3px 2px;
     color: #0098a6 !important;
     font-size: 15px !important;
     font-weight: 700 !important;
@@ -14866,9 +14875,14 @@ body.svVendorScope .sapMSltPicker .sapMSelectList:focus {
 }
 
 .RoomsPage .roomsAdWrap .adPanel > .sapMPanelContent {
+    padding: 0.25rem 0.5rem;
     max-width: 100%;
     box-sizing: border-box;
     overflow-x: hidden;
+}
+
+.RoomsPage .roomsAdWrap .sapUiTinyMargin {
+    margin: 0.25rem !important;
 }
 
 /* UI5 gives flex wrappers an inline automatic minimum width. */
@@ -14879,9 +14893,33 @@ body.svVendorScope .sapMSltPicker .sapMSelectList:focus {
 
 /* The carousel carries a theme minimum width that is wider than this column,
    so it overflowed its flex item and pushed the picture off centre. */
-.RoomsPage .roomsAdWrap .sapMCrsl {
+.RoomsPage .roomsAdWrap .sapMCrsl,
+.advertisementPreviewDialog .sapMCrsl {
     min-width: 0 !important;
 }
+
+.advertisementPreviewDialog .sapMDialogScroll,
+.advertisementPreviewDialog .sapMDialogScrollCont {
+    height: 100%;
+    padding: 0;
+}
+
+.advertisementPreviewDialog .sapMDialogSection {
+    padding: 0;
+}
+
+.umPage .umAdWrap .sapMImg,
+.RoomsPage .roomsAdWrap .sapMImg,
+.advertisementPreviewImage {
+    /* UI5 centers carousel images beside a full-height inline pseudo-element. */
+    display: inline-block;
+    max-width: 100%;
+    max-height: 100%;
+    margin-inline: auto;
+    object-fit: contain;
+    object-position: center;
+}
+
 .cardwidth{
     width: 280px !important;
     min-width: 280px;

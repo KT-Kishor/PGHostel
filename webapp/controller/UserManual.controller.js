@@ -653,23 +653,7 @@ _stopAdvertisementCarouselAutoSlide: function () {
 },
 
 onAdvertisementImagePress: function (oEvent) {
-    const oImage = oEvent.getSource();
-    const oBindingContext = oImage.getBindingContext("AdvertisementModel");
-    const oBundle = this._bundle();
-    const sMessage = oBundle
-        ? oBundle.getText("advertisementClicked")
-        : "Advertisement clicked";
-
-    if (oBindingContext) {
-        const oAdItem = oBindingContext.getObject();
-        if (oAdItem && oAdItem.url) {
-            // Open the URL in a new tab
-            window.open(oAdItem.url, "_blank");
-            return;
-        }
-    }
-
-    MessageToast.show(sMessage);
+    return this._openAdvertisementPreview(oEvent);
 },
 
 onExit: function () {

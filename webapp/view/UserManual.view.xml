@@ -107,7 +107,7 @@
 									<Carousel
 										id="AdvertisementCarousel"
 										height="215px"
-										showPageIndicator="true"
+										showPageIndicator="false"
 										arrowsPlacement="Content"
 										loop="true"
 										pages="{
@@ -120,7 +120,7 @@
 												src="{AdvertisementModel>image}"
 												alt="{AdvertisementModel>title}"
 												width="100%"
-												height="170px"
+												height="100%"
 												press="onAdvertisementImagePress"
 											/>
 										</pages>
