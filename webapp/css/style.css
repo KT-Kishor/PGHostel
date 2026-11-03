@@ -14958,17 +14958,81 @@ body.svVendorScope .sapMSltPicker .sapMSelectList:focus {
     height: auto !important;
 }
 
+.insurancePage .svWrap .insuranceBanner {
+    --insurance-form-gutter: clamp(20px, 3.5vw, 40px);
+    --insurance-logo-gutter: 20px;
+    padding-left: var(--insurance-logo-gutter);
+    padding-right: var(--insurance-form-gutter);
+}
+
+.insurancePage .svWrap .insuranceBannerLayout {
+    display: grid;
+    grid-template-columns: 295px minmax(0, 1fr);
+    align-items: center;
+    column-gap: calc(var(--insurance-form-gutter) - var(--insurance-logo-gutter));
+    width: 100%;
+}
+
+.insurancePage .svWrap .insurancePartnerLogo {
+    display: block;
+    justify-self: start;
+    width: 280px !important;
+    max-width: 100%;
+    height: auto !important;
+    border-radius: 24px;
+    box-shadow: 0 14px 30px rgba(0, 73, 83, .18);
+}
+
+.insurancePage .svWrap .insuranceBannerCopy {
+    justify-self: start;
+    width: 100%;
+    max-width: 1024px;
+    row-gap: var(--sv-text-gap);
+}
+
+.insurancePage .svWrap .insuranceBannerCopy .svH2,
+.insurancePage .svWrap .insuranceBannerCopy .svSub,
+.insurancePage .svWrap .insuranceBannerCopy .insuranceDisclaimer {
+    width: 100%;
+    max-width: 100%;
+    margin: 0;
+    text-align: left;
+}
+
 .insurancePage .svWrap .insuranceBanner .svSub {
-    max-width: 76ch;
+    max-width: 100%;
 }
 
 .insurancePage .svWrap .insuranceDisclaimer {
     display: block;
-    max-width: 76ch;
-    margin: 14px auto 0;
+    width: 100%;
+    max-width: 100%;
+    margin: 0;
     color: #fff;
     font-size: 13px;
     opacity: .9;
+}
+
+@media (max-width: 960px) {
+    .insurancePage .svWrap .insuranceBanner {
+        padding-left: var(--insurance-form-gutter);
+    }
+
+    .insurancePage .svWrap .insuranceBannerLayout {
+        grid-template-columns: minmax(0, 1fr);
+        row-gap: 24px;
+    }
+
+    .insurancePage .svWrap .insurancePartnerLogo {
+        justify-self: center;
+        width: clamp(160px, 38vw, 220px) !important;
+    }
+
+    .insurancePage .svWrap .insuranceBannerCopy {
+        justify-self: center;
+        width: 90vw;
+        max-width: 100%;
+    }
 }
 
 .insurancePage .svWrap .svStep[data-insurance-complete="true"] .svStepN {

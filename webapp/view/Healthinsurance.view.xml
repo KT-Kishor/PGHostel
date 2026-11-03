@@ -16,14 +16,31 @@
                 <VBox class="svVendorSection svReg" renderType="Bare">
                     <HBox class="svRegCard" renderType="Bare">
                         <VBox class="svRegHeader insuranceBanner" renderType="Bare">
-                            <Title
-                                text="{= ${HealthInsuranceModel>/sPath} === 'Health' ? ${i18n>insuranceHealthBannerTitle} : ${i18n>insuranceTravelBannerTitle} }"
-                                level="H1" wrapping="true" textAlign="Center" class="svH2"/>
-                            <Text
-                                text="{= ${HealthInsuranceModel>/sPath} === 'Health' ? ${i18n>insuranceHealthBannerLead} : ${i18n>insuranceTravelBannerLead} }"
-                                textAlign="Center" class="svSub"/>
-                            <Text text="{i18n>InsuranceisofferedbyourlicensedpartnersStayVrikshaisnotaninsurer}"
-                                  textAlign="Center" class="insuranceDisclaimer"/>
+                            <HBox class="insuranceBannerLayout" renderType="Bare" alignItems="Center">
+                                <Image src="./image/niva-bupa-logo.svg"
+                                       alt="{i18n>insuranceNivaBupaLogoAlt}"
+                                       decorative="false" densityAware="false"
+                                       class="insurancePartnerLogo"/>
+                                <VBox class="insuranceBannerCopy" renderType="Bare" alignItems="Start">
+                                    <Title
+                                        text="{= ${HealthInsuranceModel>/sPath} === 'Health' ? ${i18n>insuranceHealthBannerTitle} : ${i18n>insuranceTravelBannerTitle} }"
+                                        level="H1" wrapping="true" textAlign="Left" class="svH2"/>
+                                    <Text
+                                        text="{= ${HealthInsuranceModel>/sPath} === 'Health' ? ${i18n>insuranceHealthBannerLead}.split('\n\n')[0] : ${i18n>insuranceTravelBannerLead}.split('\n\n')[0] }"
+                                        textAlign="Left" class="svSub"/>
+                                    <Text
+                                        text="{= ${HealthInsuranceModel>/sPath} === 'Health' ? ${i18n>insuranceHealthBannerLead}.split('\n\n')[1] : ${i18n>insuranceTravelBannerLead}.split('\n\n')[1] }"
+                                        textAlign="Left" class="svSub"/>
+                                    <Text
+                                        text="{= ${HealthInsuranceModel>/sPath} === 'Health' ? ${i18n>insuranceHealthBannerLead}.split('\n\n')[2] : ${i18n>insuranceTravelBannerLead}.split('\n\n')[2] }"
+                                        textAlign="Left" class="svSub"/>
+                                    <Text
+                                        text="{= ${HealthInsuranceModel>/sPath} === 'Health' ? ${i18n>insuranceHealthBannerLead}.split('\n\n')[3] : ${i18n>insuranceTravelBannerLead}.split('\n\n')[3] }"
+                                        textAlign="Left" class="svSub"/>
+                                    <Text text="{= ${HealthInsuranceModel>/sPath} === 'Health' ? ${i18n>insuranceHealthBannerDisclaimer} : ${i18n>insuranceTravelBannerDisclaimer} }"
+                                          textAlign="Left" class="insuranceDisclaimer"/>
+                                </VBox>
+                            </HBox>
                         </VBox>
 
                         <VBox class="svSide" renderType="Bare">
