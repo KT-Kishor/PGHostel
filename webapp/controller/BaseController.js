@@ -479,12 +479,18 @@ sap.ui.define([
       this._pAdvertisementPreviewDialog = null;
     },
 
-    onAdvertisementPreviewImagePress: function () {
-      window.open(
-        "https://www.kalpavrikshatechnologies.com/",
-        "_blank",
-        "noopener,noreferrer"
-      );
+    onAdvertisementPreviewImagePress: function (oEvent) {
+      const sUrl = oEvent.getSource().getBindingContext("AdvertisementModel")?.getProperty("url");
+
+      try {
+        const oUrl = new URL(sUrl);
+        if (!["http:", "https:"].includes(oUrl.protocol)) {
+          throw new Error("Invalid advertisement URL protocol");
+        }
+        window.open(oUrl.href, "_blank", "noopener,noreferrer");
+      } catch (oError) {
+        MessageToast.show(this.getI18nText("errorOccurred"));
+      }
     },
 
     /* Stop autoplay for one carousel - using native auto-play properties */

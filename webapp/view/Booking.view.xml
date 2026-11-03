@@ -503,7 +503,7 @@
                             <Carousel
                                 id="AdvertisementCarousel"
                                 visible="{= ${AdvertisementModel>/Advertisements}.length > 0 }"
-                                showPageIndicator="true"
+                                showPageIndicator="false"
                                 arrowsPlacement="Content"
                                 loop="true"
                                 pages="{
