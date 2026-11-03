@@ -12,6 +12,7 @@ sap.ui.define([
 ], function (BaseController, JSONModel, MessageToast, MessageBox, utils, Formatter, Filter, FilterOperator, Fragment, encodeXML) {
     "use strict";
  
+    const ROOMS_PAGE_SIZE = 6;
     const $C = (id) => sap.ui.getCore().byId(id);
     // const $V = (id) => $C(id)?.getValue()?.trim() || "";
     this._otpResendInterval = null;
@@ -466,7 +467,7 @@ this._updateStaysData(oResourceBundle);
                 this._vrScrollToTop();
             }
 
-            this.iTop = 4; // records per load
+            this.iTop = ROOMS_PAGE_SIZE; // records per load
             this.iSkip = 0; // starting index
 
             this.flag = false
@@ -1421,7 +1422,7 @@ var sSelectedId = oButton?.data("stayId") || "Hotels";
             if (page && page.scrollTo) page.scrollTo(0, 0);
 
             this.flag = true;
-            this.iTop = 4;
+            this.iTop = ROOMS_PAGE_SIZE;
             this.iSkip = 0;
             this.roomtype = true;
 
@@ -3115,7 +3116,7 @@ const sSuccessMsg = this.i18nModel.getText("registrationSuccess", [
         },
 
         onSearchRooms: async function () {
-            this.iTop = 4
+            this.iTop = ROOMS_PAGE_SIZE;
             this.iSkip = 0
             this.flag = true
             // const oContainer = this.byId("idBedTypeFlex");
@@ -3183,9 +3184,8 @@ const sSuccessMsg = this.i18nModel.getText("registrationSuccess", [
             oContainer.setBusy(true)
             this.isInitialLoad = false;
             this.isShowmore = false
-            const sPricerange = this.byId("id_Pricerange")?.getSelectedKey() || this.byId("id_Pricerange")?.getValue();
 
-            await this._loadFilteredData(this.Scity, this.sBranchCode, this.sACType, this.sPropertyType,sPricerange);
+            await this._loadFilteredData(this.Scity, this.sBranchCode, this.sACType, this.sPropertyType, this.sPricerange);
             oContainer.setBusy(false);
         },
 
@@ -3206,7 +3206,7 @@ const sSuccessMsg = this.i18nModel.getText("registrationSuccess", [
         },
 
         _loadRoomsPageData: async function () {
-            this.iTop = 4;
+            this.iTop = ROOMS_PAGE_SIZE;
             this.iSkip = 0;
 
             this.roomtype = false
@@ -3369,11 +3369,16 @@ const sSuccessMsg = this.i18nModel.getText("registrationSuccess", [
             const oView = this.getView();
             const oVisibilityModel = oView.getModel("VisibilityModel");
 
-            var data = this.getOwnerComponent().getModel("sBRModel").getData()
-            var Branchdata = data.filter((item) => {
-                return item.City === Scity && item.Status ==="Active"
-            })
-            this.Branchlength = Branchdata.length
+            const data = this.getOwnerComponent().getModel("sBRModel").getData();
+            const aPropertyTypes = (sPropertyType || "").split(",").map(sType => sType.trim()).filter(Boolean);
+            // Count all matching properties, not just the current paginated response.
+            this.Branchlength = data.filter(branch =>
+                branch.Status === "Active" &&
+                branch.City === Scity &&
+                (!sBranchCode || branch.LandMark === sBranchCode) &&
+                (!BranchName || branch.Name === BranchName) &&
+                (!aPropertyTypes.length || aPropertyTypes.includes(branch.PropertyType))
+            ).length;
 
             try {
                 let aBranchesData;
@@ -3389,28 +3394,6 @@ const sSuccessMsg = this.i18nModel.getText("registrationSuccess", [
                         priceRange:sPricerange
                     });
                     aBranchesData = response?.data || [];
-                    // this.Branchlength = aBranchesData.length || 0;
-
-                    if (this.getOwnerComponent().getModel("branchModel1")) {
-                        let oBRModel = this.getOwnerComponent().getModel("sBRModel");
-                        let existingBranchData = oBRModel.getData() || [];
-                        var Branchdata = existingBranchData.filter((item) => {
-                            return item.City === Scity
-                        })
-                        this.Branchlength = Branchdata.length
-
-                    }
-                    if (this.isShowmore === true) {
-                        var data = this.getOwnerComponent().getModel("sBRModel").getData()
-                        var Branchdata = data.filter((item) => {
-                            return item.City === Scity
-                        })
-
-                        this.Branchlength = Branchdata.length
-                    };
-                    if (sBranchCode || BranchName || sPropertyType) {
-                        this.Branchlength = aBranchesData.length
-                    }
                     let oAreaModel = this.getView().getModel("AreaModel");
                     let aExistingData = oAreaModel.getData() || [];
 
@@ -3449,15 +3432,16 @@ const sSuccessMsg = this.i18nModel.getText("registrationSuccess", [
                 // Property Type narrows whatever City / LandMark already matched.
                 // Applied client-side too because the cached BranchModel used on the
                 // initial load was fetched without a PropertyType.
-                if (sPropertyType) {
-                    const aPropertyTypes = sPropertyType.split(",").map(sType => sType.trim()).filter(Boolean);
+                if (aPropertyTypes.length) {
                     aFilteredBranches = aFilteredBranches.filter(branch =>
                         aPropertyTypes.includes(branch.PropertyType)
                     );
                 }
                 if (aFilteredBranches.length === 0) {
-                    oVisibilityModel.setProperty("/Branches", []);
-                    oVisibilityModel.setProperty("/NoData", true);
+                    if (this.iSkip === 0) {
+                        oVisibilityModel.setProperty("/Branches", []);
+                        oVisibilityModel.setProperty("/NoData", true);
+                    }
                     oVisibilityModel.setProperty("/ShowViewMore", false);
                     return;
                 }
@@ -3504,6 +3488,7 @@ const sSuccessMsg = this.i18nModel.getText("registrationSuccess", [
                 this.sBranchCode = sBranchCode
                 this.sACType = BranchName
                 this.sPropertyType = sPropertyType
+                this.sPricerange = sPricerange;
                 if (this.iSkip === 0) {
                     oVisibilityModel.setProperty("/Branches", aBranches);
                 } else {
@@ -3511,7 +3496,7 @@ const sSuccessMsg = this.i18nModel.getText("registrationSuccess", [
                     oVisibilityModel.setProperty("/Branches", [...existing, ...aBranches]);
                 }
 
-                oVisibilityModel.setProperty("/ShowViewMore", oVisibilityModel.getProperty("/Branches").length !== this.Branchlength);
+                oVisibilityModel.setProperty("/ShowViewMore", oVisibilityModel.getProperty("/Branches").length < this.Branchlength);
                 if (oView.getModel("VisibilityModel").getData().Branches.length === 0) {
                     oView.getModel("VisibilityModel").setProperty("/NoData", true);
                 } else {
