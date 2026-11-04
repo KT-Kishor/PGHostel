@@ -14526,7 +14526,7 @@ body.svVendorScope .sapMSltPicker .sapMSelectList:focus {
 }
 .stickyFilterContainer {
     position: sticky;
-    top: 1rem;               /* Offset distance from the top of the viewport/parent */
+    top: 0.7rem;
     z-index: 10;
     max-height: calc(100vh - 2rem);
     overflow-y: auto;   
@@ -14538,8 +14538,8 @@ body.svVendorScope .sapMSltPicker .sapMSelectList:focus {
     display: flex;
     flex-direction: row;
     align-items: flex-start;
-    /* gap: 1rem; */
     width: 100%;
+    padding: 0.35rem;
     box-sizing: border-box;
 }
 
@@ -14553,6 +14553,31 @@ body.svVendorScope .sapMSltPicker .sapMSelectList:focus {
     flex: 1 1 0;
     width: 0;
     min-width: 0;
+}
+
+/* Two adjacent 0.35rem insets form one consistent 0.7rem visual gutter. */
+.RoomsPage .roomsContentContainer .sapUiRespGrid {
+    padding: 0;
+    box-sizing: border-box;
+}
+
+.RoomsPage .roomsContentContainer .sapUiRespGrid > div[class*="sapUiRespGridSpan"] {
+    padding: 0.35rem;
+    box-sizing: border-box;
+}
+
+.RoomsPage .roomsContentContainer .BranchCard {
+    margin: 0 !important;
+}
+
+.RoomsPage .footer-shell {
+    margin-top: 0 !important;
+}
+
+@media screen and (min-width: 768px) {
+    .RoomsPage .stickyFilterContainer {
+        margin: 0.35rem !important;
+    }
 }
 
 /* Mobile: vertical layout */
@@ -14604,8 +14629,7 @@ body.svVendorScope .sapMSltPicker .sapMSelectList:focus {
         display: flex;
         flex-direction: column;
         width: 100%;
-        /* gap: 0.75rem; */
-        padding: 0 !important;
+        padding: 0.35rem !important;
         margin: 0 !important;
         box-sizing: border-box;
     }
@@ -14615,9 +14639,9 @@ body.svVendorScope .sapMSltPicker .sapMSelectList:focus {
         position: static !important;
         top: auto !important;
         flex: 0 0 auto;
-        width: calc(100% - 16px) !important;
-        max-width: calc(100% - 16px) !important;
-        margin: 10px 8px !important;
+        width: calc(100% - 0.7rem) !important;
+        max-width: calc(100% - 0.7rem) !important;
+        margin: 0.35rem !important;
         padding: 0 !important;
         box-sizing: border-box;
     }

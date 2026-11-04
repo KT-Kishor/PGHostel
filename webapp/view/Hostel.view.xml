@@ -695,10 +695,10 @@
                                                 class="minHeight100 flexGrow1"
                                                 justifyContent="SpaceBetween"
                                             >
-                                              <HBox width="100%" alignItems="Start"  class="sapUiSmallMargin roomsMainLayout">
+                                              <HBox width="100%" alignItems="Start"  class="roomsMainLayout">
     
     <!-- ===== LEFT SIDE: VERTICAL FILTER BAR ===== -->
-    <VBox width="300px"  class="sapUiTinyMarginTop sapUiTinyMarginEnd stickyFilterContainer">
+    <VBox width="300px"  class="stickyFilterContainer">
         <fb:FilterBar
             id="filterbar"
             persistencyKey="myPersKey"
@@ -885,8 +885,8 @@
             id="idBedTypeFlex"
             defaultSpan="XL4 L4 M6 S12"
             containerQuery="true"
-            hSpacing="1"
-            vSpacing="1"
+            hSpacing="0"
+            vSpacing="0"
             content="{path: 'VisibilityModel>/Branches'}"
             visible="{= !${VisibilityModel>/NoData} }"
         >
