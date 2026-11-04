@@ -3134,27 +3134,14 @@ const sSuccessMsg = this.i18nModel.getText("registrationSuccess", [
             // AC Type
             const sSelectedACType = this.byId("id_Roomtype")?.getSelectedKey() || this.byId("id_Roomtype")?.getValue();
 
-
             // Locality ComboBox
             var oAreaCB = this.byId("id_Area");
             var sSelectedBranch = oAreaCB.getSelectedKey() || oAreaCB.getValue();
-            var areaList = this.getView().getModel("AreaModel").getData() || [];
-            // Check if selected or typed locality is valid
-            var validArea = areaList.find(item => item.LandMark === sSelectedBranch || item.BranchID === sSelectedBranch);
-
-            if (sSelectedBranch && !validArea) {
-                // User typed something, but it does not match the list
-                MessageToast.show(this.i18nModel.getText("pleaseselectlocality"));
-                // oContainer.setBusy(false);
-                return;
-            }
-            // If locality is empty, keep it empty (search by city only)
-            var finalBranch = validArea ? validArea.LandMark : "";
-            if (finalBranch === "") this.byId("id_Area").setValueState("None");
 
             // Property Type MultiComboBox. The API expects one comma-separated value.
             var oPropertyTypeCB = this.byId("id_PropertyType");
-            var sSelectedPropertyType = this._getSelectedPropertyTypes(oPropertyTypeCB).join(",");
+            var aSelectedPropertyTypes = this._getSelectedPropertyTypes(oPropertyTypeCB);
+            var sSelectedPropertyType = aSelectedPropertyTypes.join(",");
             oPropertyTypeCB.setValueState("None");
 
             const sPricerange = this.byId("id_Pricerange")?.getSelectedKey() || this.byId("id_Pricerange")?.getValue();
@@ -3166,13 +3153,52 @@ const sSuccessMsg = this.i18nModel.getText("registrationSuccess", [
 
             try {
                 this.getBusyDialog()
-                await this._loadFilteredData(oBranchcity, finalBranch, sSelectedACType, sSelectedPropertyType,sPricerange);
-                this.closeBusyDialog()
+                const aBranchData = await this.Branchdata();
+                this.getOwnerComponent().getModel("sBRModel").setData(aBranchData);
+
+                // Search must use current metadata so validation and the total
+                // match count reflect backend changes without a page reload.
+                const areaList = aBranchData.filter(item =>
+                    item.Status === "Active" &&
+                    item.City === oBranchcity &&
+                    (!aSelectedPropertyTypes.length || aSelectedPropertyTypes.includes(item.PropertyType))
+                );
+                const oAreaModel = this.getView().getModel("AreaModel");
+                if (oAreaModel) {
+                    oAreaModel.setData(areaList);
+                } else {
+                    this.getView().setModel(new JSONModel(areaList), "AreaModel");
+                }
+                this._populateUniqueFilterValues(areaList);
+                this._populateUniqueFilterValuesBranch(aBranchData);
+                this.byId("id_Branch").setSelectedKey(oBranchcity);
+
+                if (sSelectedACType) {
+                    const bValidPropertyName = areaList.some(item => item.Name === sSelectedACType);
+                    this.byId("id_Roomtype")[bValidPropertyName ? "setSelectedKey" : "setValue"](sSelectedACType);
+                }
+
+                // Check the selected or typed locality against the fresh data.
+                const validArea = areaList.find(item =>
+                    item.LandMark === sSelectedBranch || item.BranchID === sSelectedBranch
+                );
+                if (sSelectedBranch && !validArea) {
+                    oAreaCB.setValue(sSelectedBranch);
+                    oAreaCB.setValueState("Error");
+                    MessageToast.show(this.i18nModel.getText("pleaseselectlocality"));
+                    return;
+                }
+
+                const finalBranch = validArea ? validArea.LandMark : "";
+                oAreaCB.setSelectedKey(finalBranch);
+                oAreaCB.setValueState("None");
+                await this._loadFilteredData(oBranchcity, finalBranch, sSelectedACType, sSelectedPropertyType, sPricerange);
 
             } catch (e) {
                 console.log(e);
+                MessageToast.show(this.i18nModel.getText("errorOccurred"));
             } finally {
-                // oContainer.setBusy(false);
+                this.closeBusyDialog();
             }
         },
         onViewMoreRooms: async function () {
@@ -3200,7 +3226,7 @@ const sSuccessMsg = this.i18nModel.getText("registrationSuccess", [
             return Array.isArray(aData) ? aData : [];
         },
         Branchdata: async function () {
-            const response = await this.ajaxReadWithJQuery("HM_BranchData", "");
+            const response = await this.ajaxReadWithJQuery("HM_BranchData", { _: Date.now() });
             let aData = response?.data || [];
             return Array.isArray(aData) ? aData : [];
         },
