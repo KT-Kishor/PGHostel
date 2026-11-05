@@ -89,6 +89,8 @@
 					<OverflowToolbar>
 						<Title text="{i18n>MSstaffheading} ({= ${mainModel>/}.length})"/>
 						<ToolbarSpacer />
+						<Button id="MS_id_ResendMailButton" text="{i18n>resendMail}" press="MS_onResendMail" tooltip="{i18n>resendMail}"
+                            enabled="false" class="myUnifiedBtn"/>
 						<Button text="{i18n>MSadd}" press="HM_AddHostelFeature" tooltip="{i18n>MSadd}"
                             class="myUnifiedBtn"/>
 						<Button id="MS_id_EditButton" text="{i18n>MSedit}" press="HM_EditHostelFeature" tooltip="{i18n>MSedit}"

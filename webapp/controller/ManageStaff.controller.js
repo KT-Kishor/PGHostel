@@ -46,16 +46,63 @@ sap.ui.define([
             return this.getStyledGroupHeader(oGroup);
         },
 
-        _setStaffActionButtonsEnabled: function(bEnabled) {
+        _setStaffActionButtonsEnabled: function(bEnabled, bResendMailEnabled = false) {
             this.byId("MS_id_EditButton")?.setEnabled(bEnabled);
             this.byId("MS_id_DeleteButton")?.setEnabled(bEnabled);
+            this.byId("MS_id_ResendMailButton")?.setEnabled(bResendMailEnabled && !this._bResendingMail);
         },
 
-        onStaffSelectionChange: function(oEvent) {
-            const oSelectedItem = oEvent.getParameter("listItem");
+        onStaffSelectionChange: function() {
+            const oSelectedItem = this.byId("MS_id_ManageStaff").getSelectedItem();
             const oData = oSelectedItem?.getBindingContext("mainModel")?.getObject();
 
-            this._setStaffActionButtonsEnabled(oData?.Role !== "Admin");
+            this._setStaffActionButtonsEnabled(
+                oData?.Role !== "Admin",
+                !!oData && oData.Role !== "Admin" && oData.Role !== "SuperAdmin"
+            );
+        },
+
+        MS_onResendMail: async function() {
+            const oSelectedItem = this.byId("MS_id_ManageStaff").getSelectedItem();
+            const oData = oSelectedItem?.getBindingContext("mainModel")?.getObject();
+
+            if (!oData || oData.Role === "Admin" || oData.Role === "SuperAdmin" || this._bResendingMail) {
+                return;
+            }
+
+            this._bResendingMail = true;
+            this.byId("MS_id_ResendMailButton").setEnabled(false);
+            try {
+                this.getBusyDialog();
+                const oResponse = await this.ajaxCreateWithJQuery("CustomerresendSignupEmail", {
+                        UserName: oData.UserName,
+                        toEmailID: oData.EmailID
+                });
+                if (oResponse?.success === true) {
+                    MessageBox.success(
+                        this.i18nModel.getText("resendMailSuccessToEmail", [oData.EmailID]),
+                        {
+                            styleClass: "myUnifiedBtn",
+                            onClose: () => {
+                                this.byId("MS_id_ManageStaff").removeSelections(true);
+                                this.onStaffSelectionChange();
+                            }
+                        }
+                    );
+                } else {
+                    MessageToast.show(
+                        oResponse?.message ||
+                        (typeof oResponse === "string" ? oResponse : JSON.stringify(oResponse)) ||
+                        this.i18nModel.getText("technicalError")
+                    );
+                }
+            } catch (err) {
+                MessageToast.show(err.responseJSON?.message || err.responseText || err.message || this.i18nModel.getText("technicalError"));
+            } finally {
+                this._bResendingMail = false;
+                this.closeBusyDialog();
+                this.onStaffSelectionChange();
+            }
         },
 
         _initEmptyMDModel: function() {
@@ -364,6 +411,9 @@ sap.ui.define([
         },
 
          Onsearch: function(flag, bBusyAlreadyOpen) {
+            this.byId("MS_id_ManageStaff").removeSelections(true);
+            this._setStaffActionButtonsEnabled(true);
+
             const oExistingModel = this.getOwnerComponent().getModel("LoginModel").getData();
             const omainModel = this.getOwnerComponent().getModel("mainModel")?.getData() || [];
             var oView = this.getView();
