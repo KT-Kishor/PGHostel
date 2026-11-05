@@ -5386,6 +5386,13 @@ const sSuccessMsg = this.i18nModel.getText("registrationSuccess", [
                 return;
             }
 
+            const isImage = ["image/jpeg", "image/jpg", "image/png"].includes(file.type);
+            if (file.size > VR_MAX_BYTES && !isImage) {
+                this._vrSetSignupMessage("DocumentError", "fileExceeds400KB", [file.name]);
+                if (oUploader) oUploader.clear();
+                return;
+            }
+
             const oTask = {};
             this._adminUploadTask = oTask;
             oModel.setProperty("/ProcessingActive", true);
@@ -5401,7 +5408,6 @@ const sSuccessMsg = this.i18nModel.getText("registrationSuccess", [
             let processedFile = file;
             const MAX_SIZE_KB = 400;
             const iMaxSizeBytes = VR_MAX_BYTES;
-            const isImage = ["image/jpeg", "image/jpg", "image/png"].includes(file.type);
 
             try {
                 if (file.size > iMaxSizeBytes && isImage) {
@@ -5419,8 +5425,6 @@ const sSuccessMsg = this.i18nModel.getText("registrationSuccess", [
                     if (processedFile.size > iMaxSizeBytes) {
                         throw Object.assign(new Error("File compression failed"), { i18nKey: "fileCompressionFailed", i18nArgs: [file.name] });
                     }
-                } else if (file.size > iMaxSizeBytes && !isImage) {
-                    throw Object.assign(new Error("File size limit exceeded"), { i18nKey: "fileExceeds400KB", i18nArgs: [file.name] });
                 }
 
                 // Convert to Base64
@@ -5460,11 +5464,6 @@ const sSuccessMsg = this.i18nModel.getText("registrationSuccess", [
                 const aDocs = oModel.getProperty("/Documents") || [];
                 aDocs.push(newDoc);
                 oModel.setProperty("/Documents", aDocs);
-
-                // Clear error highlight
-                const table = this.byId("adminAttachmentTable");
-                if (table) table.removeStyleClass("fileErrorHighlight");
-
             } catch (err) {
                 if (!this._vrExited) {
                     this._removeProcessingRow(sTempId);
@@ -5518,7 +5517,6 @@ const sSuccessMsg = this.i18nModel.getText("registrationSuccess", [
             // -------- FORCE TABLE REFRESH --------
             const oTable = C("adminAttachmentTable");
             oTable?.getBinding("items")?.refresh(true);
-            oTable?.removeStyleClass("fileErrorHighlight");
             // -------- RESET CONTROLS (IMPORTANT ORDER) --------
             ["adminSalutation", "adminVendorName", "adminDOB", "adminGender", "adminEmail", "adminsignUpCountry", "adminsignUpState", "adminsignUpCity", "adminsignUpSTD", "adminMobileNo", "adminAddress", "adminDocType"].forEach(id => {
                 const c = C(id);
@@ -5753,7 +5751,6 @@ const sSuccessMsg = this.i18nModel.getText("registrationSuccess", [
             const oView = this.getView();
             const oModel = oView.getModel("AdminSignupModel");
             if (oModel.getProperty("/Submitting") || oModel.getProperty("/ProcessingActive")) return;
-            const table = this.byId("adminAttachmentTable");
 
             // Get button
             const oButton = oEvent.getSource();
@@ -5793,11 +5790,7 @@ const sSuccessMsg = this.i18nModel.getText("registrationSuccess", [
 
             oModel.setProperty("/DocTypeEnabled", true);
 
-            // Highlight if empty
-            if (docs.length === 0) {
-                table?.addStyleClass("fileErrorHighlight");
-            }
-            oModel.setProperty("/DocumentError", "");
+            this._vrSetSignupMessage("DocumentError", docs.length ? "" : "vrErrDocRequired");
             this._updateAdminSignupProgress();
         },
 

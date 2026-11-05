@@ -13941,6 +13941,19 @@ text-transform: none !important;
     outline-offset: 2px;
 }
 
+.svPage .svWrap .svDrop[data-vendor-error="true"],
+.svPage .svWrap .svDrop[data-vendor-error="true"]:hover,
+.svPage .svWrap .svDrop[data-vendor-error="true"].svDropOver {
+    border-style: solid;
+    border-color: var(--sv-error);
+    opacity: 1;
+    border-width: 1.7px;
+}
+
+.svPage .svWrap .svDrop[data-vendor-error="true"]:focus-within {
+    outline-color: var(--sv-error);
+}
+
 .svPage .svWrap .svDropIcon {
     width: 38px;
     height: 38px;

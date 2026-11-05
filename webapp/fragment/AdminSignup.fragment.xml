@@ -192,6 +192,8 @@
                 <customData>
                     <core:CustomData key="vendor-disabled" writeToDom="true"
                                      value="{= !${AdminSignupModel>/CurrentDocType} || ${AdminSignupModel>/ProcessingActive} || ${AdminSignupModel>/Submitting} ? 'true' : 'false' }"/>
+                    <core:CustomData key="vendor-error" writeToDom="true"
+                                     value="{= ${AdminSignupModel>/DocumentError} ? 'true' : 'false' }"/>
                 </customData>
                 <core:Icon src="sap-icon://upload" class="svDropIcon"/>
                 <Text text="{= ${AdminSignupModel>/CurrentDocType} ? ${i18n>vrDocStep2}.replace('{0}', ${AdminSignupModel>/CurrentDocType}) : ${i18n>vrDocStepBlocked} }"
@@ -204,9 +206,9 @@
                                 enabled="{= !!${AdminSignupModel>/CurrentDocType} &amp;&amp; !${AdminSignupModel>/ProcessingActive} &amp;&amp; !${AdminSignupModel>/Submitting} }"
                                 change="onAdminFileSelect" typeMissmatch="onAdminFileTypeMismatch"
                                 fileType="jpg,jpeg,png,pdf"/>
+                <Text text="{AdminSignupModel>/DocumentError}" class="svErrText" width="100%" textAlign="Center"
+                      visible="{= !!${AdminSignupModel>/DocumentError} }"/>
             </VBox>
-            <Text text="{AdminSignupModel>/DocumentError}" class="svErrText"
-                  visible="{= !!${AdminSignupModel>/DocumentError} }"/>
             <List id="adminAttachmentTable" items="{AdminSignupModel>/Documents}" class="svFiles"
                   showSeparators="None" showNoData="false" width="100%">
                 <CustomListItem>

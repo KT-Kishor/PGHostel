@@ -48,11 +48,10 @@
 					<layoutData>
 						<l:GridData span="XL3 L3 M3 S12"/>
 					</layoutData>
-					<core:ListItem key="Mr." text="{i18n>mr}"/>
+					<core:ListItem key="Mr." text="{i18n>mr_}"/>
 					<core:ListItem key="Ms." text="{i18n>ms}"/>
 					<core:ListItem key="Mrs." text="{i18n>mrs}"/>
 					<core:ListItem key="Dr." text="{i18n>dr}"/>
-					<core:ListItem key="Other." text="{i18n>other}"/>
 				</ComboBox>
 				<Input
                 id="MS_id_signUpName"
