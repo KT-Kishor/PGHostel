@@ -46,6 +46,14 @@
                             showCloseButton="false"
                             class="sapUiTinyMarginBottom"
                         />
+                        <MessageStrip
+                            text="{i18n>pleaseselectStartDate}"
+                            type="Information"
+                            showIcon="true"
+                            showCloseButton="false"
+                            visible="{= !!${BookingView>/showPlanDateGuidance} &amp;&amp; !${HostelModel>/StartDate} }"
+                            class="sapUiTinyMarginBottom"
+                        />
 
                         <f:SimpleForm
                             editable="true"

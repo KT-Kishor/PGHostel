@@ -653,6 +653,7 @@ sap.ui.define([
             try {
                 const oView = this.getView();
                 const oSelected = oEvent.getSource().getBindingContext("VisibilityModel").getObject();
+                const oVisibilityModel = oView.getModel("VisibilityModel");
                 const sBranchCode = oSelected.BranchCode || "";
 
                  const filter = {
@@ -706,6 +707,8 @@ sap.ui.define([
                     AvailbleBeds: oSelected.AvailbleBeds,
                     CheckInTime: oSelected.CheckInTime,
                     CheckOutTime: oSelected.CheckOutTime,
+                    StartDate: Formatter.formatDateString(oVisibilityModel.getProperty("/FilterStartDate")),
+                    EndDate: Formatter.formatDateString(oVisibilityModel.getProperty("/FilterEndDate")),
                     Deposit: oSelected.Deposit,
                     DepositCurrency: oSelected.DepositCurrency,
                     GSTType: oSelected.GSTType,
@@ -2425,6 +2428,7 @@ sap.ui.define([
                 Description: oData.Description || "",
                 BranchCode: oData.BranchCode || "",
                 SelectedPriceType: oData.SelectedPriceType,
+                SelectedMonths: "1",
                 FinalPrice: oData.SelectedPriceValue,
                 Currency: oData.Currency || "INR",
                 Source: "UI5_HostelApp",
@@ -2436,6 +2440,9 @@ sap.ui.define([
                 YearPrice: oData.YearPrice,
                 CheckInTime: oData.CheckInTime,
                 CheckOutTime: oData.CheckOutTime,
+                StartDate: oData.StartDate || "",
+                EndDate: oData.EndDate || "",
+                RoomFilterDatesApplied: !!(oData.StartDate && oData.EndDate),
                 Deposit: oData.Deposit,
                 DepositCurrency: oData.DepositCurrency,
                 GSTValue: oData.GSTValue,

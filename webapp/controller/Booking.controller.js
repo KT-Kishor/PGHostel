@@ -163,6 +163,53 @@
             this._initializeBookingData();
             this._prefillLoggedInUser();
             this._syncPropertyTypeState();
+
+            const sPlan = oHostelModel.getProperty("/SelectedPriceType");
+            if (oIncomingBookingData.RoomFilterDatesApplied && (sPlan === "Per Month" || sPlan === "Per Year")) {
+                const oStartDate = this._parseDate(oIncomingBookingData.StartDate);
+                const oFilteredEndDate = this._parseDate(oIncomingBookingData.EndDate);
+                const iDuration = parseInt(oHostelModel.getProperty("/SelectedMonths") || "1", 10) || 1;
+                const oPlanEndDate = this._addMonthsClamped(oStartDate, sPlan === "Per Month" ? iDuration : iDuration * 12);
+
+                // Confirm before automatic checkout and availability checks replace the searched window.
+                if (oStartDate && oFilteredEndDate && oPlanEndDate && oFilteredEndDate.getTime() !== oPlanEndDate.getTime()) {
+                    const oBundle = this.getView().getModel("i18n").getResourceBundle();
+                    const oBookingView = this.getView().getModel("BookingView");
+                    const sContinue = oBundle.getText("continue");
+                    const sSelectDates = oBundle.getText("selectDates");
+                    this.closeBusyDialog();
+
+                    const sAction = await new Promise(resolve => {
+                        MessageBox.warning(oBundle.getText("bookingPlanDateMismatch", [
+                            this._formatDateToDDMMYYYY(oStartDate),
+                            this._formatDateToDDMMYYYY(oFilteredEndDate),
+                            oBundle.getText(sPlan === "Per Month" ? "perMonth" : "perYear"),
+                            oBundle.getText(sPlan === "Per Month" ? "facilityUnitMonth" : "facilityUnitYear").toLowerCase(),
+                            this._formatDateToDDMMYYYY(oPlanEndDate)
+                        ]), {
+                            title: oBundle.getText("DateMismatch"),
+                            actions: [sContinue, sSelectDates],
+                            emphasizedAction: sContinue,
+                            styleClass: "myUnifiedBtn",
+                            onClose: resolve
+                        });
+                    });
+
+                    if (oBookingView !== this.getView().getModel("BookingView") || !oHostelModel.getProperty("/RoomFilterDatesApplied")) {
+                        return;
+                    }
+
+                    if (sAction !== sContinue) {
+                        oHostelModel.setProperty("/StartDate", "");
+                        oHostelModel.setProperty("/EndDate", "");
+                        this._updateEndDateMinDate(null);
+                        oBookingView.setProperty("/showPlanDateGuidance", true);
+                    }
+
+                    this.getBusyDialog();
+                }
+            }
+
             this._syncPlanState();
             await this._loadFacilities();
             this._rebuildSelectedFacilities();
@@ -247,6 +294,7 @@
                 DurationOptions: this._buildKeyTextList(11),
                 showDurationSelector: false,
                 endDateEditable: false,
+                showPlanDateGuidance: false,
                 showFamilySection: false,
                 showGSTField: false,
                 showBusinessTravelOption: false,
@@ -5283,7 +5331,7 @@
             oModel.setProperty("/AvailablePaymentMethods", aPaymentMethods);
             oModel.setProperty("/SelectedMonths", String(oData.SelectedMonths || "1"));
             oModel.setProperty("/TodayDate", oData.TodayDate instanceof Date ? oData.TodayDate : oToday);
-            oModel.setProperty("/EndDateMinDate", oModel.getProperty("/TodayDate"));
+            this._updateEndDateMinDate(this._parseDate(oData.StartDate));
             oModel.setProperty("/AllSelectedFacilities", Array.isArray(oData.AllSelectedFacilities) ? oData.AllSelectedFacilities : []);
             oModel.setProperty("/TotalFacilityPrice", this._toNumber(oData.TotalFacilityPrice));
             oModel.setProperty("/CouponCode", oData.CouponCode || "");
@@ -5408,6 +5456,8 @@
 
             if (bHasDuration) {
                 this._updateAutoEndDate();
+            } else if (sPlan === "Per Day" && oModel.getProperty("/StartDate") && oModel.getProperty("/EndDate")) {
+                this._checkRoomAvailabilityForBooking();
             }
         },
 
