@@ -7460,11 +7460,77 @@ html, body {
     min-height: 100%;
 }
 
-/* Keep the date filter flush with the room sections without changing UI5 defaults. */
-.vrDateFilterSection,
-.vrDateFilterSection .sapUxAPObjectPageSubSection,
-.vrDateFilterSection .sapUxAPBlockContainer,
-.vrDateFilterSection.sapUxAPObjectPageSectionFirstVisible,
+/* View Rooms keeps the date filter and advertisements in one sidebar section. */
+.vrRoomsSidebarSection,
+.vrRoomsSidebarSection .sapUxAPObjectPageSubSection,
+.vrRoomsSidebarSection .sapUxAPBlockContainer,
+.vrRoomsSidebarSection .sapUxAPBlockBase {
+    margin: 0 !important;
+    padding: 0 !important;
+    background: transparent !important;
+}
+
+.vrRoomsSidebarSection .sapUxAPObjectPageSectionHeader,
+.vrRoomsSidebarSection .sapUxAPObjectPageSubSectionHeader {
+    display: none !important;
+}
+
+.vrRoomsSidebarSection .sapUxAPBlockContainer > .sapUiRespGrid {
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+.vrRoomsSidebarSection .sapUxAPBlockContainer > .sapUiRespGrid > div {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    box-sizing: border-box;
+}
+
+.vrRoomsSidebar .vrRoomDateFilterBar .sapUiCompFilterBarItems > div,
+.vrRoomsSidebar .vrRoomDateFilterBar .sapMDatePicker,
+.vrRoomsSidebar .vrRoomDateFilterBar .sapMInputBaseInner {
+    width: 100% !important;
+    min-width: 0 !important;
+    box-sizing: border-box;
+}
+
+.vrRoomContentSection .sapUxAPObjectPageSubSection,
+.vrRoomContentSection .sapUxAPBlockContainer,
+.vrRoomContentSection .sapUxAPBlockBase {
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+}
+
+.vrRoomContentSection .sapUxAPBlockContainer > .sapUiRespGrid,
+.vrRoomContentSection .sapUxAPBlockContainer > .sapUiRespGrid > div,
+.RoomsPage .vrRoomCardsGrid {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    box-sizing: border-box;
+}
+
+.RoomsPage .vrRoomCardsGrid > div[class*="sapUiRespGridSpan"] {
+    padding: 0.35rem !important;
+    box-sizing: border-box;
+}
+
+.RoomsPage .vrRoomContentSection .bedCard {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    box-sizing: border-box;
+}
+
+/* Keep the date filter flush with its shared teal sidebar. */
 .vrRoomDateFilterBar,
 .vrDateFilterSection .vrRoomDateFilterBar.sapUiCompFilterBar {
     margin: 0 !important;
@@ -7580,10 +7646,107 @@ html, body {
     margin-top: auto !important;
 }
 
+/* Desktop: reserve a fixed left rail while AC and Non-AC remain real OBL
+   sections, preserving their anchor-bar tabs and scroll targets. */
+@media (min-width: 769px) {
+    .vrObjectPageLayout .sapUxAPObjectPageContainer {
+        position: relative;
+        min-height: 38rem !important;
+        padding-left: calc(300px + 1.05rem) !important;
+        box-sizing: border-box;
+    }
+
+    .vrRoomsSidebarSection {
+        position: absolute !important;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        height: auto !important;
+        width: calc(300px + 1.05rem) !important;
+        max-width: calc(300px + 1.05rem) !important;
+        overflow-anchor: none;
+        box-sizing: border-box;
+        z-index: 2;
+    }
+
+    .vrRoomsSidebarSection.vrRoomsSidebarFixed {
+        position: fixed !important;
+        top: var(--vr-sidebar-fixed-top) !important;
+        bottom: auto !important;
+        left: var(--vr-sidebar-fixed-left) !important;
+        height: var(--vr-sidebar-fixed-height) !important;
+        overflow: clip;
+        z-index: 10;
+    }
+
+    .vrRoomsSidebarSection.vrRoomsSidebarHidden {
+        visibility: hidden;
+        pointer-events: none;
+    }
+
+    .RoomsPage .vrRoomsSidebar.stickyFilterContainer {
+        position: relative !important;
+        top: auto !important;
+        height: max(0px, calc(var(--vr-sidebar-fixed-height, 100vh) - 0.7rem)) !important;
+        max-height: none !important;
+        min-height: min-content !important;
+        display: flex !important;
+        flex-direction: column;
+        overflow: visible;
+        box-sizing: border-box;
+    }
+
+    /* Only move behind the header after flexible spacing reaches its minimum. */
+    .vrRoomsSidebarFixed .vrRoomsSidebar {
+        transform: translate3d(0, min(0px, calc(var(--vr-sidebar-fixed-height) - 100% - 0.7rem)), 0);
+        will-change: transform;
+    }
+
+    .RoomsPage .vrRoomsSidebar .vrRoomDateFilterBar {
+        flex: 0 0 auto;
+        padding-bottom: 0 !important;
+    }
+
+    .RoomsPage .vrRoomsSidebar.roomsFilterAdSection .roomsAdWrap {
+        flex: 1 0 auto;
+        margin-top: 0 !important;
+        display: flex !important;
+        flex-direction: column;
+        align-items: stretch;
+        justify-content: center !important;
+        justify-content: safe center !important;
+        box-sizing: border-box;
+    }
+
+    .RoomsPage .vrRoomsSidebar .roomsAdTitle,
+    .RoomsPage .vrRoomsSidebar .roomsAdWrap .adPanel {
+        flex: 0 0 auto;
+        width: 100% !important;
+        max-width: 100%;
+        box-sizing: border-box;
+    }
+
+    .vrRoomContentSection {
+        width: 100% !important;
+        max-width: 100% !important;
+        box-sizing: border-box;
+    }
+
+    .vrFooterSection {
+        width: calc(100% + 300px + 1.05rem) !important;
+        max-width: none !important;
+        margin-left: calc(-300px - 1.05rem) !important;
+    }
+}
+
 /* Mobile only: narrow the date filter bar so its inset matches the room cards
    (sapUiTinyMargin = 0.5rem). The global <=768px .sapUiCompFilterBar padding and the
    padded section wrappers stack up otherwise. Desktop stays untouched. */
 @media (max-width: 768px) {
+    .RoomsPage .vrRoomsSidebar.stickyFilterContainer {
+        height: auto !important;
+    }
+
     .vrDateFilterSection,
     .vrDateFilterSection .sapUxAPObjectPageSubSection,
     .vrDateFilterSection .sapUxAPBlockContainer {
@@ -14910,6 +15073,71 @@ body.svVendorScope .sapMSltPicker .sapMSelectList:focus {
 
 .RoomsPage .roomsFilterAdSection .roomsAdTitle {
     color: #ffffff !important;
+}
+
+.hostelRoomsSidebarRail,
+.hostelRoomsSidebarFrame {
+    width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+}
+
+@media (min-width: 768px) {
+    .hostelRoomsSidebarRail {
+        position: relative;
+        flex: 0 0 calc(300px + 0.7rem);
+        width: calc(300px + 0.7rem);
+        height: var(--hostel-sidebar-reserved-height, auto);
+        overflow-anchor: none;
+    }
+
+    .hostelRoomsSidebarFrame.hostelRoomsSidebarFixed {
+        position: absolute;
+        top: var(--hostel-sidebar-top);
+        left: 0;
+        width: 100%;
+        height: var(--hostel-sidebar-height);
+        overflow: clip;
+        z-index: 10;
+    }
+
+    .hostelRoomsSidebarFrame.hostelRoomsSidebarHidden {
+        visibility: hidden;
+        pointer-events: none;
+    }
+
+    .RoomsPage .hostelRoomsSidebar.stickyFilterContainer {
+        position: relative !important;
+        top: auto !important;
+        height: max(0px, calc(var(--hostel-sidebar-height, 100vh) - 0.7rem)) !important;
+        min-height: min-content !important;
+        max-height: none !important;
+        overflow: visible;
+    }
+
+    .hostelRoomsSidebarFixed .hostelRoomsSidebar {
+        transform: translate3d(0, min(0px, calc(var(--hostel-sidebar-height) - 100% - 0.7rem)), 0);
+        will-change: transform;
+    }
+
+    .RoomsPage .hostelRoomsSidebar .filterBarTheme {
+        flex: 0 0 auto;
+        padding-bottom: 0 !important;
+    }
+
+    .RoomsPage .hostelRoomsSidebar.roomsFilterAdSection .roomsAdWrap {
+        flex: 1 0 auto;
+        margin-top: 0 !important;
+        justify-content: safe center !important;
+    }
+
+    .RoomsPage .hostelRoomsSidebar .roomsAdTitle,
+    .RoomsPage .hostelRoomsSidebar .roomsAdWrap .adPanel {
+        flex: 0 0 auto;
+        width: 100% !important;
+        max-width: 100%;
+        box-sizing: border-box;
+    }
 }
 
 /* Same panel as on the booking page and the user manual page, but it lives in

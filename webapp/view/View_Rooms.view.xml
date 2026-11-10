@@ -171,11 +171,17 @@
 							id="VR_id_DateFilterSection"
 							title=""
 							titleUppercase="false"
-							class="vrDateFilterSection"
+							class="vrDateFilterSection vrRoomsSidebarSection"
 						>
 							<uxap:subSections>
 								<uxap:ObjectPageSubSection id="VR_id_DateFilterSubSection">
 									<uxap:blocks>
+										<VBox
+											id="VR_id_RoomsSidebar"
+											width="300px"
+											renderType="Bare"
+											class="stickyFilterContainer roomsFilterAdSection vrRoomsSidebar"
+										>
 										<fb:FilterBar
 											id="VR_id_DateFilterBar"
 											persistencyKey="viewRoomsDateFilter"
@@ -184,8 +190,8 @@
 											showClearOnFB="true"
 											search="onApplyRoomDateFilter"
 											showFilterConfiguration="false"
-											filterContainerWidth="auto"
-											class="sapUiContentPadding HostelRooms sapUiTinyMargin filterBarTheme vrRoomDateFilterBar"
+											filterContainerWidth="100%"
+											class="sapUiContentPadding HostelRooms filterBarTheme vrRoomDateFilterBar"
 											busyIndicatorDelay="0"
 										>
 											<fb:filterGroupItems>
@@ -203,7 +209,7 @@
 											valueFormat="yyyy-MM-dd"
 											minDate="{RoomFilterModel>/TodayDate}"
 															change="onRoomFilterDateChange"
-															width="12rem"
+															width="100%"
 														/>
 													</fb:control>
 												</fb:FilterGroupItem>
@@ -221,111 +227,154 @@
 											valueFormat="yyyy-MM-dd"
 											minDate="{RoomFilterModel>/EndDateMinDate}"
 															change="onRoomFilterDateChange"
-															width="12rem"
+															width="100%"
 														/>
 													</fb:control>
 												</fb:FilterGroupItem>
 											</fb:filterGroupItems>
 										</fb:FilterBar>
-									</uxap:blocks>
-								</uxap:ObjectPageSubSection>
-							</uxap:subSections>
-						</uxap:ObjectPageSection>
-						<!-- AC Rooms Tab Section -->
-						<uxap:ObjectPageSection
-							visible="{= ${VisibilityModel>/isDataLoaded} &amp;&amp; ${VisibilityModel>/ACRooms}.length > 0 }"
-							id="VR_id_ACSection"
-							title="{i18n>ACRooms}"
-							titleUppercase="false"
-							class="vrRoomContentSection">
-							<uxap:subSections>
-								<uxap:ObjectPageSubSection
-									id="VR_id_ACSubSection"
-									visible="{= ${VisibilityModel>/isDataLoaded} &amp;&amp; ${VisibilityModel>/ACRooms}.length > 0}">
-									<uxap:blocks>
-										<VBox>
-											<VBox class="">
-												<l:Grid
-													id="idBedTypeFlex2"
-													defaultSpan="XL3 L3 M6 S12"
-													containerQuery="true"
-													hSpacing="0"
-													vSpacing="0"
-													content="{path: 'VisibilityModel>/ACRooms'}">
-													<VBox class="bedCard sapUiTinyMargin">
-														<Carousel
-															height="300px"
-															width="100%"
-															loop="true"
-															showPageIndicator="false"
-															backgroundDesign="Transparent"
-															class="roomCardCarousel"
-															pages="{path: 'VisibilityModel>Images', templateShareable: false}">
-															<pages>
-																<VBox class="imageWrapper">
-																	<HBox class="areaTagBox">
-																		<core:Icon
-																			src="sap-icon://building"
-																			size="0.9rem"
-																			color="black"
-																			class="sapUiTinyMarginEnd" />
-																		<Text text="{VisibilityModel>Area}" />
-																	</HBox>
-																	<Image
-																		src="{VisibilityModel>src}"
-																		width="100%"
-																		height="300px"
-																		class="bedCardImage"
-																		decorative="false" />
-																</VBox>
-															</pages>
-														</Carousel>
-														<VBox class="bedCardContent">
-															<Text
-																text="{= ${VisibilityModel>Name} + ' (' + ${VisibilityModel>ACType} + ')' }"
-																class="bedCardTitle" />
-															<Text
-																text="{VisibilityModel>Description}"
-																class="bedCardDesc"
-																maxLines="4"
-																wrapping="true" />
-															<Text
-																text="{
-																	parts: ['VisibilityModel>Currency','VisibilityModel>BasicPrice'],
-																	formatter: '.Formatter.formatStartingPrice'
-																}"
-																class="bedCardPrice" />
-															<HBox
-																justifyContent="Center"
-																alignItems="Center"
-																class="sapUiTinyMarginTop">
-										<Link
-											text="{= ${VisibilityModel>Visible} ? ${i18n>bookRoom} : ${i18n>occupied} }"
-											enabled="{VisibilityModel>Visible}"
-																	press="onViewDetailsPress"
-																	class="pillActionBtn pillLeft" />
-																<Link
-																	text="{i18n>enquiry}"
-																	press="onEnquiryPress"
-																	class="pillActionBtn pillRight" />
-															</HBox>
-														</VBox>
-													</VBox>
-												</l:Grid>
+
 												<VBox
-													alignItems="Center"
-													class="sapUiTinyMarginTop sapUiTinyMarginBottom"
-													visible="{VisibilityModel>/ShowViewMore}">
-													<VBox height="2rem" />
-												</VBox>
-											</VBox>
+													id="VR_id_AdWrap"
+													renderType="Bare"
+													class="roomsAdWrap"
+													visible="{= ${AdvertisementModel>/Advertisements}.length > 0 }"
+												>
+													<Title
+														text="{i18n>advertisements}"
+														class="roomsAdTitle"
+													/>
+													<Panel class="adPanel">
+														<VBox class="sapUiTinyMargin">
+															<Carousel
+																id="AdvertisementCarousel"
+																height="215px"
+																showPageIndicator="false"
+																arrowsPlacement="Content"
+																loop="true"
+																pages="{
+																	path: 'AdvertisementModel>/Advertisements',
+																	templateShareable: false
+																}"
+															>
+																<pages>
+																	<Image
+																		src="{AdvertisementModel>image}"
+																		alt="{AdvertisementModel>title}"
+																		width="100%"
+																		height="100%"
+																		press="onAdvertisementImagePress"
+																	/>
+																</pages>
+															</Carousel>
+																</VBox>
+														</Panel>
+													</VBox>
 										</VBox>
 									</uxap:blocks>
 								</uxap:ObjectPageSubSection>
 							</uxap:subSections>
 						</uxap:ObjectPageSection>
 
-						<!-- Non-AC Rooms Tab Section -->
+						<uxap:ObjectPageSection
+							id="VR_id_ACSection"
+							title="{i18n>ACRooms}"
+							titleUppercase="false"
+							class="vrRoomContentSection"
+							visible="{= ${VisibilityModel>/isDataLoaded} &amp;&amp; ${VisibilityModel>/ACRooms}.length > 0 }">
+							<uxap:subSections>
+								<uxap:ObjectPageSubSection
+									id="VR_id_ACSubSection"
+									visible="{= ${VisibilityModel>/isDataLoaded} &amp;&amp; ${VisibilityModel>/ACRooms}.length > 0 }">
+									<uxap:blocks>
+										<VBox width="100%">
+													<l:Grid
+														id="idBedTypeFlex2"
+														defaultSpan="XL4 L4 M6 S12"
+														containerQuery="true"
+														hSpacing="0"
+														vSpacing="0"
+														class="vrRoomCardsGrid"
+														content="{path: 'VisibilityModel>/ACRooms'}"
+													>
+														<VBox class="bedCard">
+															<Carousel
+																height="300px"
+																width="100%"
+																loop="true"
+																showPageIndicator="false"
+																backgroundDesign="Transparent"
+																class="roomCardCarousel"
+																pages="{path: 'VisibilityModel>Images', templateShareable: false}"
+															>
+																<pages>
+																	<VBox class="imageWrapper">
+																		<HBox class="areaTagBox">
+																			<core:Icon
+																				src="sap-icon://building"
+																				size="0.9rem"
+																				color="black"
+																				class="sapUiTinyMarginEnd"
+																			/>
+																			<Text text="{VisibilityModel>Area}" />
+																		</HBox>
+																		<Image
+																			src="{VisibilityModel>src}"
+																			width="100%"
+																			height="300px"
+																			class="bedCardImage"
+																			decorative="false"
+																		/>
+																	</VBox>
+																</pages>
+															</Carousel>
+															<VBox class="bedCardContent">
+																<Text
+																	text="{= ${VisibilityModel>Name} + ' (' + ${VisibilityModel>ACType} + ')' }"
+																	class="bedCardTitle"
+																/>
+																<Text
+																	text="{VisibilityModel>Description}"
+																	class="bedCardDesc"
+																	maxLines="4"
+																	wrapping="true"
+																/>
+																<Text
+																	text="{
+																		parts: ['VisibilityModel>Currency','VisibilityModel>BasicPrice'],
+																		formatter: '.Formatter.formatStartingPrice'
+																	}"
+																	class="bedCardPrice"
+																/>
+																<HBox justifyContent="Center" alignItems="Center" class="sapUiTinyMarginTop">
+																	<Link
+																		text="{= ${VisibilityModel>Visible} ? ${i18n>bookRoom} : ${i18n>occupied} }"
+																		enabled="{VisibilityModel>Visible}"
+																		press="onViewDetailsPress"
+																		class="pillActionBtn pillLeft"
+																	/>
+																	<Link
+																		text="{i18n>enquiry}"
+																		press="onEnquiryPress"
+																		class="pillActionBtn pillRight"
+																	/>
+																</HBox>
+															</VBox>
+														</VBox>
+													</l:Grid>
+													<VBox
+														alignItems="Center"
+														class="sapUiTinyMarginTop sapUiTinyMarginBottom"
+														visible="{VisibilityModel>/ShowViewMore}"
+													>
+														<VBox height="2rem" />
+													</VBox>
+										</VBox>
+									</uxap:blocks>
+								</uxap:ObjectPageSubSection>
+							</uxap:subSections>
+						</uxap:ObjectPageSection>
+
 						<uxap:ObjectPageSection
 							id="VR_id_NonACSection"
 							title="{i18n>NonACRooms}"
@@ -335,85 +384,90 @@
 							<uxap:subSections>
 								<uxap:ObjectPageSubSection
 									id="VR_id_NonACSubSection"
-									title="{i18n>NonACRooms}"
-									visible="{= ${VisibilityModel>/isDataLoaded} &amp;&amp; ${VisibilityModel>/NonACRooms}.length > 0}">
+									visible="{= ${VisibilityModel>/isDataLoaded} &amp;&amp; ${VisibilityModel>/NonACRooms}.length > 0 }">
 									<uxap:blocks>
-										<VBox>
-											<VBox class="">
-												<l:Grid
-													id="idBedTypeFlex1"
-													defaultSpan="XL3 L3 M6 S12"
-													containerQuery="true"
-													hSpacing="0"
-													vSpacing="0"
-													content="{path: 'VisibilityModel>/NonACRooms'}">
-													<VBox class="bedCard sapUiTinyMargin">
-														<Carousel
-															height="300px"
-															width="100%"
-															loop="true"
-															showPageIndicator="false"
-															backgroundDesign="Transparent"
-															class="roomCardCarousel"
-															pages="{path: 'VisibilityModel>Images', templateShareable: false}">
-															<pages>
-																<VBox class="imageWrapper">
-																	<HBox class="areaTagBox">
-																		<core:Icon
-																			src="sap-icon://building"
-																			size="0.9rem"
-																			color="black"
-																			class="sapUiTinyMarginEnd" />
-																		<Text text="{VisibilityModel>Area}" />
-																	</HBox>
-																	<Image
-																		src="{VisibilityModel>src}"
-																		width="100%"
-																		height="300px"
-																		class="bedCardImage"
-																		decorative="false" />
-																</VBox>
-															</pages>
-														</Carousel>
-														<VBox class="bedCardContent">
-															<Text
-																text="{= ${VisibilityModel>Name} + ' (' + ${VisibilityModel>ACType} + ')' }"
-																class="bedCardTitle" />
-															<Text
-																text="{VisibilityModel>Description}"
-																class="bedCardDesc"
-																maxLines="4"
-																wrapping="true" />
-															<Text
-																text="{
-																	parts: ['VisibilityModel>Currency','VisibilityModel>BasicPrice'],
-																	formatter: '.Formatter.formatStartingPrice'
-																}"
-																class="bedCardPrice" />
-															<HBox
-																justifyContent="Center"
-																alignItems="Center"
-																class="sapUiTinyMarginTop">
-										<Link
-											text="{= ${VisibilityModel>Visible} ? ${i18n>bookRoom} : ${i18n>occupied} }"
-											enabled="{VisibilityModel>Visible}"
-																	press="onViewDetailsPress"
-																	class="pillActionBtn pillLeft" />
-																<Link
-																	text="{i18n>enquiry}"
-																	press="onEnquiryPress"
-																	class="pillActionBtn pillRight" />
-															</HBox>
+										<VBox width="100%">
+													<l:Grid
+														id="idBedTypeFlex1"
+														defaultSpan="XL4 L4 M6 S12"
+														containerQuery="true"
+														hSpacing="0"
+														vSpacing="0"
+														class="vrRoomCardsGrid"
+														content="{path: 'VisibilityModel>/NonACRooms'}"
+													>
+														<VBox class="bedCard">
+															<Carousel
+																height="300px"
+																width="100%"
+																loop="true"
+																showPageIndicator="false"
+																backgroundDesign="Transparent"
+																class="roomCardCarousel"
+																pages="{path: 'VisibilityModel>Images', templateShareable: false}"
+															>
+																<pages>
+																	<VBox class="imageWrapper">
+																		<HBox class="areaTagBox">
+																			<core:Icon
+																				src="sap-icon://building"
+																				size="0.9rem"
+																				color="black"
+																				class="sapUiTinyMarginEnd"
+																			/>
+																			<Text text="{VisibilityModel>Area}" />
+																		</HBox>
+																		<Image
+																			src="{VisibilityModel>src}"
+																			width="100%"
+																			height="300px"
+																			class="bedCardImage"
+																			decorative="false"
+																		/>
+																	</VBox>
+																</pages>
+															</Carousel>
+															<VBox class="bedCardContent">
+																<Text
+																	text="{= ${VisibilityModel>Name} + ' (' + ${VisibilityModel>ACType} + ')' }"
+																	class="bedCardTitle"
+																/>
+																<Text
+																	text="{VisibilityModel>Description}"
+																	class="bedCardDesc"
+																	maxLines="4"
+																	wrapping="true"
+																/>
+																<Text
+																	text="{
+																		parts: ['VisibilityModel>Currency','VisibilityModel>BasicPrice'],
+																		formatter: '.Formatter.formatStartingPrice'
+																	}"
+																	class="bedCardPrice"
+																/>
+																<HBox justifyContent="Center" alignItems="Center" class="sapUiTinyMarginTop">
+																	<Link
+																		text="{= ${VisibilityModel>Visible} ? ${i18n>bookRoom} : ${i18n>occupied} }"
+																		enabled="{VisibilityModel>Visible}"
+																		press="onViewDetailsPress"
+																		class="pillActionBtn pillLeft"
+																	/>
+																	<Link
+																		text="{i18n>enquiry}"
+																		press="onEnquiryPress"
+																		class="pillActionBtn pillRight"
+																	/>
+																</HBox>
+															</VBox>
 														</VBox>
+													</l:Grid>
+													<VBox
+														alignItems="Center"
+														class="sapUiTinyMarginTop sapUiTinyMarginBottom"
+														visible="{VisibilityModel>/ShowViewMore}"
+													>
+														<VBox height="2rem" />
 													</VBox>
-												</l:Grid>
-												<VBox
-													alignItems="Center"
-													class="sapUiTinyMarginTop sapUiTinyMarginBottom"
-													visible="{VisibilityModel>/ShowViewMore}">
-													<VBox height="2rem" />
-												</VBox>
-											</VBox>
 										</VBox>
 									</uxap:blocks>
 								</uxap:ObjectPageSubSection>
@@ -424,20 +478,19 @@
 							id="VR_id_NoDataSection"
 							title=""
 							titleUppercase="false"
+							class="vrRoomContentSection vrNoDataSection"
 							visible="{= ${VisibilityModel>/isDataLoaded} &amp;&amp; ${VisibilityModel>/NonACRooms}.length === 0 &amp;&amp; ${VisibilityModel>/ACRooms}.length === 0 }">
 							<uxap:subSections>
 								<uxap:ObjectPageSubSection id="VR_id_NoDataSubSection">
 									<uxap:blocks>
 										<VBox
+											width="100%"
 											height="300px"
 											justifyContent="Center"
-											alignItems="Center">
-											<Text
-												text="{i18n>noRoomsFound}"
-												class="cssNoDataMessage" />
-											<Text
-												text="{i18n>pleaseselectanotherCity}"
-												class="cssNoDataSubMessage" />
+											alignItems="Center"
+											visible="{= ${VisibilityModel>/isDataLoaded} &amp;&amp; ${VisibilityModel>/NonACRooms}.length === 0 &amp;&amp; ${VisibilityModel>/ACRooms}.length === 0 }">
+											<Text text="{i18n>noRoomsFound}" class="cssNoDataMessage" />
+											<Text text="{i18n>pleaseselectanotherCity}" class="cssNoDataSubMessage" />
 										</VBox>
 									</uxap:blocks>
 								</uxap:ObjectPageSubSection>

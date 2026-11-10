@@ -695,10 +695,16 @@
                                                 class="minHeight100 flexGrow1"
                                                 justifyContent="SpaceBetween"
                                             >
-                                              <HBox width="100%" alignItems="Start"  class="roomsMainLayout">
+                                              <HBox width="100%" alignItems="Start" renderType="Bare" class="roomsMainLayout">
     
     <!-- ===== LEFT SIDE: VERTICAL FILTER BAR ===== -->
-    <VBox width="300px" class="stickyFilterContainer roomsFilterAdSection">
+    <VBox
+        id="hostelRoomsSidebarRail"
+        renderType="Bare"
+        class="hostelRoomsSidebarRail"
+    >
+    <VBox id="hostelRoomsSidebarFrame" renderType="Bare" class="hostelRoomsSidebarFrame">
+    <VBox id="hostelRoomsSidebar" width="300px" renderType="Bare" class="stickyFilterContainer roomsFilterAdSection hostelRoomsSidebar">
         <fb:FilterBar
             id="filterbar"
             persistencyKey="myPersKey"
@@ -842,6 +848,7 @@
              page and the user manual page, kept under the filter bar ===== -->
         <VBox
             id="roomsAdWrap"
+            renderType="Bare"
             class="roomsAdWrap"
             visible="{= ${AdvertisementModel>/Advertisements}.length > 0 }">
             <Title
@@ -876,6 +883,8 @@
                 </VBox>
             </Panel>
         </VBox>
+    </VBox>
+    </VBox>
     </VBox>
 
     <!-- ===== RIGHT SIDE: ROOMS GRID & CONTENT ===== -->
@@ -1000,6 +1009,7 @@
 </HBox>
 
                                                 <VBox
+                                                    id="hostelRoomsFooter"
                                                     visible="{FooterModel>/showRoomsFooter}"
                                                     class="footer-shell"
                                                 >

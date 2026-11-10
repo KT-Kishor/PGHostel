@@ -16,6 +16,8 @@ sap.ui.define([
     return BaseController.extend("sap.ui.com.project1.controller.View_Rooms", {
         Formatter: Formatter,
         onInit: function () {
+            this._adCarouselPauseResumeHandlers = [];
+            this._setupAdvertisementModel([]);
             this.getOwnerComponent().getRouter().getRoute("RouteViewRooms").attachMatched(this._onRouteMatched, this);
         },
 
@@ -48,6 +50,152 @@ sap.ui.define([
                         }
                     });
                 }
+            }
+
+            this._attachRoomsSidebarViewportSizing();
+        },
+        _attachRoomsSidebarViewportSizing: function () {
+            this._detachRoomsSidebarViewportSizing();
+
+            const oLayout = this.byId("VR_id_ObjectPageLayout");
+            const oLayoutDomRef = oLayout?.getDomRef();
+            const oScrollContainer = oLayoutDomRef?.querySelector(".sapUxAPObjectPageWrapper");
+            if (!oScrollContainer) return;
+
+            this._oRoomsObjectPageLayout = oLayout;
+            this._oRoomsSidebarScrollContainer = oScrollContainer;
+            this._fnRoomsSidebarViewportChange = this._scheduleRoomsSidebarViewportSync.bind(this);
+            oScrollContainer.addEventListener("scroll", this._fnRoomsSidebarViewportChange, { passive: true });
+            window.addEventListener("resize", this._fnRoomsSidebarViewportChange);
+            oLayout.attachToggleAnchorBar(this._fnRoomsSidebarViewportChange);
+
+            if (window.ResizeObserver) {
+                this._oRoomsSidebarResizeObserver = new window.ResizeObserver(this._fnRoomsSidebarViewportChange);
+                this._oRoomsSidebarResizeObserver.observe(oScrollContainer);
+                this._oRoomsSidebarResizeObserver.observe(oLayoutDomRef);
+                const oFooterDomRef = this.byId("VR_id_FooterSection")?.getDomRef();
+                const oFooterContentDomRef = oFooterDomRef?.querySelector(".svFooter") || oFooterDomRef;
+                const oHeaderTitleDomRef = document.getElementById(`${oLayout.getId()}-headerTitle`);
+                const oStickyAnchorDomRef = document.getElementById(`${oLayout.getId()}-stickyAnchorBar`);
+                const oSidebarDomRef = this.byId("VR_id_RoomsSidebar")?.getDomRef();
+                [oFooterContentDomRef, oHeaderTitleDomRef, oStickyAnchorDomRef, oSidebarDomRef].forEach(function (oDomRef) {
+                    if (oDomRef) this._oRoomsSidebarResizeObserver.observe(oDomRef);
+                }.bind(this));
+            }
+
+            this._syncRoomsSidebarViewport();
+        },
+        _detachRoomsSidebarViewportSizing: function () {
+            if (this._oRoomsSidebarScrollContainer && this._fnRoomsSidebarViewportChange) {
+                this._oRoomsSidebarScrollContainer.removeEventListener("scroll", this._fnRoomsSidebarViewportChange);
+            }
+            if (this._fnRoomsSidebarViewportChange) {
+                window.removeEventListener("resize", this._fnRoomsSidebarViewportChange);
+            }
+            if (this._oRoomsObjectPageLayout && this._fnRoomsSidebarViewportChange) {
+                this._oRoomsObjectPageLayout.detachToggleAnchorBar(this._fnRoomsSidebarViewportChange);
+            }
+            if (this._oRoomsSidebarResizeObserver) {
+                this._oRoomsSidebarResizeObserver.disconnect();
+            }
+            if (this._iRoomsSidebarViewportFrame) {
+                cancelAnimationFrame(this._iRoomsSidebarViewportFrame);
+            }
+
+            this._oRoomsObjectPageLayout = null;
+            this._oRoomsSidebarScrollContainer = null;
+            this._fnRoomsSidebarViewportChange = null;
+            this._oRoomsSidebarResizeObserver = null;
+            this._iRoomsSidebarViewportFrame = null;
+        },
+        _scheduleRoomsSidebarViewportSync: function () {
+            if (this._iRoomsSidebarViewportFrame) return;
+
+            this._iRoomsSidebarViewportFrame = requestAnimationFrame(function () {
+                this._iRoomsSidebarViewportFrame = null;
+                this._syncRoomsSidebarViewport();
+            }.bind(this));
+        },
+        _syncRoomsSidebarViewport: function () {
+            const oSidebarSection = this.byId("VR_id_DateFilterSection");
+            const oSidebarSectionDomRef = oSidebarSection?.getDomRef();
+            const oSidebar = this.byId("VR_id_RoomsSidebar");
+            const oSidebarDomRef = oSidebar?.getDomRef();
+            const oLayout = this.byId("VR_id_ObjectPageLayout");
+            const oLayoutDomRef = oLayout?.getDomRef();
+            const oScrollContainer = this._oRoomsSidebarScrollContainer;
+            const oContentContainer = oLayoutDomRef?.querySelector(".sapUxAPObjectPageContainer");
+            const oFooterDomRef = this.byId("VR_id_FooterSection")?.getDomRef();
+            const oFooterContentDomRef = oFooterDomRef?.querySelector(".svFooter") || oFooterDomRef;
+            if (!oSidebarSection || !oSidebarSectionDomRef || !oSidebarDomRef || !oContentContainer || !oScrollContainer) return;
+
+            if (window.innerWidth <= 768) {
+                oSidebarSection.removeStyleClass("vrRoomsSidebarFixed");
+                oSidebarSection.removeStyleClass("vrRoomsSidebarHidden");
+                oSidebarSectionDomRef.style.removeProperty("--vr-sidebar-fixed-top");
+                oSidebarSectionDomRef.style.removeProperty("--vr-sidebar-fixed-left");
+                oSidebarSectionDomRef.style.removeProperty("--vr-sidebar-fixed-height");
+                return;
+            }
+
+            const oScrollRect = oScrollContainer.getBoundingClientRect();
+            const oContentRect = oContentContainer.getBoundingClientRect();
+            const oFooterRect = oFooterContentDomRef?.getBoundingClientRect();
+            const iViewportTop = Math.max(0, oScrollRect.top);
+            const iViewportBottom = Math.min(window.innerHeight, oScrollRect.bottom);
+            const aTopBoundaryElements = [
+                document.getElementById(`${oLayout.getId()}-headerTitle`),
+                document.getElementById(`${oLayout.getId()}-stickyAnchorBar`),
+                document.getElementById(`${oLayout.getId()}-anchorBar`)
+            ];
+            const iVisibleHeaderBottom = aTopBoundaryElements.reduce(function (iBottom, oElement) {
+                if (!oElement) return iBottom;
+
+                const oStyle = window.getComputedStyle(oElement);
+                const oRect = oElement.getBoundingClientRect();
+                const bVisible = oStyle.display !== "none" &&
+                    oStyle.visibility !== "hidden" &&
+                    oRect.width > 0 &&
+                    oRect.height > 0 &&
+                    oRect.bottom > iViewportTop &&
+                    oRect.top < iViewportBottom;
+
+                return bVisible ? Math.max(iBottom, Math.min(oRect.bottom, iViewportBottom)) : iBottom;
+            }, iViewportTop);
+            const iFixedTop = Math.max(iVisibleHeaderBottom, oContentRect.top);
+            const iFooterTop = oFooterRect ? oFooterRect.top : iViewportBottom;
+            const iFixedBottom = Math.min(iViewportBottom, iFooterTop);
+            const iAvailableHeight = Math.max(0, iFixedBottom - iFixedTop);
+            const bOutsideViewport = iAvailableHeight < 1 || iFixedTop >= iViewportBottom;
+            const iRootFontSize = parseFloat(window.getComputedStyle(document.documentElement).fontSize) || 16;
+
+            // CSS sizing avoids re-rendering the UI5 controls on every scroll frame.
+            const mSidebarStyles = {
+                "--vr-sidebar-fixed-top": `${iFixedTop.toFixed(3)}px`,
+                "--vr-sidebar-fixed-left": `${oContentRect.left.toFixed(3)}px`,
+                "--vr-sidebar-fixed-height": `${iAvailableHeight.toFixed(3)}px`
+            };
+            Object.keys(mSidebarStyles).forEach(function (sProperty) {
+                if (oSidebarSectionDomRef.style.getPropertyValue(sProperty) !== mSidebarStyles[sProperty]) {
+                    oSidebarSectionDomRef.style.setProperty(sProperty, mSidebarStyles[sProperty]);
+                }
+            });
+
+            const iSidebarOuterHeight = oSidebarDomRef.getBoundingClientRect().height + iRootFontSize * 0.7;
+            // Allow 1px of CSS rounding before switching a tall sidebar to natural scrolling.
+            if (!bOutsideViewport && iFooterTop >= iViewportBottom &&
+                iSidebarOuterHeight > iViewportBottom - iFixedTop + 1 &&
+                oContentRect.top + iSidebarOuterHeight > iViewportBottom + 1) {
+                oSidebarSection.removeStyleClass("vrRoomsSidebarFixed");
+                oSidebarSection.removeStyleClass("vrRoomsSidebarHidden");
+                return;
+            }
+
+            oSidebarSection.addStyleClass("vrRoomsSidebarFixed");
+            if (bOutsideViewport) {
+                oSidebarSection.addStyleClass("vrRoomsSidebarHidden");
+            } else {
+                oSidebarSection.removeStyleClass("vrRoomsSidebarHidden");
             }
         },
         _onRouteMatched: async function (oEvent) {
@@ -129,6 +277,7 @@ sap.ui.define([
                 return this._goToNotFound();
             }
 
+            this._loadAdvertisements();
             await this._loadFilteredData()
             this.closeBusyDialog()
             const oView = this.getView();
@@ -637,8 +786,137 @@ sap.ui.define([
 
             this._restartRoomCardCarouselsAutoSlide();
         },
+        _loadAdvertisements: async function () {
+            let aCarouselItems = [];
+
+            try {
+                const oResponse = await this.ajaxReadWithJQuery("HM_Advertisement");
+                aCarouselItems = this._transformAdvertisementData(oResponse?.data || []);
+            } catch (oError) {
+                aCarouselItems = [];
+            }
+
+            this._setupAdvertisementModel(aCarouselItems);
+        },
+        _transformAdvertisementData: function (aAdvertisements) {
+            const aCarouselItems = [];
+
+            aAdvertisements.forEach(function (oAdvertisement) {
+                for (let iPhotoIndex = 1; iPhotoIndex <= 3; iPhotoIndex++) {
+                    const sPhotoField = `Photo${iPhotoIndex}`;
+                    const sNameField = `Photo${iPhotoIndex}Name`;
+                    const sTypeField = `Photo${iPhotoIndex}Type`;
+                    const sImageSource = this._prepareAdvertisementImage(
+                        oAdvertisement[sPhotoField],
+                        oAdvertisement[sTypeField]
+                    );
+
+                    if (sImageSource) {
+                        aCarouselItems.push({
+                            id: `${oAdvertisement.ID}-${iPhotoIndex}`,
+                            image: sImageSource,
+                            title: oAdvertisement[sNameField] || `Advertisement ${iPhotoIndex}`,
+                            url: oAdvertisement.URL,
+                            originalAd: oAdvertisement
+                        });
+                    }
+                }
+            }.bind(this));
+
+            return aCarouselItems;
+        },
+        _prepareAdvertisementImage: function (sImageData, sImageType) {
+            if (!sImageData) return null;
+
+            const sCleanData = sImageData.replace(/\s/g, "");
+            if (sCleanData.startsWith("data:")) return sCleanData;
+
+            const sType = sImageType?.startsWith("image/") ? sImageType : "image/png";
+            return `data:${sType};base64,${sCleanData}`;
+        },
+        _setupAdvertisementModel: function (aCarouselItems) {
+            const oView = this.getView();
+            if (!oView || oView.bIsDestroyed) return;
+
+            this._stopAdvertisementCarouselAutoSlide();
+            oView.setModel(new JSONModel({
+                Advertisements: aCarouselItems,
+                currentPage: 0,
+                itemsPerPage: 1
+            }), "AdvertisementModel");
+
+            if (aCarouselItems.length > 1) {
+                this._startAdvertisementCarouselAutoSlide();
+            }
+        },
+        _startAdvertisementCarouselAutoSlide: function () {
+            const oCarousel = this.byId("AdvertisementCarousel");
+
+            if (!oCarousel || oCarousel.getPages().length <= 1) {
+                this._iAdCarouselRetries = (this._iAdCarouselRetries || 0) + 1;
+                if (this._iAdCarouselRetries > 40 || !this.getView()) return;
+
+                clearTimeout(this._iAdCarouselRetryTimer);
+                this._iAdCarouselRetryTimer = setTimeout(function () {
+                    this._iAdCarouselRetryTimer = null;
+                    this._startAdvertisementCarouselAutoSlide();
+                }.bind(this), 300);
+                return;
+            }
+
+            this._iAdCarouselRetries = 0;
+            this._stopAdvertisementCarouselAutoSlide();
+
+            const fnPauseAndResume = function () {
+                this._stopAdvertisementCarouselAutoSlide();
+                this._iAdCarouselResumeTimer = setTimeout(function () {
+                    this._iAdCarouselResumeTimer = null;
+                    if (!oCarousel.bIsDestroyed && oCarousel.getPages().length > 1) {
+                        this._startAdvertisementCarouselAutoSlide();
+                    }
+                }.bind(this), 3000);
+            }.bind(this);
+
+            ["touchstart", "mousedown"].forEach(function (sEventName) {
+                oCarousel.attachBrowserEvent(sEventName, fnPauseAndResume);
+                this._adCarouselPauseResumeHandlers.push({
+                    element: oCarousel,
+                    event: sEventName,
+                    fn: fnPauseAndResume
+                });
+            }.bind(this));
+
+            this._adCarouselInterval = setInterval(function () {
+                if (!oCarousel.bIsDestroyed) {
+                    oCarousel.next();
+                } else {
+                    this._stopAdvertisementCarouselAutoSlide();
+                }
+            }.bind(this), 3000);
+        },
+        _stopAdvertisementCarouselAutoSlide: function () {
+            clearInterval(this._adCarouselInterval);
+            clearTimeout(this._iAdCarouselRetryTimer);
+            clearTimeout(this._iAdCarouselResumeTimer);
+            this._adCarouselInterval = null;
+            this._iAdCarouselRetryTimer = null;
+            this._iAdCarouselResumeTimer = null;
+            this._iAdCarouselRetries = 0;
+
+            (this._adCarouselPauseResumeHandlers || []).forEach(function (oHandler) {
+                if (oHandler.element && !oHandler.element.bIsDestroyed) {
+                    oHandler.element.detachBrowserEvent(oHandler.event, oHandler.fn);
+                }
+            });
+            this._adCarouselPauseResumeHandlers = [];
+        },
+        onAdvertisementImagePress: function (oEvent) {
+            return this._openAdvertisementPreview(oEvent);
+        },
         onExit: function () {
             this._stopRoomCardCarouselsAutoSlide();
+            this._stopAdvertisementCarouselAutoSlide();
+            this._detachRoomsSidebarViewportSizing();
 
             if (this._roomCardCarouselStartTimeout) {
                 clearTimeout(this._roomCardCarouselStartTimeout);
@@ -2626,6 +2904,7 @@ sap.ui.define([
             this._roomCardCarouselStartTimeout = setTimeout(function () {
                 requestAnimationFrame(function () {
                     this._startRoomCardCarouselsAutoSlide(3000);
+                    this._scheduleRoomsSidebarViewportSync();
                 }.bind(this));
             }.bind(this), 300);
         },

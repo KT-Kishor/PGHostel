@@ -31,6 +31,18 @@ sap.ui.define([
         Formatter: Formatter,
         onInit: function () {
 
+            this._fnRoomsSidebarSchedule = this._scheduleRoomsSidebarViewportSync.bind(this);
+            this._oRoomsSidebarPageDelegate = {
+                onAfterShow: this._startRoomsSidebarViewportSizing.bind(this),
+                onBeforeHide: this._stopRoomsSidebarViewportSizing.bind(this)
+            };
+            this._oRoomsSidebarRenderDelegate = {
+                onAfterRendering: this._startRoomsSidebarViewportSizing.bind(this),
+                onBeforeRendering: this._stopRoomsSidebarViewportSizing.bind(this)
+            };
+            this.byId("idRooms").addEventDelegate(this._oRoomsSidebarPageDelegate);
+            this.byId("hostelRoomsSidebarRail").addEventDelegate(this._oRoomsSidebarRenderDelegate);
+
             // The advertisement panel under the filter bar binds to this model,
             // so it exists (empty) before the first render and fills in once
             // the pictures arrive.
@@ -95,6 +107,99 @@ sap.ui.define([
             this._makeAdminDobReadOnly();
             this._hookAdminDropZone();
             this._vrHookPropertyTabs();
+        },
+
+        _startRoomsSidebarViewportSizing: function () {
+            this._stopRoomsSidebarViewportSizing();
+            const oScrollControl = this.byId("idRoomsScroll");
+            const oScrollDom = oScrollControl?.getDomRef();
+            if (!this.byId("hostelRoomsSidebarRail")?.getDomRef() || !oScrollDom) return;
+
+            this._oRoomsSidebarScrollDom = oScrollDom;
+            oScrollDom.addEventListener("scroll", this._fnRoomsSidebarSchedule, { passive: true, capture: true });
+            window.addEventListener("resize", this._fnRoomsSidebarSchedule);
+
+            if (window.ResizeObserver) {
+                this._oRoomsSidebarResizeObserver = new window.ResizeObserver(this._fnRoomsSidebarSchedule);
+                // The inner scroll content also changes when the footer is shown or cards load.
+                [oScrollDom, oScrollControl.getDomRef("scroll"), this.byId("hostelRoomsSidebar")?.getDomRef()]
+                    .forEach(function (oDom) {
+                        if (oDom) this._oRoomsSidebarResizeObserver.observe(oDom);
+                    }, this);
+            }
+            this._syncRoomsSidebarViewport();
+        },
+
+        _stopRoomsSidebarViewportSizing: function () {
+            if (this._oRoomsSidebarScrollDom) {
+                this._oRoomsSidebarScrollDom.removeEventListener("scroll", this._fnRoomsSidebarSchedule, true);
+            }
+            window.removeEventListener("resize", this._fnRoomsSidebarSchedule);
+            if (this._oRoomsSidebarResizeObserver) this._oRoomsSidebarResizeObserver.disconnect();
+            if (this._iRoomsSidebarViewportFrame) window.cancelAnimationFrame(this._iRoomsSidebarViewportFrame);
+            this._oRoomsSidebarScrollDom = null;
+            this._oRoomsSidebarResizeObserver = null;
+            this._iRoomsSidebarViewportFrame = null;
+            const oFrame = this.byId("hostelRoomsSidebarFrame");
+            oFrame?.removeStyleClass("hostelRoomsSidebarFixed");
+            oFrame?.removeStyleClass("hostelRoomsSidebarHidden");
+        },
+
+        _scheduleRoomsSidebarViewportSync: function () {
+            if (this._iRoomsSidebarViewportFrame) return;
+            this._iRoomsSidebarViewportFrame = window.requestAnimationFrame(function () {
+                this._iRoomsSidebarViewportFrame = null;
+                this._syncRoomsSidebarViewport();
+            }.bind(this));
+        },
+
+        _syncRoomsSidebarViewport: function () {
+            const oRailDom = this.byId("hostelRoomsSidebarRail")?.getDomRef();
+            const oFrame = this.byId("hostelRoomsSidebarFrame");
+            const oSidebarDom = this.byId("hostelRoomsSidebar")?.getDomRef();
+            if (!oRailDom || !oFrame?.getDomRef() || !oSidebarDom || !this._oRoomsSidebarScrollDom) return;
+
+            const oScrollRect = this._oRoomsSidebarScrollDom.getBoundingClientRect();
+            if (window.innerWidth < 768 || !oScrollRect.width || !oScrollRect.height) {
+                oFrame.removeStyleClass("hostelRoomsSidebarFixed");
+                oFrame.removeStyleClass("hostelRoomsSidebarHidden");
+                return;
+            }
+
+            const oRailRect = oRailDom.getBoundingClientRect();
+            const oFooter = this.byId("hostelRoomsFooter");
+            const oFooterDom = oFooter?.getVisible() ? oFooter.getDomRef() : null;
+            const oFooterContent = oFooterDom?.querySelector(".svFooter") || oFooterDom;
+            const iViewportTop = Math.max(0, oScrollRect.top);
+            const iViewportBottom = Math.min(window.innerHeight, oScrollRect.bottom);
+            const iFixedTop = Math.max(iViewportTop, oRailRect.top);
+            const iFooterTop = oFooterContent?.getBoundingClientRect().top ?? iViewportBottom;
+            const iAvailableHeight = Math.max(0, Math.min(iViewportBottom, iFooterTop) - iFixedTop);
+            const mStyles = {
+                // Stay in the rail's coordinate system inside TNT/NavContainer wrappers.
+                "--hostel-sidebar-top": `${(iFixedTop - oRailRect.top).toFixed(3)}px`,
+                "--hostel-sidebar-height": `${iAvailableHeight.toFixed(3)}px`
+            };
+            Object.keys(mStyles).forEach(function (sProperty) {
+                if (oRailDom.style.getPropertyValue(sProperty) !== mStyles[sProperty]) {
+                    oRailDom.style.setProperty(sProperty, mStyles[sProperty]);
+                }
+            });
+
+            const iRootFontSize = parseFloat(window.getComputedStyle(document.documentElement).fontSize) || 16;
+            const iSidebarOuterHeight = oSidebarDom.getBoundingClientRect().height + iRootFontSize * 0.7;
+            // Reserve a stable column height so footer clipping never pulls the footer upward.
+            const sReservedHeight = `${Math.max(iViewportBottom - iViewportTop, iSidebarOuterHeight).toFixed(3)}px`;
+            if (oRailDom.style.getPropertyValue("--hostel-sidebar-reserved-height") !== sReservedHeight) {
+                oRailDom.style.setProperty("--hostel-sidebar-reserved-height", sReservedHeight);
+            }
+
+            const bOutsideViewport = iAvailableHeight < 1 || iFixedTop >= iViewportBottom;
+            const bNaturalScroll = !bOutsideViewport && iFooterTop >= iViewportBottom &&
+                iSidebarOuterHeight > iViewportBottom - iFixedTop + 1 &&
+                oRailRect.top + iSidebarOuterHeight > iViewportBottom + 1;
+            oFrame.toggleStyleClass("hostelRoomsSidebarFixed", !bNaturalScroll);
+            oFrame.toggleStyleClass("hostelRoomsSidebarHidden", bOutsideViewport);
         },
 
         _getBrowserLocation: function () {
@@ -1543,6 +1648,13 @@ var sSelectedId = oButton?.data("stayId") || "Hotels";
         },
 
         onExit: function () {
+            this._stopRoomsSidebarViewportSizing();
+            this.byId("idRooms")?.removeEventDelegate(this._oRoomsSidebarPageDelegate);
+            this.byId("hostelRoomsSidebarRail")?.removeEventDelegate(this._oRoomsSidebarRenderDelegate);
+            this._oRoomsSidebarPageDelegate = null;
+            this._oRoomsSidebarRenderDelegate = null;
+            this._fnRoomsSidebarSchedule = null;
+
             if (this._exploreBtnAnimationTimeout) {
                 clearTimeout(this._exploreBtnAnimationTimeout);
             }
