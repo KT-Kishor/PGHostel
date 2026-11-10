@@ -1114,7 +1114,7 @@
     min-width: 0;
     max-width: 18rem;
     flex: 1 1 auto;
-    padding-top: 1.55rem;
+    padding-top: 0.85rem;
 }
 
 .vrHeaderTitle {
@@ -7506,6 +7506,15 @@ html, body {
     padding-right: 0 !important;
 }
 
+.vrRoomContentSection .sapUxAPObjectPageSectionHeader {
+    padding-left: 0.35rem !important;
+    padding-right: 0.35rem !important;
+}
+
+.vrRoomContentSection .sapUxAPBlockContainer {
+    padding-top: 0 !important;
+}
+
 .vrRoomContentSection .sapUxAPBlockContainer > .sapUiRespGrid,
 .vrRoomContentSection .sapUxAPBlockContainer > .sapUiRespGrid > div,
 .RoomsPage .vrRoomCardsGrid {
@@ -7829,7 +7838,7 @@ html, body {
 
   .vrTitleBlock {
     max-width: 15rem;
-    padding-top: 1.1rem;
+    padding-top: 0.85rem;
   }
 
   .vrIdentityRow {

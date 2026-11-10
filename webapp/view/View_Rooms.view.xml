@@ -42,10 +42,10 @@
 									alignItems="Center"
 									class="vrSnappedHeader">
 									<Avatar
-										src="{= 'data:image/jpeg;base64,' + ${BranchModel>/Photo1} }"
+										src="{= ${BranchModel>/Photo1} ? 'data:image/jpeg;base64,' + ${BranchModel>/Photo1} : '' }"
+										initials="{= ${BranchModel>/Name} ? ${BranchModel>/Name}.charAt(0).toUpperCase() : '' }"
 										displaySize="L"
 										displayShape="Square"
-										visible="{= !!${BranchModel>/Photo1} }"
 										class="vrSquareAvatarSmall vrSnappedAvatar sapUiAvatarImageContain" />
 									<VBox class="vrSnappedTitleBlock">
 										<Title
@@ -70,10 +70,10 @@
 							class="sapUiTinyMarginTop vrHeaderRow">
 							<HBox class="vrIdentityRow sapUiMediumMarginEnd sapUiSmallMarginBottom" alignItems="Start">
 								<Avatar
-									src="{= 'data:image/jpeg;base64,' + ${BranchModel>/Photo1} }"
+									src="{= ${BranchModel>/Photo1} ? 'data:image/jpeg;base64,' + ${BranchModel>/Photo1} : '' }"
+									initials="{= ${BranchModel>/Name} ? ${BranchModel>/Name}.charAt(0).toUpperCase() : '' }"
 									displaySize="XL"
 									displayShape="Square"
-									visible="{= !!${BranchModel>/Photo1} }"
 									class="vrSquareAvatarLarge sapUiMediumMarginEnd sapUiAvatarImageContain vrHeaderAvatar" />
 								<VBox class="vrTitleBlock">
 									<Title
