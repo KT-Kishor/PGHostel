@@ -223,6 +223,8 @@ sap.ui.define([
             }
 
             // Clear the HostelModel when returning to this view
+            this._pendingBookingNav = false;
+            this._pendingBookingData = null;
             const oHostelModel = this.getView().getModel("HostelModel");
             if (oHostelModel) {
                 oHostelModel.setData({});
@@ -932,6 +934,11 @@ sap.ui.define([
                 const oView = this.getView();
                 const oSelected = oEvent.getSource().getBindingContext("VisibilityModel").getObject();
                 const oVisibilityModel = oView.getModel("VisibilityModel");
+                const oStartPicker = this.byId("VR_id_StartDate");
+                const oEndPicker = this.byId("VR_id_EndDate");
+                const bUseSelectedDates = oStartPicker?.getDateValue() && oEndPicker?.getDateValue() &&
+                    oStartPicker.getValueState() !== "Error" && oEndPicker.getValueState() !== "Error" &&
+                    oEndPicker.getDateValue() >= oStartPicker.getDateValue();
                 const sBranchCode = oSelected.BranchCode || "";
 
                  const filter = {
@@ -985,8 +992,8 @@ sap.ui.define([
                     AvailbleBeds: oSelected.AvailbleBeds,
                     CheckInTime: oSelected.CheckInTime,
                     CheckOutTime: oSelected.CheckOutTime,
-                    StartDate: Formatter.formatDateString(oVisibilityModel.getProperty("/FilterStartDate")),
-                    EndDate: Formatter.formatDateString(oVisibilityModel.getProperty("/FilterEndDate")),
+                    StartDate: Formatter.formatDateString(bUseSelectedDates ? oStartPicker.getValue() : oVisibilityModel.getProperty("/FilterStartDate")),
+                    EndDate: Formatter.formatDateString(bUseSelectedDates ? oEndPicker.getValue() : oVisibilityModel.getProperty("/FilterEndDate")),
                     Deposit: oSelected.Deposit,
                     DepositCurrency: oSelected.DepositCurrency,
                     GSTType: oSelected.GSTType,
@@ -1075,6 +1082,7 @@ sap.ui.define([
             if (this._oRoomDetailFragment) this._oRoomDetailFragment.close();
             this._clearRoomDetailDialog();
             this._pendingBookingNav = false;
+            this._pendingBookingData = null;
         },
 
         onDialogAfterClose: function () {
@@ -1244,6 +1252,7 @@ sap.ui.define([
       onDialogClose: function () {
     this._resetOtpState();
     this._pendingBookingNav = false;
+    this._pendingBookingData = null;
 
     if (this._oSignDialog) {
         this._oSignDialog.close();
@@ -1770,8 +1779,7 @@ sap.ui.define([
 
                 // ✅ Check if user was trying to book before login
                 if (this._pendingBookingNav) {
-                    this._pendingBookingNav = false;
-                    this.onConfirmBooking();
+                    await this.onConfirmBooking();
                 }
                 // If no pending booking, stay on current view (View_Rooms)
             } catch (err) {
@@ -2635,6 +2643,8 @@ sap.ui.define([
             const oUIModel = this.getOwnerComponent().getModel("UIModel");
             const oLoginModel = this.getOwnerComponent().getModel("LoginModel");
             const oUser = oLoginModel?.getData?.() || {};
+            const oData = this._pendingBookingData || this.oHostelModel?.getData?.() || {};
+            this._pendingBookingData = null;
 
             // -------------------------
             // LOGIN CHECK (resilient, multi-source)
@@ -2644,6 +2654,8 @@ sap.ui.define([
             const bLoggedIn = this._isUserLoggedIn();
 
             if (!bLoggedIn) {
+                // Preserve the selection independently of auth and dialog model resets.
+                this._pendingBookingData = JSON.parse(JSON.stringify(oData));
                 this._pendingBookingNav = true;
                 MessageBox.information(
                     this.i18nModel.getText("Pleaselogintocontinuebooking"),
@@ -2660,9 +2672,8 @@ sap.ui.define([
                 return;
             }
 
+            this._pendingBookingNav = false;
             const oView = this.getView();
-            const oLocalModel = this.oHostelModel;
-            const oData = oLocalModel?.getData?.() || {};
 
             let aMember = [];
 

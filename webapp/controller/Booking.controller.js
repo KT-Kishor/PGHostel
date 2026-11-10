@@ -114,6 +114,7 @@
         },
         _onRouteMatched: async function (oEvent) {
             const HostelModel = sap.ui.getCore().getModel("HostelModel");
+            const bHasBookingSelection = !!(HostelModel?.getProperty("/BranchCode") && HostelModel?.getProperty("/BedType"));
             let sBranchCode = HostelModel ? HostelModel.getProperty("/BranchCode") : "";
 
             if (sBranchCode) {
@@ -125,7 +126,8 @@
             var LoginFUnction = await this.commonLoginFunction("Booking");
             if (!LoginFUnction) return;
 
-            if (performance.navigation && performance.navigation.type === 1) {
+            // The refresh flag persists across SPA navigation; a fresh selection is still valid.
+            if (!bHasBookingSelection && performance.navigation && performance.navigation.type === 1) {
                 this.closeBusyDialog();
                 var oLoginModel = this.getOwnerComponent().getModel("LoginModel") || this.getView().getModel("LoginModel");
                 var sRole = oLoginModel ? String(oLoginModel.getProperty("/Role") || "").trim() : "";
