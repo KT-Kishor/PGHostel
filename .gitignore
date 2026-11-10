@@ -1,6 +1,7 @@
 node_modules/
 dist/
 .scp/
+.env
 Makefile*.mta
 mta_archives
 mta-*
@@ -12,7 +13,4 @@ branch_structure.json
 scripts
 .kilo/
 .kilocode/
-temp_auto_push.bat
-temp_interactive_push.bat
 kilo.json
-config.bat
