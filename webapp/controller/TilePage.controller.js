@@ -270,171 +270,173 @@ sap.ui.define([
         // ─── ROLE ACCESS CONFIG ────────────────────────────────────────────────────
         // Maps each role to its guide metadata
         _getRoleGuideConfig: function (sRole) {
+            var oBundle = this.getView().getModel("i18n").getResourceBundle();
             var oRoleMap = {
                 "SuperAdmin": {
-                    roleLabel: "Super Admin",
-                    accessLevel: "Full Access",
+                    roleLabel: oBundle.getText("roleGuideSuperAdmin"),
+                    accessLevel: oBundle.getText("roleGuideFullAccess"),
                     accessState: "Success",
                     accessIcon: "sap-icon://shield",
-                    summary: "Unrestricted access to manage all Branches, Staffs, Vendors, Finances, and System-wide configurations.",
+                    summary: oBundle.getText("roleGuideSuperAdminSummary"),
                     accessItems: [
                         {
                             icon: "sap-icon://building",
                             color: "#008b96",
-                            label: "Infrastructure",
-                            detail: "Manage Branches, Rooms, Beds, Facilities and Amenities"
+                            label: oBundle.getText("roleGuideInfrastructure"),
+                            detail: oBundle.getText("roleGuideInfrastructureDetail")
                         },
                         {
                             icon: "sap-icon://customer",
                             color: "#008b96",
-                            label: "Operations",
-                            detail: "Full control over Bookings, Invoices, Deposits & Coupons"
+                            label: oBundle.getText("roleGuideOperations"),
+                            detail: oBundle.getText("roleGuideOperationsDetail")
                         },
                         {
                             icon: "sap-icon://group",
                             color: "#008b96",
-                            label: "User Management",
-                            detail: "Administer Staff members, Vendors and Customer Support requests"
+                            label: oBundle.getText("roleGuideUserManagement"),
+                            detail: oBundle.getText("roleGuideUserManagementDetail")
                         },
                         {
                             icon: "sap-icon://feedback",
                             color: "#008b96",
-                            label: "Feedback & Issues",
-                            detail: "Monitor Complaints, Damages and Reviews"
+                            label: oBundle.getText("roleGuideFeedbackIssues"),
+                            detail: oBundle.getText("roleGuideFeedbackIssuesDetail")
                         },
                         {
                             icon: "sap-icon://business-objects-experience",
                             color: "#008b96",
-                            label: "Analytics",
-                            detail: "Real-time insights across all Dashboards"
+                            label: oBundle.getText("roleGuideAnalytics"),
+                            detail: oBundle.getText("roleGuideAnalyticsDetail")
                         }
                     ]
                 },
                 "Admin": {
-                    roleLabel: "Branch Admin",
-                    accessLevel: "Branch-Wide Access",
+                    roleLabel: oBundle.getText("roleGuideBranchAdmin"),
+                    accessLevel: oBundle.getText("roleGuideBranchWideAccess"),
                     accessState: "Success",
                     accessIcon: "sap-icon://building",
-                    summary: "Unrestricted access to manage all Branches, Staff, Finances, and System-wide configurations",
+                    summary: oBundle.getText("roleGuideAdminSummary"),
                     accessItems: [
                         {
                             icon: "sap-icon://building",
                             color: "#008b96",
-                            label: "Infrastructure",
-                            detail: "Manage Branches, Rooms, Beds, Facilities and Amenities"
+                            label: oBundle.getText("roleGuideInfrastructure"),
+                            detail: oBundle.getText("roleGuideInfrastructureDetail")
                         },
                         {
                             icon: "sap-icon://customer",
                             color: "#008b96",
-                            label: "Operations",
-                            detail: "Full control over Bookings, Invoices, Deposits & Coupons"
+                            label: oBundle.getText("roleGuideOperations"),
+                            detail: oBundle.getText("roleGuideOperationsDetail")
                         },
                         {
                             icon: "sap-icon://group",
                             color: "#008b96",
-                            label: "User Management",
-                            detail: "Administer Staff members and Customer Support requests"
+                            label: oBundle.getText("roleGuideUserManagement"),
+                            detail: oBundle.getText("roleGuideStaffSupportDetail")
                         },
                         {
                             icon: "sap-icon://feedback",
                             color: "#008b96",
-                            label: "Feedback & Issues",
-                            detail: "Monitor Complaints, Damages and Reviews"
+                            label: oBundle.getText("roleGuideFeedbackIssues"),
+                            detail: oBundle.getText("roleGuideFeedbackIssuesDetail")
                         },
                         {
                             icon: "sap-icon://business-objects-experience",
                             color: "#008b96",
-                            label: "Analytics",
-                            detail: "Real-time insights across all Dashboards"
+                            label: oBundle.getText("roleGuideAnalytics"),
+                            detail: oBundle.getText("roleGuideAnalyticsDetail")
                         }
                     ]
                 },
                 "Branch Manager": {
-                    roleLabel: "Branch Manager",
-                    accessLevel: "Branch-Scoped Access",
+                    roleLabel: oBundle.getText("roleGuideBranchManager"),
+                    accessLevel: oBundle.getText("roleGuideBranchScopedAccess"),
                     accessState: "Success",
                     accessIcon: "sap-icon://manager",
-                    summary: "Unrestricted access to all operations specific to your allocated Branch — Staff, Finances, and System-wide configurations",
+                    summary: oBundle.getText("roleGuideBranchManagerSummary"),
                     accessItems: [
                         {
                             icon: "sap-icon://building",
                             color: "#008b96",
-                            label: "Infrastructure",
-                            detail: "Manage Rooms, Beds, Facilities and Amenities"
+                            label: oBundle.getText("roleGuideInfrastructure"),
+                            detail: oBundle.getText("roleGuideBranchInfrastructureDetail")
                         },
                         {
                             icon: "sap-icon://customer",
                             color: "#008b96",
-                            label: "Operations",
-                            detail: "Full control over Bookings, Invoices, Deposits & Coupons"
+                            label: oBundle.getText("roleGuideOperations"),
+                            detail: oBundle.getText("roleGuideOperationsDetail")
                         },
                         {
                             icon: "sap-icon://group",
                             color: "#008b96",
-                            label: "User Management",
-                            detail: "Administer Staff members and Customer Support requests"
+                            label: oBundle.getText("roleGuideUserManagement"),
+                            detail: oBundle.getText("roleGuideStaffSupportDetail")
                         },
                         {
                             icon: "sap-icon://feedback",
                             color: "#008b96",
-                            label: "Feedback & Issues",
-                            detail: "Monitor Complaints, Damages and Reviews"
+                            label: oBundle.getText("roleGuideFeedbackIssues"),
+                            detail: oBundle.getText("roleGuideFeedbackIssuesDetail")
                         },
                         {
                             icon: "sap-icon://business-objects-experience",
                             color: "#008b96",
-                            label: "Analytics",
-                            detail: "Real-time insights across all Dashboards"
+                            label: oBundle.getText("roleGuideAnalytics"),
+                            detail: oBundle.getText("roleGuideAnalyticsDetail")
                         }
                     ]
                 },
                 "Front Office Employee": {
-                    roleLabel: "Front Office Employee",
-                    accessLevel: "Mixed Access",
+                    roleLabel: oBundle.getText("roleGuideFrontOfficeEmployee"),
+                    accessLevel: oBundle.getText("roleGuideMixedAccess"),
                     accessState: "Success",
                     accessIcon: "sap-icon://retail-store",
 
 
-                    summary: "As a Front Office Employee, you have full access to customer-facing operations (bookings, invoices, complaints) and view-only access to branch-level data.",
+                    summary: oBundle.getText("roleGuideFrontOfficeSummary"),
                     accessItems: [
-                        { icon: "sap-icon://customer", color: "#008b96", label: "Full: Customers & Invoices", detail: "Manage customers, invoices, payments and deposits." },
-                        { icon: "sap-icon://display", color: "#e9730c", label: "View Only: Config Data", detail: "Branch, Bed, Room, Facilities, Amenities and coupons are read-only." },
+                        { icon: "sap-icon://customer", color: "#008b96", label: oBundle.getText("roleGuideCustomersInvoices"), detail: oBundle.getText("roleGuideCustomersInvoicesDetail") },
+                        { icon: "sap-icon://display", color: "#e9730c", label: oBundle.getText("roleGuideConfigDataView"), detail: oBundle.getText("roleGuideConfigDataViewDetail") },
 
                     ]
                 },
                 "Housekeeping": {
-                    roleLabel: "House Keeping",
-                    accessLevel: "Limited Access",
+                    roleLabel: oBundle.getText("roleGuideHousekeeping"),
+                    accessLevel: oBundle.getText("roleGuideLimitedAccess"),
                     accessState: "Success",
                     accessIcon: "sap-icon://customer-view",
-                    summary: "As a Housekeeping staff member, your access is restricted to Complaint & Complaint Dashbaord",
+                    summary: oBundle.getText("roleGuideHousekeepingSummary"),
                     accessItems: [
-                        { icon: "sap-icon://customer-view", color: "#008b96", label: "View: Complaint Details", detail: "Read-only access to complaint details" },
-                        { icon: "sap-icon://alert", color: "#008b96", label: "View: Complaint Dashboard", detail: "Read-only access to complaint dashboard." },
+                        { icon: "sap-icon://customer-view", color: "#008b96", label: oBundle.getText("roleGuideComplaintDetailsView"), detail: oBundle.getText("roleGuideComplaintDetailsViewDetail") },
+                        { icon: "sap-icon://alert", color: "#008b96", label: oBundle.getText("roleGuideComplaintDashboardView"), detail: oBundle.getText("roleGuideComplaintDashboardViewDetail") },
                     ]
                 },
                 "ManageVendor": {
-                    roleLabel: "Vendor Manager",
-                    accessLevel: "Vendor-Only Access",
+                    roleLabel: oBundle.getText("roleGuideVendorManager"),
+                    accessLevel: oBundle.getText("roleGuideVendorOnlyAccess"),
                     accessState: "Success",
                     accessIcon: "sap-icon://supplier",
-                    summary: "As a Vendor Manager, you have access to vendor management and customer support requests. All hostel operations, customer data, and dashboards are outside your scope.",
+                    summary: oBundle.getText("roleGuideVendorManagerSummary"),
                     accessItems: [
-                        { icon: "sap-icon://supplier", color: "#008b96", label: "Vendor Management", detail: "Full access to create and manage  vendors" },
-                        { icon: "sap-icon://customer", color: "#008b96", label: "Customer Support", detail: "Review and manage customer support requests." },
+                        { icon: "sap-icon://supplier", color: "#008b96", label: oBundle.getText("roleGuideVendorManagement"), detail: oBundle.getText("roleGuideVendorManagementDetail") },
+                        { icon: "sap-icon://customer", color: "#008b96", label: oBundle.getText("roleGuideCustomerSupport"), detail: oBundle.getText("roleGuideCustomerSupportDetail") },
                
                     ]
                 }
             };
 
             return oRoleMap[sRole] || {
-                roleLabel: sRole || "User",
-                accessLevel: "Custom Access",
+                roleLabel: sRole === "DevEmployee" ? oBundle.getText("roleGuideDevEmployee") :
+                    (sRole || oBundle.getText("roleGuideUser")),
+                accessLevel: oBundle.getText("roleGuideCustomAccess"),
                 accessState: "None",
                 accessIcon: "sap-icon://person-placeholder",
-                summary: "Your access is configured by your system administrator. Use the tour below to explore available modules.",
+                summary: oBundle.getText("roleGuideCustomSummary"),
                 accessItems: [
-                    { icon: "sap-icon://information", color: "#008b96", label: "Contact Admin", detail: "Reach out to your Super Admin for access queries." }
+                    { icon: "sap-icon://information", color: "#008b96", label: oBundle.getText("roleGuideContactAdmin"), detail: oBundle.getText("roleGuideContactAdminDetail") }
                 ]
             };
         },
@@ -512,7 +514,7 @@ sap.ui.define([
         _buildTileSteps: function () {
             var oView = this.getView();
             var oComponent = this.getOwnerComponent();
-            var oI18nModel = oComponent.getModel("i18n");
+            var oI18nModel = oView.getModel("i18n");
             var oLoginModel = oComponent.getModel("LoginModel");
             var oBundle = oI18nModel ? oI18nModel.getResourceBundle() : null;
             var sRole = oLoginModel ? oLoginModel.getProperty("/Role") : "";
@@ -551,7 +553,7 @@ sap.ui.define([
                 },
                 {
                     id: "idRaiseBug",
-                    headerKey: "Bug Details",
+                    headerKey: "BugDetails",
                     descKey: "tour_desc_bug"
                 },
                 {

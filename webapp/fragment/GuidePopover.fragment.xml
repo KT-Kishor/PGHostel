@@ -50,7 +50,7 @@
                 <contentRight>
                     <Button
                         id="nextButtonId"
-                        text="{= ${guideModel>/isLast} ? 'Finish' : 'Next' }"
+                        text="{= ${guideModel>/isLast} ? ${i18n>tour_finish} : ${i18n>next} }"
                         press="onNextTourStep"
                         class="myUnifiedBtn"
                         icon="{= ${guideModel>/isLast} ? 'sap-icon://accept' : 'sap-icon://navigation-right-arrow' }"/>

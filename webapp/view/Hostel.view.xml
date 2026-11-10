@@ -698,7 +698,7 @@
                                               <HBox width="100%" alignItems="Start"  class="roomsMainLayout">
     
     <!-- ===== LEFT SIDE: VERTICAL FILTER BAR ===== -->
-    <VBox width="300px"  class="stickyFilterContainer">
+    <VBox width="300px" class="stickyFilterContainer roomsFilterAdSection">
         <fb:FilterBar
             id="filterbar"
             persistencyKey="myPersKey"
@@ -842,14 +842,14 @@
              page and the user manual page, kept under the filter bar ===== -->
         <VBox
             id="roomsAdWrap"
-            class="roomsAdWrap sapUiMediumMarginTop"
+            class="roomsAdWrap"
             visible="{= ${AdvertisementModel>/Advertisements}.length > 0 }">
             <Title
                 text="{i18n>advertisements}"
                 class="roomsAdTitle"
             />
             <Panel
-                class="adPanel panelbracket"
+                class="adPanel"
             >
                 <VBox class="sapUiTinyMargin">
                     <Carousel

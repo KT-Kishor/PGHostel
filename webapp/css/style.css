@@ -14888,6 +14888,30 @@ body.svVendorScope .sapMSltPicker .sapMSelectList:focus {
 }
 
 /* ===== Advertisement panel under the filter bar (rooms tab) ===== */
+/* The filter and advertisements share one uninterrupted teal surface. */
+.RoomsPage .roomsFilterAdSection {
+    background: linear-gradient(135deg, #00b7c7, #008b96);
+    border-radius: 0.6rem;
+    box-sizing: border-box;
+}
+
+.RoomsPage .roomsFilterAdSection .filterBarTheme.sapUiCompFilterBar {
+    background: transparent !important;
+    margin-bottom: 0 !important;
+    border-bottom: 0 !important;
+    box-shadow: none !important;
+}
+
+.RoomsPage .roomsFilterAdSection .roomsAdWrap {
+    margin-top: 1.8rem !important;
+    padding: 0 0.75rem 0.75rem;
+    box-sizing: border-box;
+}
+
+.RoomsPage .roomsFilterAdSection .roomsAdTitle {
+    color: #ffffff !important;
+}
+
 /* Same panel as on the booking page and the user manual page, but it lives in
    the narrow filter column, so it needs the same width guards. */
 .RoomsPage .roomsAdWrap {

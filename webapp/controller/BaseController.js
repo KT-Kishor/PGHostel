@@ -1205,6 +1205,7 @@ sap.ui.define([
 
       var oStepData = aSteps[iIndex];
       var oComponent = this.getOwnerComponent();
+      var oBundle = this.getView().getModel("i18n").getResourceBundle();
 
       if (!this._oGuideModel) {
         this._oGuideModel = oComponent.getModel("guideModel");
@@ -1219,7 +1220,7 @@ sap.ui.define([
           title: oStepData.title || "",
           description: oStepData.description || "",
           media: oStepData.media || "",
-          stepText: "Step " + (iIndex + 1) + " of " + aSteps.length
+          stepText: oBundle.getText("tour_stepText", [iIndex + 1, aSteps.length])
         },
         isLast: iIndex === aSteps.length - 1
       });

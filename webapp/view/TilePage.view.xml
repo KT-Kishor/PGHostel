@@ -433,7 +433,7 @@
         <Button
                 id="idRaiseBugFooterBtn"
                 text="{i18n>raisebug}"
-                tooltip="{i18n>proceedToPay}"
+                tooltip="{i18n>raisebug}"
             visible="true"
             class="myUnifiedBtn "
             press="onPressbugs"
