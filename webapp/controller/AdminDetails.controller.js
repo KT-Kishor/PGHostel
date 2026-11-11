@@ -104,7 +104,9 @@ sap.ui.define([
                 UnitText: "daily", // daily | monthly | yearly
                 TotalMonths: 1,
                 TotalYears: 1,
-                BedTypeName: ""
+                BedTypeName: "",
+                OriginalCouponCode: "",
+                OriginalCouponDiscount: 0
             });
             this.getView().setModel(model, "Bookingmodel");
             this.flag = false
@@ -613,6 +615,8 @@ onChekout: function () {
                     Currency: oCustomer.Bookings?.[0]?.Currency || "",
                     Discount: oCustomer.Bookings?.[0]?.Discount || "",
                     CouponCode: oCustomer.Bookings?.[0]?.CouponCode || "",
+                    OriginalCouponCode: oCustomer.Bookings?.[0]?.CouponCode || "",
+                    OriginalCouponDiscount: oCustomer.Bookings?.[0]?.Discount || 0,
                     Deposit: Deposit.Deposit || "0.00",
                     PaymentPaid: Paymentpaid || "0.00",
                     RefundPaymentpaid: RefundPaymentpaid || "0.00",
@@ -2284,13 +2288,13 @@ if (!isValidDay) {
 
             if (data.CouponCode) {
                 this.Coupon();
-                this.getView().byId("couponInput").setShowValueHelp(true)
-            } else {
-                this.getView().byId("couponInput").setShowValueHelp(false);
             }
+            this.getView().byId("couponInput").setShowValueHelp(true);
 
             model.setProperty("/BedTypeName", data.BedType);
             model.setProperty("/CouponCode", data.CouponCode);
+            model.setProperty("/OriginalCouponCode", data.OriginalCouponCode || data.CouponCode);
+            model.setProperty("/OriginalCouponDiscount", data.OriginalCouponDiscount ?? data.Discount);
             model.setProperty("/UnitText", data.PaymentType);
             model.setProperty("/StartDate", data.StartDate);
             model.setProperty("/EndDate", data.EndDate);
@@ -2332,7 +2336,7 @@ if (!isValidDay) {
                 this.byId("idMonthYearSelect").setVisible(true);
             }
 
-            this.getView().getModel("VisibleModel").setProperty("/IsCouponApplied", false);
+            this.getView().getModel("VisibleModel").setProperty("/IsCouponApplied", !!data.CouponCode);
         },
 
         onBookingEditDateChange:async function (oEvent) {
@@ -6686,6 +6690,126 @@ sap.m.MessageBox.confirm(
                 this._oPreviewDialog = null;
             }
         },
+        AD_onOpenCouponValueHelp: async function () {
+            var oCustomerDataModel = this.getView().getModel("CustomerData");
+            var oBookingModel = this.getView().getModel("Bookingmodel");
+            var sBranchCode = oCustomerDataModel.getProperty("/BranchCode");
+            var sBookingStartDate = oBookingModel.getProperty("/StartDate");
+            var sOriginalCouponCode = String(oBookingModel.getProperty("/OriginalCouponCode") || "").trim();
+            var oBookingStartDate = sBookingStartDate && sBookingStartDate.includes("/")
+                ? this._parseDate(sBookingStartDate)
+                : new Date(sBookingStartDate || Date.now());
+
+            if (isNaN(oBookingStartDate.getTime())) {
+                oBookingStartDate = new Date();
+            }
+            oBookingStartDate.setHours(0, 0, 0, 0);
+
+            if (!this.AD_CouponDialog) {
+                this.AD_CouponDialog = sap.ui.xmlfragment(
+                    "sap.ui.com.project1.fragment.ShowCoupon",
+                    this
+                );
+                this.getView().addDependent(this.AD_CouponDialog);
+            }
+
+            this.getBusyDialog();
+
+            try {
+                var oResponse = await this.ajaxReadWithJQuery("HM_CouponBookingCount", {
+                    Status: "Active",
+                    BranchCode: sBranchCode
+                });
+                var aCoupons = Array.isArray(oResponse.data) ? oResponse.data : [oResponse.data];
+                var aFilteredCoupons = aCoupons.filter(function (oCoupon) {
+                    if (!oCoupon) {
+                        return false;
+                    }
+
+                    var bIsOriginalCoupon = sOriginalCouponCode &&
+                        String(oCoupon.CouponCode || "").trim().toUpperCase() ===
+                        sOriginalCouponCode.toUpperCase();
+
+                    if (bIsOriginalCoupon) {
+                        return true;
+                    }
+
+                    var oCouponStartDate = new Date(oCoupon.StartDate);
+                    var oCouponEndDate = new Date(oCoupon.EndDate);
+
+                    oCouponStartDate.setHours(0, 0, 0, 0);
+                    oCouponEndDate.setHours(23, 59, 59, 999);
+
+                    return oBookingStartDate >= oCouponStartDate &&
+                        oBookingStartDate <= oCouponEndDate;
+                });
+
+                this.getView().setModel(
+                    new JSONModel(aFilteredCoupons),
+                    "ShowCouponDetails"
+                );
+                this.AD_CouponDialog.open();
+            } finally {
+                this.closeBusyDialog();
+            }
+        },
+
+        SC_onVHDPick: function (oEvent) {
+            var oSelectedCoupon = oEvent.getSource()
+                .getBindingContext("ShowCouponDetails")
+                .getObject();
+
+            this.getView().getModel("Bookingmodel")
+                .setProperty("/CouponCode", oSelectedCoupon.CouponCode);
+            this.AD_CouponDialog.close();
+            this.onApplyCoupon();
+        },
+
+        SC_onVHDClose: function () {
+            this.AD_CouponDialog.close();
+        },
+
+        _restoreOriginalBookingCoupon: function (sOriginalCouponCode, vOriginalDiscount) {
+            var oCustomerDataModel = this.getView().getModel("CustomerData");
+            var oBookingModel = this.getView().getModel("Bookingmodel");
+            var oCustomerData = oCustomerDataModel.getData();
+            var fSubtotalBeforeDiscount = Number(oCustomerData.RentPrice || 0) +
+                Number(oCustomerData.TotalFacilityPrice || 0);
+            var fDiscount = Math.min(
+                Number(vOriginalDiscount || 0),
+                fSubtotalBeforeDiscount
+            );
+            var fSubtotal = fSubtotalBeforeDiscount - fDiscount;
+            var fTax = fSubtotal * Number(oCustomerData.GSTValue || 0) / 100;
+            var fGrandTotal = fSubtotal;
+
+            oCustomerData.CouponCode = sOriginalCouponCode;
+            oCustomerData.Discount = fDiscount.toFixed(2);
+            oCustomerData.SubTotal = fSubtotal;
+
+            if (oCustomerData.GSTType === "CGST/SGST") {
+                oCustomerData.CGST = fTax;
+                oCustomerData.SGST = fTax;
+                fGrandTotal += fTax * 2;
+            } else if (oCustomerData.GSTType === "IGST") {
+                oCustomerData.IGST = fTax;
+                fGrandTotal += fTax;
+            }
+
+            oCustomerData.GrandTotal = fGrandTotal;
+            oCustomerData.DueAmount = fGrandTotal - Number(oCustomerData.PaymentPaid || 0);
+
+            oBookingModel.setProperty("/CouponCode", sOriginalCouponCode);
+            oCustomerDataModel.refresh(true);
+            this.getView().getModel("VisibleModel").setProperty("/IsCouponApplied", true);
+            MessageToast.show(this.i18nModel.getText("couponAppliedSuccessfully"));
+        },
+
+        _rejectBookingCoupon: function (sMessage) {
+            this.oncancelCoupon();
+            MessageToast.show(sMessage);
+        },
+
         onApplyCoupon: async function () {
             var oCustomerData = this.getView().getModel("CustomerData").getData();
             var Bookingmodel = this.getView().getModel("Bookingmodel").getData();
@@ -6700,6 +6824,20 @@ sap.m.MessageBox.confirm(
 
             if (oCustomerData.CouponCode === sEnteredCode) {
                 sap.m.MessageToast.show(this.i18nModel.getText("couponAlreadyApplied"));
+                return;
+            }
+
+            var sOriginalCouponCode = String(
+                Bookingmodel.OriginalCouponCode || oCustomerData.OriginalCouponCode || ""
+            ).trim();
+            var bIsOriginalCoupon = sOriginalCouponCode &&
+                sEnteredCode.toUpperCase() === sOriginalCouponCode.toUpperCase();
+
+            if (bIsOriginalCoupon) {
+                this._restoreOriginalBookingCoupon(
+                    sOriginalCouponCode,
+                    Bookingmodel.OriginalCouponDiscount ?? oCustomerData.OriginalCouponDiscount
+                );
                 return;
             }
 
@@ -6722,19 +6860,19 @@ sap.m.MessageBox.confirm(
 
                 // Coupon exists
                 if (!oCoupon) {
-                    sap.m.MessageToast.show(this.i18nModel.getText("invalidCouponCode"));
+                    this._rejectBookingCoupon(this.i18nModel.getText("invalidCouponCode"));
                     return;
                 }
 
                 // Status validation
                 if (String(oCoupon.Status || "").trim() !== "Active") {
-                    sap.m.MessageToast.show(this.i18nModel.getText("couponnotActive"));
+                    this._rejectBookingCoupon(this.i18nModel.getText("couponnotActive"));
                     return;
                 }
 
                 // Usage count validation
                 if (Number(oCoupon.couponUsedCount || 0) >= Number(oCoupon.MaxUses || 0)) {
-                    sap.m.MessageToast.show("This coupon cannot be applied to this booking");
+                    this._rejectBookingCoupon(this.i18nModel.getText("couponCannotApplied"));
                     return;
                 }
 
@@ -6744,7 +6882,7 @@ sap.m.MessageBox.confirm(
                     String(oCoupon.BranchCode || "").trim() !==
                     String(oCustomerData.BranchCode || "").trim()
                 ) {
-                    sap.m.MessageToast.show(
+                    this._rejectBookingCoupon(
                         this.i18nModel.getText("thiscouponnotAvailableforthisBranch")
                     );
                     return;
@@ -6752,13 +6890,13 @@ sap.m.MessageBox.confirm(
 
                 // Expiry validation
                 if (this._isCouponExpired(oCoupon.EndDate)) {
-                    sap.m.MessageToast.show(this.i18nModel.getText("Couponisexpired"));
+                    this._rejectBookingCoupon(this.i18nModel.getText("Couponisexpired"));
                     return;
                 }
 
                 // Not started validation
                 if (this._isCouponNotStarted(oCoupon.StartDate)) {
-                    sap.m.MessageToast.show(this.i18nModel.getText("Couponisnotactiveyet"));
+                    this._rejectBookingCoupon(this.i18nModel.getText("Couponisnotactiveyet"));
                     return;
                 }
 
@@ -6778,7 +6916,7 @@ sap.m.MessageBox.confirm(
                     this._getCouponBookingDateReasons(oCoupon);
 
                 if (aCouponBookingDateReasons.length > 0) {
-                    sap.m.MessageToast.show(
+                    this._rejectBookingCoupon(
                         this.i18nModel.getText("couponnotValidforSelectedDates")
                     );
                     return;
@@ -6791,8 +6929,8 @@ sap.m.MessageBox.confirm(
 
                 // Minimum order validation
                 if (subtotal < Number(oCoupon.MinOrderValue || 0)) {
-                    sap.m.MessageToast.show(
-                    this.i18nModel.getText("couponMinimumValue", [oCoupon.MinOrderValue])
+                    this._rejectBookingCoupon(
+                        this.i18nModel.getText("couponMinimumValue", [oCoupon.MinOrderValue])
                     );
                     return;
                 }
@@ -7253,7 +7391,7 @@ sap.m.MessageBox.confirm(
             var oInput = this.getView().byId("couponInput");
             if (oInput) {
                 oInput.setValue("");
-                oInput.setShowValueHelp(false);
+                oInput.setShowValueHelp(true);
             }
         },
 

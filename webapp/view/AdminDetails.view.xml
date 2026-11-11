@@ -749,13 +749,14 @@
                         <Input
                             id="couponInput"
                             value="{Bookingmodel>/CouponCode}"
-                            placeholder="{i18n>enterCoupon}"
+                            placeholder="{i18n>enterCouponCode}"
                             width="150px"
                             class="sapUiTinyMarginEnd myUnifiedBtn tealValueHelpIcon"
+                            maxLength="21"
                             showValueHelp="true"
-                            valueHelpIconSrc="sap-icon://delete"
-                            valueHelpRequest="oncancelCoupon"
-                            liveChange="onCouponLiveChange"
+                            valueHelpRequest="AD_onOpenCouponValueHelp"
+                            valueStateText="{i18n>modelValueState}"
+                            submit="onApplyCoupon"
                         />
                         <!-- Apply Now Button -->
                         <Button
@@ -763,8 +764,16 @@
                             text="{i18n>applyNow}"
                             tooltip="{i18n>applyCoupon}"
                             press=".onApplyCoupon"
-                            class="sapUiTinyMarginEnd myUnifiedBtn"
+                            class="sapUiTinyMarginBegin sapUiTinyMarginEnd myUnifiedBtn"
                             visible="{= !${VisibleModel>/IsCouponApplied} }"
+                        />
+                        <Button
+                            id="idRemoveCouponButton"
+                            text="{i18n>Remove}"
+                            tooltip="{i18n>Remove}"
+                            press="oncancelCoupon"
+                            class="sapUiTinyMarginBegin sapUiTinyMarginEnd myUnifiedBtn"
+                            visible="{VisibleModel>/IsCouponApplied}"
                         />
                     </FlexBox>
                     <!-- <HBox justifyContent="SpaceBetween" visible="{= ${CustomerData>/CouponCode} ? true : false }">
