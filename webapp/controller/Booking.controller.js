@@ -5828,25 +5828,25 @@
             ].join("|");
         },
 
-        _checkRoomAvailabilityForBooking: async function () {
+        _checkRoomAvailabilityForBooking: async function (bForceRefresh) {
             const oModel = this.getView().getModel("HostelModel");
             const sStartDate = this._formatDateToISO(oModel.getProperty("/StartDate"));
             const sEndDate = this._formatDateToISO(oModel.getProperty("/EndDate"));
 
             // The complete window must be known before availability can be verified.
             if (!sStartDate || !sEndDate || sEndDate < sStartDate) {
-                return;
+                return null;
             }
 
             const sCheckKey = this._getBookingAvailabilityCheckKey();
 
             // Already verified for this exact room + window (e.g. a duration
             // change that recomputes the same end date) - reuse the verdict.
-            if (this._oRoomAvailabilityCheck && this._oRoomAvailabilityCheck.key === sCheckKey) {
+            if (!bForceRefresh && this._oRoomAvailabilityCheck && this._oRoomAvailabilityCheck.key === sCheckKey) {
                 if (this._oRoomAvailabilityCheck.available === false) {
                     this._showRoomUnavailableMessage();
                 }
-                return;
+                return this._oRoomAvailabilityCheck.available;
             }
 
             this.getBusyDialog();
@@ -5863,7 +5863,7 @@
                 if (!oResponse || oResponse.success === false) {
                     // Verification failed - do not block the booking flow.
                     this._oRoomAvailabilityCheck = null;
-                    return;
+                    return null;
                 }
 
                 let iAvailableCount = parseInt(oResponse.availableCount, 10);
@@ -5879,9 +5879,12 @@
                 if (!bAvailable) {
                     this._showRoomUnavailableMessage();
                 }
+
+                return bAvailable;
             } catch (err) {
                 // Verification failed - do not block the booking flow.
                 this._oRoomAvailabilityCheck = null;
+                return null;
             } finally {
                 this.closeBusyDialog();
             }
@@ -7216,6 +7219,13 @@
                     MessageToast.show(this.getView().getModel("i18n").getResourceBundle().getText("completePayment"));
                     return;
                 }
+            }
+
+            // Availability may have changed while the payment dialog was open.
+            // Force a fresh backend check before creating the booking.
+            const bRoomAvailable = await this._checkRoomAvailabilityForBooking(true);
+            if (bRoomAvailable === false) {
+                return;
             }
 
             try {
