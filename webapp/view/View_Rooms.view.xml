@@ -239,42 +239,75 @@
 											</fb:filterGroupItems>
 										</fb:FilterBar>
 
-												<VBox
-													id="VR_id_AdWrap"
-													renderType="Bare"
-													class="roomsAdWrap"
-													visible="{= ${AdvertisementModel>/Advertisements}.length > 0 }"
-												>
-													<Title
-														text="{i18n>advertisements}"
-														class="roomsAdTitle"
-													/>
-													<Panel class="adPanel">
-														<VBox class="sapUiTinyMargin">
-															<Carousel
-																id="AdvertisementCarousel"
-																height="215px"
-																showPageIndicator="false"
-																arrowsPlacement="Content"
-																loop="true"
-																pages="{
-																	path: 'AdvertisementModel>/Advertisements',
-																	templateShareable: false
-																}"
-															>
-																<pages>
-																	<Image
-																		src="{AdvertisementModel>image}"
-																		alt="{AdvertisementModel>title}"
-																		width="100%"
-																		height="100%"
-																		press="onAdvertisementImagePress"
-																	/>
-																</pages>
-															</Carousel>
-																</VBox>
-														</Panel>
-													</VBox>
+										<VBox
+											id="VR_id_AdWrap"
+											renderType="Bare"
+											class="roomsAdWrap"
+											visible="{= ${AdvertisementModel>/EvenAdvertisementCount} > 0 || ${AdvertisementModel>/OddAdvertisementCount} > 0 }"
+										>
+											<Title
+												text="{i18n>advertisements}"
+												class="roomsAdTitle"
+											/>
+											<Panel
+												class="adPanel"
+												visible="{= ${AdvertisementModel>/EvenAdvertisementCount} > 0 }"
+											>
+												<VBox class="sapUiTinyMargin">
+													<Carousel
+														id="AdvertisementCarouselEven"
+														height="215px"
+														showPageIndicator="false"
+														arrowsPlacement="Content"
+														loop="true"
+														pages="{
+															path: 'AdvertisementModel>/Advertisements',
+															filters: [{ path: 'positionParity', operator: 'EQ', value1: 'Even' }],
+															templateShareable: false
+														}"
+													>
+														<pages>
+															<Image
+																src="{AdvertisementModel>image}"
+																alt="{AdvertisementModel>title}"
+																width="100%"
+																height="100%"
+																press="onAdvertisementImagePress"
+															/>
+														</pages>
+													</Carousel>
+												</VBox>
+											</Panel>
+											<Panel
+												class="adPanel sapUiSmallMarginTop"
+												visible="{= ${AdvertisementModel>/OddAdvertisementCount} > 0 }"
+											>
+												<VBox class="sapUiTinyMargin">
+													<Carousel
+														id="AdvertisementCarouselOdd"
+														height="215px"
+														showPageIndicator="false"
+														arrowsPlacement="Content"
+														loop="true"
+														pages="{
+															path: 'AdvertisementModel>/Advertisements',
+															filters: [{ path: 'positionParity', operator: 'EQ', value1: 'Odd' }],
+															templateShareable: false
+														}"
+													>
+														<pages>
+															<Image
+																src="{AdvertisementModel>image}"
+																alt="{AdvertisementModel>title}"
+																width="100%"
+																height="100%"
+																press="onAdvertisementImagePress"
+															/>
+														</pages>
+													</Carousel>
+												</VBox>
+											</Panel>
+										</VBox>
 										</VBox>
 									</uxap:blocks>
 								</uxap:ObjectPageSubSection>

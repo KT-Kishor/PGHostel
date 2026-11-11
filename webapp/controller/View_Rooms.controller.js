@@ -129,6 +129,34 @@ sap.ui.define([
             const oFooterContentDomRef = oFooterDomRef?.querySelector(".svFooter") || oFooterDomRef;
             if (!oSidebarSection || !oSidebarSectionDomRef || !oSidebarDomRef || !oContentContainer || !oScrollContainer) return;
 
+            const fnGetRenderedOuterHeight = function (oDomRef) {
+                if (!oDomRef) return 0;
+
+                const oStyle = window.getComputedStyle(oDomRef);
+                if (oStyle.display === "none") return 0;
+
+                const iContentHeight = Math.max(
+                    oDomRef.getBoundingClientRect().height,
+                    oDomRef.scrollHeight || 0
+                );
+                const iMarginTop = parseFloat(oStyle.marginTop) || 0;
+                const iMarginBottom = parseFloat(oStyle.marginBottom) || 0;
+                return iContentHeight + iMarginTop + iMarginBottom;
+            };
+            const iSidebarMinimumHeight = Math.ceil(
+                fnGetRenderedOuterHeight(oSidebarDomRef.querySelector(".roomsFilterTitle")) +
+                fnGetRenderedOuterHeight(this.byId("VR_id_DateFilterBar")?.getDomRef()) +
+                fnGetRenderedOuterHeight(this.byId("VR_id_AdWrap")?.getDomRef())
+            );
+            const sSidebarMinimumHeight = `${iSidebarMinimumHeight}px`;
+            const sFooterContentHeight = `${Math.ceil(fnGetRenderedOuterHeight(oFooterContentDomRef))}px`;
+            if (oLayoutDomRef.style.getPropertyValue("--vr-sidebar-content-height") !== sSidebarMinimumHeight) {
+                oLayoutDomRef.style.setProperty("--vr-sidebar-content-height", sSidebarMinimumHeight);
+            }
+            if (oLayoutDomRef.style.getPropertyValue("--vr-footer-content-height") !== sFooterContentHeight) {
+                oLayoutDomRef.style.setProperty("--vr-footer-content-height", sFooterContentHeight);
+            }
+
             if (window.innerWidth <= 768) {
                 oSidebarSection.removeStyleClass("vrRoomsSidebarFixed");
                 oSidebarSection.removeStyleClass("vrRoomsSidebarHidden");
@@ -164,32 +192,26 @@ sap.ui.define([
             }, iViewportTop);
             const iFixedTop = Math.max(iVisibleHeaderBottom, oContentRect.top);
             const iFooterTop = oFooterRect ? oFooterRect.top : iViewportBottom;
-            const iFixedBottom = Math.min(iViewportBottom, iFooterTop);
-            const iAvailableHeight = Math.max(0, iFixedBottom - iFixedTop);
-            const bOutsideViewport = iAvailableHeight < 1 || iFixedTop >= iViewportBottom;
             const iRootFontSize = parseFloat(window.getComputedStyle(document.documentElement).fontSize) || 16;
+            const iSidebarOuterHeight = Math.max(
+                oSidebarDomRef.getBoundingClientRect().height,
+                iSidebarMinimumHeight
+            ) + iRootFontSize * 0.7;
+            const iStickyTop = Math.min(iFixedTop, iFooterTop - iSidebarOuterHeight);
+            const bOutsideViewport = iFooterTop <= iViewportTop || iStickyTop >= iViewportBottom;
 
-            // CSS sizing avoids re-rendering the UI5 controls on every scroll frame.
+            // Keep the complete rail fixed below the header and move it upward
+            // only when its lower edge reaches the footer.
             const mSidebarStyles = {
-                "--vr-sidebar-fixed-top": `${iFixedTop.toFixed(3)}px`,
+                "--vr-sidebar-fixed-top": `${iStickyTop.toFixed(3)}px`,
                 "--vr-sidebar-fixed-left": `${oContentRect.left.toFixed(3)}px`,
-                "--vr-sidebar-fixed-height": `${iAvailableHeight.toFixed(3)}px`
+                "--vr-sidebar-fixed-height": `${iSidebarOuterHeight.toFixed(3)}px`
             };
             Object.keys(mSidebarStyles).forEach(function (sProperty) {
                 if (oSidebarSectionDomRef.style.getPropertyValue(sProperty) !== mSidebarStyles[sProperty]) {
                     oSidebarSectionDomRef.style.setProperty(sProperty, mSidebarStyles[sProperty]);
                 }
             });
-
-            const iSidebarOuterHeight = oSidebarDomRef.getBoundingClientRect().height + iRootFontSize * 0.7;
-            // Allow 1px of CSS rounding before switching a tall sidebar to natural scrolling.
-            if (!bOutsideViewport && iFooterTop >= iViewportBottom &&
-                iSidebarOuterHeight > iViewportBottom - iFixedTop + 1 &&
-                oContentRect.top + iSidebarOuterHeight > iViewportBottom + 1) {
-                oSidebarSection.removeStyleClass("vrRoomsSidebarFixed");
-                oSidebarSection.removeStyleClass("vrRoomsSidebarHidden");
-                return;
-            }
 
             oSidebarSection.addStyleClass("vrRoomsSidebarFixed");
             if (bOutsideViewport) {
@@ -803,7 +825,9 @@ sap.ui.define([
         _transformAdvertisementData: function (aAdvertisements) {
             const aCarouselItems = [];
 
-            aAdvertisements.forEach(function (oAdvertisement) {
+            aAdvertisements.forEach(function (oAdvertisement, iAdvertisementIndex) {
+                const sPositionParity = (iAdvertisementIndex + 1) % 2 === 0 ? "Even" : "Odd";
+
                 for (let iPhotoIndex = 1; iPhotoIndex <= 3; iPhotoIndex++) {
                     const sPhotoField = `Photo${iPhotoIndex}`;
                     const sNameField = `Photo${iPhotoIndex}Name`;
@@ -819,6 +843,7 @@ sap.ui.define([
                             image: sImageSource,
                             title: oAdvertisement[sNameField] || `Advertisement ${iPhotoIndex}`,
                             url: oAdvertisement.URL,
+                            positionParity: sPositionParity,
                             originalAd: oAdvertisement
                         });
                     }
@@ -841,20 +866,46 @@ sap.ui.define([
             if (!oView || oView.bIsDestroyed) return;
 
             this._stopAdvertisementCarouselAutoSlide();
+            const iEvenAdvertisementCount = aCarouselItems.filter(function (oItem) {
+                return oItem.positionParity === "Even";
+            }).length;
+            const iOddAdvertisementCount = aCarouselItems.length - iEvenAdvertisementCount;
+
             oView.setModel(new JSONModel({
                 Advertisements: aCarouselItems,
+                EvenAdvertisementCount: iEvenAdvertisementCount,
+                OddAdvertisementCount: iOddAdvertisementCount,
                 currentPage: 0,
                 itemsPerPage: 1
             }), "AdvertisementModel");
 
-            if (aCarouselItems.length > 1) {
+            if (iEvenAdvertisementCount > 1 || iOddAdvertisementCount > 1) {
                 this._startAdvertisementCarouselAutoSlide();
             }
         },
         _startAdvertisementCarouselAutoSlide: function () {
-            const oCarousel = this.byId("AdvertisementCarousel");
+            const oAdvertisementModel = this.getView()?.getModel("AdvertisementModel");
+            const aCarouselIds = [
+                {
+                    id: "AdvertisementCarouselEven",
+                    count: oAdvertisementModel?.getProperty("/EvenAdvertisementCount") || 0
+                },
+                {
+                    id: "AdvertisementCarouselOdd",
+                    count: oAdvertisementModel?.getProperty("/OddAdvertisementCount") || 0
+                }
+            ].filter(function (oConfig) {
+                return oConfig.count > 1;
+            });
+            if (aCarouselIds.length === 0) return;
 
-            if (!oCarousel || oCarousel.getPages().length <= 1) {
+            const aCarousels = aCarouselIds.map(function (oConfig) {
+                return this.byId(oConfig.id);
+            }.bind(this)).filter(function (oCarousel) {
+                return oCarousel && oCarousel.getPages().length > 1;
+            });
+
+            if (aCarousels.length !== aCarouselIds.length) {
                 this._iAdCarouselRetries = (this._iAdCarouselRetries || 0) + 1;
                 if (this._iAdCarouselRetries > 40 || !this.getView()) return;
 
@@ -873,27 +924,38 @@ sap.ui.define([
                 this._stopAdvertisementCarouselAutoSlide();
                 this._iAdCarouselResumeTimer = setTimeout(function () {
                     this._iAdCarouselResumeTimer = null;
-                    if (!oCarousel.bIsDestroyed && oCarousel.getPages().length > 1) {
+                    if (aCarousels.some(function (oCarousel) {
+                        return !oCarousel.bIsDestroyed && oCarousel.getPages().length > 1;
+                    })) {
                         this._startAdvertisementCarouselAutoSlide();
                     }
                 }.bind(this), 3000);
             }.bind(this);
 
-            ["touchstart", "mousedown"].forEach(function (sEventName) {
-                oCarousel.attachBrowserEvent(sEventName, fnPauseAndResume);
-                this._adCarouselPauseResumeHandlers.push({
-                    element: oCarousel,
-                    event: sEventName,
-                    fn: fnPauseAndResume
-                });
+            aCarousels.forEach(function (oCarousel) {
+                ["touchstart", "mousedown"].forEach(function (sEventName) {
+                    oCarousel.attachBrowserEvent(sEventName, fnPauseAndResume);
+                    this._adCarouselPauseResumeHandlers.push({
+                        element: oCarousel,
+                        event: sEventName,
+                        fn: fnPauseAndResume
+                    });
+                }.bind(this));
             }.bind(this));
 
             this._adCarouselInterval = setInterval(function () {
-                if (!oCarousel.bIsDestroyed) {
-                    oCarousel.next();
-                } else {
+                const aActiveCarousels = aCarousels.filter(function (oCarousel) {
+                    return !oCarousel.bIsDestroyed;
+                });
+
+                if (aActiveCarousels.length === 0) {
                     this._stopAdvertisementCarouselAutoSlide();
+                    return;
                 }
+
+                aActiveCarousels.forEach(function (oCarousel) {
+                    oCarousel.next();
+                });
             }.bind(this), 3000);
         },
         _stopAdvertisementCarouselAutoSlide: function () {

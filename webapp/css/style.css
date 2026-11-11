@@ -7660,7 +7660,14 @@ html, body {
 @media (min-width: 769px) {
     .vrObjectPageLayout .sapUxAPObjectPageContainer {
         position: relative;
-        min-height: 38rem !important;
+        min-height: max(
+            38rem,
+            calc(
+                var(--vr-sidebar-content-height, 0px) +
+                var(--vr-footer-content-height, 0px) +
+                0.7rem
+            )
+        ) !important;
         padding-left: calc(300px + 1.05rem) !important;
         box-sizing: border-box;
     }
@@ -7696,19 +7703,18 @@ html, body {
     .RoomsPage .vrRoomsSidebar.stickyFilterContainer {
         position: relative !important;
         top: auto !important;
-        height: max(0px, calc(var(--vr-sidebar-fixed-height, 100vh) - 0.7rem)) !important;
+        height: auto !important;
         max-height: none !important;
-        min-height: min-content !important;
+        min-height: var(--vr-sidebar-content-height, min-content) !important;
         display: flex !important;
         flex-direction: column;
         overflow: visible;
         box-sizing: border-box;
     }
 
-    /* Only move behind the header after flexible spacing reaches its minimum. */
+    /* Keep the filter below the sticky header even when both ad panels are present. */
     .vrRoomsSidebarFixed .vrRoomsSidebar {
-        transform: translate3d(0, min(0px, calc(var(--vr-sidebar-fixed-height) - 100% - 0.7rem)), 0);
-        will-change: transform;
+        transform: none;
     }
 
     .RoomsPage .vrRoomsSidebar .vrRoomDateFilterBar {
@@ -7717,13 +7723,14 @@ html, body {
     }
 
     .RoomsPage .vrRoomsSidebar.roomsFilterAdSection .roomsAdWrap {
-        flex: 1 0 auto;
+        flex: 0 0 auto;
         margin-top: 3rem !important;
         display: flex !important;
         flex-direction: column;
         align-items: stretch;
         justify-content: center !important;
         justify-content: safe center !important;
+        overflow: visible;
         box-sizing: border-box;
     }
 
