@@ -182,6 +182,11 @@
 											renderType="Bare"
 											class="stickyFilterContainer roomsFilterAdSection vrRoomsSidebar"
 										>
+										<Title
+											text="{i18n>searchByDate}"
+											level="H4"
+											class="roomsFilterTitle"
+										/>
 										<fb:FilterBar
 											id="VR_id_DateFilterBar"
 											persistencyKey="viewRoomsDateFilter"
