@@ -14756,6 +14756,7 @@ body.svVendorScope .sapMSltPicker .sapMSelectList:focus {
 }
 
 .RoomsPage .footer-shell {
+    /* The grid and layout already provide the 0.7rem bottom gutter. */
     margin-top: 0 !important;
 }
 
@@ -15118,14 +15119,15 @@ body.svVendorScope .sapMSltPicker .sapMSelectList:focus {
     .RoomsPage .hostelRoomsSidebar.stickyFilterContainer {
         position: relative !important;
         top: auto !important;
-        height: max(0px, calc(var(--hostel-sidebar-height, 100vh) - 0.7rem)) !important;
+        /* Keep 0.7rem below the panel after its 0.35rem top margin. */
+        height: max(0px, calc(var(--hostel-sidebar-height, 100vh) - 1.05rem)) !important;
         min-height: min-content !important;
         max-height: none !important;
         overflow: visible;
     }
 
     .hostelRoomsSidebarFixed .hostelRoomsSidebar {
-        transform: translate3d(0, min(0px, calc(var(--hostel-sidebar-height) - 100% - 0.7rem)), 0);
+        transform: translate3d(0, min(0px, calc(var(--hostel-sidebar-height) - 100% - 1.05rem)), 0);
         will-change: transform;
     }
 
