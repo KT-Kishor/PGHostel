@@ -641,8 +641,11 @@ try {
 
             var oHostelModel = this.getView().getModel("HostelModel");
             var aCustomers = oHostelModel.getData();
+           var Activeroomsdata= aRooms.filter((item)=>{
+                return item.Status ==="Active"
+            })
             // 🔹 SHOW ALL ROOMS (NO CAPACITY CHECK)
-            var availableRoomNos = aRooms.filter(function (room) {
+            var availableRoomNos = Activeroomsdata.filter(function (room) {
 
                 // Branch match
                 if (room.BranchCode !== customerBranchCode) {

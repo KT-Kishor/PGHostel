@@ -1130,10 +1130,12 @@ sap.ui.define([
                 endDate.setDate(endDate.getDate() + 1);
                 const unitText = "Fix"; // default unit
 
+                var GSTvalue=this.getView().byId("GSTValue").getValue()
+
                 const newItem = {
                     IndexNo: this.IndexNo,
                     Particulars: "",
-                    SAC: "996322",
+                    SAC: GSTvalue ? "996322":"",
                     GSTCalculation: (currency === "INR") ? "YES" : "",
                     StartDate: this.Formatter.formatDate(startDate),
                     EndDate: this.Formatter.formatDate(endDate),
@@ -2070,7 +2072,7 @@ sap.ui.define([
 
             CI_onPercentageChange: function (oEvent) {
                 utils._LCvalidateMandatoryField(oEvent);
-                const sPercentage = parseFloat(oEvent.getParameter("value")) || 0;
+                const sPercentage = parseFloat(oEvent.getParameter("value")) || "";
 
                 const oView = this.getView();
                 const oCustomerModel = oView.getModel("SelectedCustomerModel");

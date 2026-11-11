@@ -593,8 +593,52 @@ sap.ui.define([
             oRouter.navTo("TilePage");
             this.getView().getModel("Damage").setData({});
         },
+        Damgeitemreadcall:async function(sDamageID){
+         
+             const oData = await this.ajaxReadWithJQuery("HM_DamageItem", {DamageID:sDamageID});
 
-        HM_ReturnDamage: function () {
+                    var oFCIAerData = Array.isArray(oData.data) ? oData.data : [oData.data];
+
+                    var Damage = oFCIAerData[0].HM_Damage[0];
+                    var Items = oFCIAerData[0].HM_DamageItem;
+
+                    var aItemsWithIndex = Items.map(function (item, index) {
+                        return {
+                            IndexNo: index + 1,
+                            Type: item.Type,
+                            ItemName: item.ItemName,
+                            Description: item.Description,
+                            Cost: item.Cost,
+                            TotalCost:item.TotalCost,
+                            RecoverCost: item.RecoverCost,
+                            Quantity: item.Quantity,
+                            ItemId: item.ItemID
+                        };
+                    });
+
+                    var DamageModel = {
+                        DamageID: Damage.DamageID,
+                        BookingID: Damage.BookingID,
+                        CustomerName: Damage.CustomerName,
+                        RoomNo: Damage.RoomNo,
+                        BedTypeName: Damage.BedTypeName,
+                        BranchCode: Damage.BranchCode,
+                        Date: Formatter.formatDate(new Date(Damage.InvoiceDate)),
+                        Status: Damage.Status,
+                        Currency: Damage.Currency,
+                        CustomerEmail: Damage.CustomerEmail,
+                        UserID: Damage.UserID,
+                        RecoverCost: Damage.RecoverCost,
+                        TotalCost: Damage.TotalCost,
+                        ReturnDamageAmount: Damage.ReturnDamageAmount,
+                        Items: aItemsWithIndex
+                    };
+
+                    this.getView().setModel(new JSONModel(DamageModel), "DamageItemModel");
+        },
+
+        HM_ReturnDamage:async function () {
+         
             const oView = this.getView();
             var oTable = this.byId("HD_id_ARD_Table");
             var oSelected = oTable.getSelectedItems();
@@ -612,11 +656,15 @@ sap.ui.define([
             var oContext = oSelected[0].getBindingContext("Damage");
             var oData = oContext.getObject();
 
+            
+
             if (oData.Status === "Damage Claimed") {
                 MessageToast.show(this.getView().getModel("i18n").getResourceBundle().getText("damageAlreadyClaimed"));
                 return;
             }
-
+              this.getBusyDialog()
+            await this.Damgeitemreadcall(oData.DamageID)
+            this.closeBusyDialog()
             if (!this._oReturnDialog) {
                 this._oReturnDialog = sap.ui.xmlfragment(
                     oView.getId(),
@@ -675,6 +723,348 @@ sap.ui.define([
                 }
             }
         },
+     
+DM_onPressGeneratePDF: async function () {
+    try {
+        this.getBusyDialog();
+
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF("portrait", "mm", "a4");
+
+        const oModel = this.getView()
+            .getModel("DamageItemModel")
+            .getData();
+
+        const aItems = oModel.Items || [];
+
+        let filter = {
+            BranchID: [oModel.BranchCode]
+        };
+
+        const oCompanyDetailsModel =
+            await this.ajaxReadWithJQuery("HM_Branch", filter);
+
+        var companyImage = oCompanyDetailsModel?.data?.[0]?.Photo1 || "";
+        var branchName = (oCompanyDetailsModel?.data?.[0]?.Name || "").toUpperCase();
+
+        const margin = 15;
+        const pageWidth = doc.internal.pageSize.getWidth();
+        const pageHeight = doc.internal.pageSize.getHeight();
+
+        let currentY = 20;
+
+        doc.setFont("times", "bold");
+        doc.setFontSize(16);
+
+        // ================= HEADER =================
+
+        const documentTitle =
+            oModel.Status === "Damage Claimed"
+                ? "DAMAGE RECEIPT"
+                : "DAMAGE NOTICE";
+
+        const titleWidth = doc.getTextWidth(documentTitle);
+        const branchMaxWidth = pageWidth - (margin * 2) - titleWidth - 10;
+
+        let branchNameLines = [];
+
+        if (branchName && branchName.trim() !== "") {
+            branchNameLines = doc.splitTextToSize(
+                branchName,
+                branchMaxWidth
+            );
+
+            doc.text(
+                branchNameLines,
+                margin,
+                currentY,
+                {
+                    align: "left",
+                    lineHeightFactor: 1.2
+                }
+            );
+        }
+
+        // Right side title
+        doc.text(
+            documentTitle,
+            pageWidth - margin,
+            currentY,
+            {
+                align: "right"
+            }
+        );
+
+        // ================= LOGO =================
+
+        let logoY = currentY + (branchNameLines.length * 6) + 3;
+
+        if (companyImage && companyImage.trim() !== "") {
+
+            const imgData = "data:image/png;base64," + companyImage;
+
+            doc.addImage(
+                imgData,
+                "PNG",
+                margin,
+                logoY,
+                35,
+                30
+            );
+        }
+
+        // ================= NEXT CONTENT =================
+
+        currentY = logoY + 15;
+
+        // ================= DAMAGE META =================
+
+        const detailsStartY = currentY;
+        const rowHeight = 7;
+        const columnWidths = [45, 35];
+
+        const rightAlignX =
+            pageWidth - margin - columnWidths[0] - columnWidths[1];
+
+        doc.setFontSize(11);
+        doc.setFont("times", "bold");
+
+        const damageDetails = [
+            ...(oModel.DamageID
+                ? [{
+                    label: "Damage No :",
+                    value: oModel.DamageID
+                }]
+                : []),
+
+            {
+                label: "Date :",
+                value: oModel.Date || "N/A"
+            },
+            {
+                label: "Room No :",
+                value: oModel.RoomNo || "N/A"
+            }
+        ];
+
+        currentY = detailsStartY;
+
+        damageDetails.forEach(row => {
+
+            doc.text(
+                row.label,
+                rightAlignX + columnWidths[0] - doc.getTextWidth(row.label),
+                currentY + 5
+            );
+
+            doc.setFont("times", "normal");
+
+            doc.text(
+                String(row.value),
+                rightAlignX + columnWidths[0] + 5,
+                currentY + 5
+            );
+
+            doc.setFont("times", "bold");
+
+            currentY += rowHeight;
+        });
+
+        currentY += 8;
+
+        // ================= CUSTOMER DETAILS =================
+
+        doc.setFont("times", "bold").setFontSize(11);
+        doc.text("To,", margin, currentY);
+
+        currentY += 6;
+
+        doc.setFont("times", "normal").setFontSize(12);
+
+        doc.text(`Name : ${oModel.CustomerName || ""}`, margin, currentY);
+
+        currentY += 6;
+
+        doc.text(`Email : ${oModel.CustomerEmail || ""}`, margin, currentY);
+
+        currentY += 10;
+
+        // ================= ITEMS TABLE =================
+
+        const body = aItems.map((item, index) => [
+            index + 1,
+            item.ItemName || "",
+            item.Description || "-",
+            item.Type || "",
+            item.Quantity || 0,
+            Formatter.fromatNumber(item.Cost),
+            Formatter.fromatNumber(item.TotalCost),
+            Formatter.fromatNumber(item.RecoverCost)
+        ]);
+
+        doc.autoTable({
+            startY: currentY,
+
+            head: [[
+                'Sl.No',
+                'Item Name',
+                'Description',
+                'Type',
+                'Quantity',
+                'Actual Cost',
+                'Total Cost',
+                'Recover Cost'
+            ]],
+
+            body: body,
+
+            theme: "grid",
+
+            headStyles: {
+                fillColor: [20, 170, 183]
+            },
+
+            styles: {
+                font: "times",
+                fontSize: 10,
+                cellPadding: 3,
+                lineWidth: 0.5,
+                lineColor: [30, 30, 30],
+                halign: "center"
+            },
+
+            columnStyles: {
+                1: { halign: "left" },
+                2: { halign: "left" },
+                3: { halign: "center" },
+                4: { halign: "center" },
+                5: { halign: "right" },
+                6: { halign: "right" },
+                7: { halign: "right" }
+            }
+        });
+
+        currentY = doc.lastAutoTable.finalY + 8;
+
+        // ================= SUMMARY =================
+
+        const totalAmount = parseFloat(oModel.RecoverCost || 0);
+
+        const summary = [];
+
+        if (totalAmount > 0) {
+            summary.push([
+                `Sub-Total (${oModel.Currency}) :`,
+                totalAmount.toFixed(2)
+            ]);
+        }
+
+        const totalRowIndex = summary.length;
+
+        summary.push([
+            `Total (${oModel.Currency}) :`,
+            totalAmount.toFixed(2)
+        ]);
+
+        doc.autoTable({
+            startY: currentY,
+
+            body: summary,
+
+            theme: "plain",
+
+            styles: {
+                font: "times",
+                fontSize: 10,
+                halign: "right",
+                cellPadding: 2,
+                overflow: "ellipsize"
+            },
+
+            columnStyles: {
+                0: {
+                    halign: "right",
+                    cellWidth: 60
+                },
+                1: {
+                    halign: "right",
+                    cellWidth: 40
+                }
+            },
+
+            margin: {
+                left: 95
+            },
+
+            didParseCell: function (data) {
+                if (data.row.index === totalRowIndex) {
+
+                    data.cell.styles.lineWidth = {
+                        top: 0.5,
+                        right: 0,
+                        bottom: 0,
+                        left: 0
+                    };
+
+                    data.cell.styles.lineColor = [0, 0, 0];
+                    data.cell.styles.fontStyle = "bold";
+                }
+            }
+        });
+
+        currentY = doc.lastAutoTable.finalY + 8;
+
+        // ================= AMOUNT IN WORDS =================
+
+        const finalAmount = totalAmount;
+
+        const amountInWords =
+            await this.convertNumberToWords(finalAmount, "INR");
+
+        doc.setFont("times", "bold");
+
+        doc.text("Amount in Words :", margin, currentY);
+
+        currentY += 6;
+
+        doc.setFont("times", "normal");
+
+        const lines = doc.splitTextToSize(
+            amountInWords,
+            pageWidth - 2 * margin
+        );
+
+        doc.text(lines, margin, currentY);
+
+        // ================= FOOTER =================
+
+        this.addFooter(
+            doc,
+            oCompanyDetailsModel,
+            pageWidth,
+            pageHeight
+        );
+
+        // ================= RETURN BASE64 =================
+
+        const pdfBase64 = doc.output("datauristring").split(",")[1];
+
+        return pdfBase64;
+
+    } catch (error) {
+
+        sap.m.MessageToast.show(error.message);
+
+        console.error("PDF Generation Error:", error);
+
+        throw error;
+
+    } finally {
+
+        this.closeBusyDialog();
+    }
+},
+
 
         onSaveReturn: async function () {
     const oView = this.getView();
@@ -758,6 +1148,9 @@ sap.ui.define([
             oView
                 .getModel("LoginModel")
                 .getProperty("/EmployeeName");
+
+     const pdfBase64 = await this.DM_onPressGeneratePDF();
+
         const payload = {
 
             ReturnDamageAmount: returnAmount,
@@ -775,7 +1168,17 @@ sap.ui.define([
             ReturningEmployeeName:
                 currentUser,
 
-            Status: "Damage Claimed"
+            Status: "Damage Claimed",
+            CustomerName:oDamage.CustomerName,
+            DamageID:oDamage.DamageID,
+            RecoverCost:oDamage.RecoverCost,
+            TotalCost:oDamage.TotalCost,
+            CustomerEmail:oDamage.CustomerEmail,
+             pdfAttachment: {
+                fileName: "Damage.pdf",
+                mimeType: "application/pdf",
+                content: pdfBase64
+            }
         };
       
         const res =

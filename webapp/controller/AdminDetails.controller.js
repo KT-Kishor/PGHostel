@@ -6095,6 +6095,7 @@ sap.m.MessageBox.confirm(
         },
 
         onPressCancelBooking: async function (oEvent) {
+           await this.AD_onSearch()
             var oHostelModel = this.getView().getModel("CustomerData");
             var oLoginModel = this.getOwnerComponent().getModel("LoginModel").getData();
             var oData = oHostelModel.getData();
