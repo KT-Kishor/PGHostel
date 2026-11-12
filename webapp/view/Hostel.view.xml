@@ -705,11 +705,16 @@
     >
     <VBox id="hostelRoomsSidebarFrame" renderType="Bare" class="hostelRoomsSidebarFrame">
     <VBox id="hostelRoomsSidebar" width="300px" renderType="Bare" class="stickyFilterContainer roomsFilterAdSection hostelRoomsSidebar">
-        <Title
-            text="{i18n>searchFilterSort}"
-            level="H4"
-            class="roomsFilterTitle"
-        />
+        <HBox
+            alignItems="Center"
+            class="roomsFilterTitle hostelRoomsFilterTitle"
+        >
+            <Text text="{i18n>roomsFilterSearch}" class="hostelRoomsFilterTitleWord" />
+            <Text text="{i18n>roomsFilterSeparator}" class="hostelRoomsFilterTitleSeparator" />
+            <Text text="{i18n>roomsFilterFilter}" class="hostelRoomsFilterTitleWord" />
+            <Text text="{i18n>roomsFilterSeparator}" class="hostelRoomsFilterTitleSeparator" />
+            <Text text="{i18n>roomsFilterSort}" class="hostelRoomsFilterTitleWord" />
+        </HBox>
         <fb:FilterBar
             id="filterbar"
             persistencyKey="myPersKey"

@@ -7513,6 +7513,11 @@ html, body {
 
 .vrRoomContentSection .sapUxAPBlockContainer {
     padding-top: 0 !important;
+    padding-bottom: 0 !important;
+}
+
+.vrRoomContentSection .sapUxAPBlockContainer > .sapUiRespGrid.sapUiRespGridVSpace1 > div {
+    margin-bottom: 0 !important;
 }
 
 .vrRoomContentSection .sapUxAPBlockContainer > .sapUiRespGrid,
@@ -7668,7 +7673,7 @@ html, body {
                 0.7rem
             )
         ) !important;
-        padding-left: calc(300px + 1.05rem) !important;
+        padding-left: calc(300px + 0.7rem) !important;
         box-sizing: border-box;
     }
 
@@ -7678,8 +7683,8 @@ html, body {
         bottom: 0;
         left: 0;
         height: auto !important;
-        width: calc(300px + 1.05rem) !important;
-        max-width: calc(300px + 1.05rem) !important;
+        width: calc(300px + 0.7rem) !important;
+        max-width: calc(300px + 0.7rem) !important;
         overflow-anchor: none;
         box-sizing: border-box;
         z-index: 2;
@@ -7749,9 +7754,9 @@ html, body {
     }
 
     .vrFooterSection {
-        width: calc(100% + 300px + 1.05rem) !important;
+        width: calc(100% + 300px + 0.7rem) !important;
         max-width: none !important;
-        margin-left: calc(-300px - 1.05rem) !important;
+        margin-left: calc(-300px - 0.7rem) !important;
     }
 }
 
@@ -15091,6 +15096,27 @@ body.svVendorScope .sapMSltPicker .sapMSelectList:focus {
     font-weight: 700 !important;
 }
 
+.RoomsPage .hostelRoomsSidebar .hostelRoomsFilterTitle {
+    gap: 0.35rem;
+}
+
+.RoomsPage .hostelRoomsSidebar .hostelRoomsFilterTitle .sapMText {
+    font-size: 1rem !important;
+    font-weight: 700 !important;
+}
+
+.RoomsPage .hostelRoomsSidebar .hostelRoomsFilterTitleWord {
+    color: #ffffff !important;
+}
+
+.RoomsPage .hostelRoomsSidebar .hostelRoomsFilterTitleSeparator {
+    color: rgba(255, 255, 255, 0.8) !important;
+}
+
+.RoomsPage .vrRoomsSidebar .vrDateFilterTitle {
+    margin-bottom: 0.7rem !important;
+}
+
 .RoomsPage .roomsFilterAdSection .roomsAdWrap {
     margin-top: 3rem !important;
     padding: 0 0.75rem 0.75rem;
@@ -15188,6 +15214,10 @@ body.svVendorScope .sapMSltPicker .sapMSelectList:focus {
     padding: 0 !important;
     max-width: 100%;
     box-sizing: border-box;
+}
+
+.RoomsPage .roomsAdWrap .vrAdPanelGap {
+    margin-top: 0.75rem !important;
 }
 
 .RoomsPage .roomsAdWrap .adPanel > .sapMPanelContent {

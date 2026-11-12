@@ -185,7 +185,7 @@
 										<Title
 											text="{i18n>searchByDate}"
 											level="H4"
-											class="roomsFilterTitle"
+											class="roomsFilterTitle vrDateFilterTitle"
 										/>
 										<fb:FilterBar
 											id="VR_id_DateFilterBar"
@@ -212,8 +212,10 @@
 															value="{RoomFilterModel>/StartDate}"
 															displayFormat="dd/MM/yyyy"
 											valueFormat="yyyy-MM-dd"
-											minDate="{RoomFilterModel>/TodayDate}"
+															minDate="{RoomFilterModel>/TodayDate}"
 															change="onRoomFilterDateChange"
+															busy="{VisibilityModel>/isLoading}"
+															busyIndicatorDelay="0"
 															width="100%"
 														/>
 													</fb:control>
@@ -230,8 +232,10 @@
 															value="{RoomFilterModel>/EndDate}"
 															displayFormat="dd/MM/yyyy"
 											valueFormat="yyyy-MM-dd"
-											minDate="{RoomFilterModel>/EndDateMinDate}"
+															minDate="{RoomFilterModel>/EndDateMinDate}"
 															change="onRoomFilterDateChange"
+															busy="{VisibilityModel>/isLoading}"
+															busyIndicatorDelay="0"
 															width="100%"
 														/>
 													</fb:control>
@@ -243,7 +247,6 @@
 											id="VR_id_AdWrap"
 											renderType="Bare"
 											class="roomsAdWrap"
-											visible="{= ${AdvertisementModel>/EvenAdvertisementCount} > 0 || ${AdvertisementModel>/OddAdvertisementCount} > 0 }"
 										>
 											<Title
 												text="{i18n>advertisements}"
@@ -251,7 +254,8 @@
 											/>
 											<Panel
 												class="adPanel"
-												visible="{= ${AdvertisementModel>/EvenAdvertisementCount} > 0 }"
+												busy="{AdvertisementModel>/isLoading}"
+												busyIndicatorDelay="0"
 											>
 												<VBox class="sapUiTinyMargin">
 													<Carousel
@@ -279,8 +283,9 @@
 												</VBox>
 											</Panel>
 											<Panel
-												class="adPanel sapUiSmallMarginTop"
-												visible="{= ${AdvertisementModel>/OddAdvertisementCount} > 0 }"
+												class="adPanel vrAdPanelGap"
+												busy="{AdvertisementModel>/isLoading}"
+												busyIndicatorDelay="0"
 											>
 												<VBox class="sapUiTinyMargin">
 													<Carousel
@@ -398,16 +403,9 @@
 																	/>
 																</HBox>
 															</VBox>
-														</VBox>
-													</l:Grid>
-													<VBox
-														alignItems="Center"
-														class="sapUiTinyMarginTop sapUiTinyMarginBottom"
-														visible="{VisibilityModel>/ShowViewMore}"
-													>
-														<VBox height="2rem" />
 													</VBox>
-										</VBox>
+												</l:Grid>
+									</VBox>
 									</uxap:blocks>
 								</uxap:ObjectPageSubSection>
 							</uxap:subSections>
@@ -497,16 +495,9 @@
 																	/>
 																</HBox>
 															</VBox>
-														</VBox>
-													</l:Grid>
-													<VBox
-														alignItems="Center"
-														class="sapUiTinyMarginTop sapUiTinyMarginBottom"
-														visible="{VisibilityModel>/ShowViewMore}"
-													>
-														<VBox height="2rem" />
 													</VBox>
-										</VBox>
+												</l:Grid>
+									</VBox>
 									</uxap:blocks>
 								</uxap:ObjectPageSubSection>
 							</uxap:subSections>

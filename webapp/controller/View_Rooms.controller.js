@@ -17,7 +17,17 @@ sap.ui.define([
         Formatter: Formatter,
         onInit: function () {
             this._adCarouselPauseResumeHandlers = [];
-            this._setupAdvertisementModel([]);
+            this.getView().setModel(new JSONModel({
+                isLoading: true,
+                isDataLoaded: false,
+                BedTypes: [],
+                ACRooms: [],
+                NonACRooms: [],
+                NoData: false,
+                ShowGlobalNoData: false,
+                ShowViewMore: false
+            }), "VisibilityModel");
+            this._setupAdvertisementModel([], true);
             this.getOwnerComponent().getRouter().getRoute("RouteViewRooms").attachMatched(this._onRouteMatched, this);
         },
 
@@ -254,8 +264,13 @@ sap.ui.define([
 
             this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
             var model = new JSONModel({
+                isLoading: true,
+                isDataLoaded: false,
                 BedTypes: [],
+                ACRooms: [],
+                NonACRooms: [],
                 NoData: false,
+                ShowGlobalNoData: false,
                 ShowViewMore: false
 
             });
@@ -452,6 +467,7 @@ sap.ui.define([
             // var Date=this.byId("VR_id_JoiningDate").getValue() || sap.ui.getCore().byId("idBookingDate").getValue()
             try {
                 this.getBusyDialog();
+                oVisibilityModel.setProperty("/isLoading", true);
                 oVisibilityModel.setProperty("/isDataLoaded", false);
                 let response;
                 response = await this.ajaxReadWithJQuery("BookingBedTypeRoomReadCall", {
@@ -459,7 +475,6 @@ sap.ui.define([
                     BranchCode: sBranchCode,
                 });
                 await this.model(response)
-                oVisibilityModel.setProperty("/isDataLoaded", true);
                 this.closeBusyDialog();
 
 
@@ -628,10 +643,13 @@ sap.ui.define([
                 oVisibilityModel.setProperty("/NonACRooms", NonACRooms);
                 oVisibilityModel.setProperty("/ShowGlobalNoData", !bHasAC && !bHasNonAC);
                 oVisibilityModel.setProperty("/ShowViewMore", aFinal.length !== HM_RoomCount);
+                oVisibilityModel.setProperty("/isDataLoaded", true);
                 this._restartRoomCardCarouselsAutoSlide();
             } catch (err) {
                 console.log(err);
                 oVisibilityModel.setProperty("/isDataLoaded", false);
+            } finally {
+                oVisibilityModel.setProperty("/isLoading", false);
             }
         },
         onRoomFilterDateChange: function (oEvent) {
@@ -812,6 +830,7 @@ sap.ui.define([
         },
         _loadAdvertisements: async function () {
             let aCarouselItems = [];
+            this._setupAdvertisementModel([], true);
 
             try {
                 const oResponse = await this.ajaxReadWithJQuery("HM_Advertisement");
@@ -820,7 +839,7 @@ sap.ui.define([
                 aCarouselItems = [];
             }
 
-            this._setupAdvertisementModel(aCarouselItems);
+            this._setupAdvertisementModel(aCarouselItems, false);
         },
         _transformAdvertisementData: function (aAdvertisements) {
             const aCarouselItems = [];
@@ -861,7 +880,7 @@ sap.ui.define([
             const sType = sImageType?.startsWith("image/") ? sImageType : "image/png";
             return `data:${sType};base64,${sCleanData}`;
         },
-        _setupAdvertisementModel: function (aCarouselItems) {
+        _setupAdvertisementModel: function (aCarouselItems, bIsLoading) {
             const oView = this.getView();
             if (!oView || oView.bIsDestroyed) return;
 
@@ -872,6 +891,7 @@ sap.ui.define([
             const iOddAdvertisementCount = aCarouselItems.length - iEvenAdvertisementCount;
 
             oView.setModel(new JSONModel({
+                isLoading: Boolean(bIsLoading),
                 Advertisements: aCarouselItems,
                 EvenAdvertisementCount: iEvenAdvertisementCount,
                 OddAdvertisementCount: iOddAdvertisementCount,
