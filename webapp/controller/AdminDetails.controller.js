@@ -2338,7 +2338,10 @@ if (!isValidDay) {
                 model.setProperty("/DurationUnit", data.Duration);
                 this.byId("idMonthYearSelect").setVisible(true);
             }
-
+              if(data.Status==="New"){
+               this.getView().getModel("VisibleModel").setProperty("/visible", false);
+               this.getView().byId("idMonthYearSelect").setVisible(false);
+              }
             this.getView().getModel("VisibleModel").setProperty("/IsCouponApplied", !!data.CouponCode);
         },
 
