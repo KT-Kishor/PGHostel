@@ -6901,17 +6901,6 @@ sap.m.MessageBox.confirm(
                     return;
                 }
 
-                // Date format correction
-                if (Bookingmodel.StartDate.includes("/")) {
-                    Bookingmodel.StartDate =
-                        Bookingmodel.StartDate.split("/").reverse().join("-");
-                }
-
-                if (Bookingmodel.EndDate.includes("/")) {
-                    Bookingmodel.EndDate =
-                        Bookingmodel.EndDate.split("/").reverse().join("-");
-                }
-
                 // Booking date validation
                 var aCouponBookingDateReasons =
                     this._getCouponBookingDateReasons(oCoupon);
