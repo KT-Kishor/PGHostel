@@ -2247,11 +2247,14 @@ if (!isValidDay) {
             this.getBusyDialog();
 
             const response = await this.ajaxReadWithJQuery("HM_Customer", "");
-            this.closeBusyDialog();
 
             const oCustomer = response?.Customers || response?.value?.[0] || [];
 
             this.getView().getModel("VisibleModel").setProperty("/visible", true);
+
+            await this.AD_onSearch()
+
+            this.closeBusyDialog();
 
             var data = this.getView().getModel("CustomerData").getData();
             var model = this.getView().getModel("Bookingmodel");
@@ -3933,6 +3936,9 @@ iMonths = Math.max(iMonths, 1);
 
 
         HM_ConfirmRoom: async function (oEvent) {
+            this.getBusyDialog();
+
+            await this.AD_onSearch()
             var ID = this.getView().getModel("CustomerData").getData()
 
 
@@ -3956,7 +3962,6 @@ iMonths = Math.max(iMonths, 1);
             //     return;
             // }
 
-            this.getBusyDialog();
             const pdfBase64 = await this.onGeneratePDF("Confirmed");
             this.closeBusyDialog();
             var Payload = {
@@ -4016,7 +4021,11 @@ iMonths = Math.max(iMonths, 1);
             );
         },
 
-        HM_RejectRoom: function (oEvent) {
+        HM_RejectRoom:async function (oEvent) {
+            this.getBusyDialog()
+            await this.AD_onSearch()
+            this.closeBusyDialog()
+
             this.ID = this.getView().getModel("CustomerData").getData()
 
             if (!this.RB_Dialog) {

@@ -1135,8 +1135,8 @@ sap.ui.define([
                 const newItem = {
                     IndexNo: this.IndexNo,
                     Particulars: "",
-                    SAC: GSTvalue ? "996322":"",
-                    GSTCalculation: (currency === "INR") ? "YES" : "",
+                    SAC: GSTvalue ? "996322":"-",
+                    GSTCalculation: (GSTvalue && currency === "INR") ? "YES" : "NO",
                     StartDate: this.Formatter.formatDate(startDate),
                     EndDate: this.Formatter.formatDate(endDate),
                     UnitText: unitText,

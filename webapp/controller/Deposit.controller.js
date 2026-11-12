@@ -782,7 +782,7 @@ sap.ui.define([
 
                 // Prepare update data - USE SAME CURRENCY AS DEPOSIT
                 const updateData = {
-                    ReturnDepositAmount: newReturnAmount.toFixed(2),
+                    ReturnDepositAmount: newReturnAmount,
                     ReturnDepositCurrency: depositCurrency, // Use deposit currency, not hardcoded INR
                     ReturnDepositDate: new Date().toISOString().slice(0, 10),
                     ReturnDepositMode: returnMode,
