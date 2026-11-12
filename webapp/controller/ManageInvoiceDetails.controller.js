@@ -1882,19 +1882,15 @@ sap.ui.define([
                             }),
                             beginButton: new sap.m.Button({
                                 text: this.i18nModel.getText("invoiceok"),
-                                type: "Transparent",
-                                class: "myUnifiedBtn",
                                 press: function () {
                                     oDialog.close();
                                     that.getOwnerComponent().getRouter().navTo("RouteManageInvoice", {
                                         sPath: "TilePage"
                                     });
                                 }
-                            }),
+                            }).addStyleClass("myUnifiedBtn"),
                             endButton: new sap.m.Button({
                                 text: this.i18nModel.getText("generatePdf"),
-                                type: "Transparent",
-                                class: "myUnifiedBtn",
                                 press: async () => {
                                     oDialog.close();
                                     await that.CID_onPressGeneratePdf();
@@ -1902,7 +1898,7 @@ sap.ui.define([
                                         sPath: "ManageInvoicedetails"
                                     });
                                 }
-                            }),
+                            }).addStyleClass("myUnifiedBtn"),
                             afterClose: function () {
                                 oDialog.destroy();
                             }
