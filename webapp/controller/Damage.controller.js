@@ -745,6 +745,8 @@ DM_onPressGeneratePDF: async function () {
             await this.ajaxReadWithJQuery("HM_Branch", filter);
 
         var companyImage = oCompanyDetailsModel?.data?.[0]?.Photo1 || "";
+        this.BranchEmailID = oCompanyDetailsModel?.data?.[0]?.EmailID || "";
+
         var branchName = (oCompanyDetailsModel?.data?.[0]?.Name || "").toUpperCase();
 
         const margin = 15;
@@ -1174,6 +1176,7 @@ DM_onPressGeneratePDF: async function () {
             RecoverCost:oDamage.RecoverCost,
             TotalCost:oDamage.TotalCost,
             CustomerEmail:oDamage.CustomerEmail,
+            BranchEmail:this.BranchEmailID,
              pdfAttachment: {
                 fileName: "Damage.pdf",
                 mimeType: "application/pdf",
