@@ -407,6 +407,7 @@ sap.ui.define([
 
             aItems.push({
                 IndexNo: aItems.length + 1,
+                _isNew: true,
                 Type: "",
                 ItemName: "",
                 Description: "",
@@ -593,12 +594,24 @@ _calculateTotalCost: function (oInput) {
         },
       
 
-        DM_onPressSubmit: function () {
+        DM_onPressSubmit: async function () {
+
+            if (this._bDamageSaveInProgress) {
+                return;
+            }
 
             var oModel = this.getView().getModel("DamageModel");
             var oData = oModel.getData();
+            var bIsCreate = this.decodedPath === "Damage" && !oData.DamageID;
+            var sDamageID = oData.DamageID || (bIsCreate ? "" : this.decodedPath);
 
-            if (this.decodedPath === "Damage") {
+            // An existing record must never fall back to a create request.
+            if (!bIsCreate && !sDamageID) {
+                sap.m.MessageToast.show(this.i18nModel.getText("errorWhileUpdating_ab30"));
+                return;
+            }
+
+            if (bIsCreate) {
                 if (
                     !utils._LCstrictValidationComboBox(this.getView().byId("HD_id_BookingID1"), "ID") ||
                     !utils._LCvalidateMandatoryField(this.getView().byId("HD_id_DamageDate1"), "ID")
@@ -691,6 +704,12 @@ _calculateTotalCost: function (oInput) {
                     return;
                 }
             }
+
+            if (!bIsCreate && aItems.some(item => !item.ItemId && !item._isNew)) {
+                sap.m.MessageToast.show(this.i18nModel.getText("errorWhileUpdating_ab30"));
+                return;
+            }
+
             var Payload = {
                 data: {
                     BookingID: oData.BookingID,
@@ -719,101 +738,87 @@ _calculateTotalCost: function (oInput) {
                 })
             };
 
-            this.getBusyDialog()
+            this._bDamageSaveInProgress = true;
+            this.getBusyDialog();
 
-            if (oData.DamageID) {
-
-                var aItems = oData.Items.map(item => {
-
-                    var itemObj = {
-                        data: {
-                            DamageID: oData.DamageID,
-                            Type: item.Type,
-                            ItemName: item.ItemName,
-                            Description: item.Description,
-                            Cost: item.Cost,
-                            TotalCost:(item.TotalCost || 0).toString(),
-                            RecoverCost: item.RecoverCost,
-                            Quantity: item.Quantity,
-                        }
-
+            try {
+                if (!bIsCreate) {
+                    Payload.filters = {
+                        DamageID: sDamageID
                     };
-
-                    if (!item.ItemId) {
-                        itemObj.filters = {
-                            flag: "create"
+                    Payload.Items = aItems.map(item => {
+                        return {
+                            data: {
+                                DamageID: sDamageID,
+                                Type: item.Type,
+                                ItemName: item.ItemName,
+                                Description: item.Description,
+                                Cost: item.Cost,
+                                TotalCost: (item.TotalCost || 0).toString(),
+                                RecoverCost: item.RecoverCost,
+                                Quantity: item.Quantity
+                            },
+                            filters: item._isNew && !item.ItemId
+                                ? { flag: "create" }
+                                : { ItemID: item.ItemId }
                         };
-                    } else {
-                        itemObj.filters = {
-                            ItemID: item.ItemId
-                        }
-                    }
+                    });
 
+                    await this.ajaxUpdateWithJQuery("HM_Damage", Payload);
+                } else {
+                    var Data = await this.ajaxCreateWithJQuery("HM_Damage", Payload);
+                    sDamageID = (Data && (Data.DamageID || Data.InvoiceNo)) || "";
+                }
 
-                    return itemObj;
+                this.decodedPath = sDamageID;
+                oModel.setProperty("/DamageID", sDamageID);
+
+                // Persisted rows must not be inserted again if the refresh fails.
+                aItems.forEach(item => {
+                    item._isNew = false;
                 });
 
+                this.getView().getModel("VisibleModel").setProperty("/visible", false);
+                this.getView().byId("HD_id_BookingID1").setEditable(false);
 
-                var Payload = {
-                    data: Payload.data,
-                    filters: {
-                        DamageID: oData.DamageID
-                    },
-                    Items: aItems,
+                if (sDamageID) {
+                    await this.OnSearch();
+                }
 
-                };
-
-                this.ajaxUpdateWithJQuery("HM_Damage", Payload)
-                    .then(() => {
-                        this.closeBusyDialog()
-                        sap.m.MessageToast.show(this.getView().getModel("i18n").getResourceBundle().getText("damageUpdated"));
-                        this.OnSearch();
-                        this.getView().getModel("VisibleModel")
-                            .setProperty("/visible", false);
-                    })
-                    .catch(err => {
-                        this.closeBusyDialog()
-                        sap.m.MessageToast.show(this.getView().getModel("i18n").getResourceBundle().getText("errorWhileUpdating_ab30"));
-                        console.error(err);
-                    });
-
-            } else {
-
-                this.ajaxCreateWithJQuery("HM_Damage", Payload)
-                    .then((Data) => {
-                        this.decodedPath = Data.InvoiceNo;
-                        this.closeBusyDialog()
-                        this.getView().getModel("VisibleModel").setProperty("/visible", false);
-                        this.getView().byId("HD_id_BookingID1").setEditable(false);
-                        sap.m.MessageBox.confirm(
-                            this.getView().getModel("i18n").getResourceBundle().getText("damageCreated"),
-                            {
-                                title: this.getView().getModel("i18n").getResourceBundle().getText("confirmation_8552"),
-                                actions: [
-                                    sap.m.MessageBox.Action.OK,
-                                    this.getView().getModel("i18n").getResourceBundle().getText("generatepdf")
-                                ],
-                                // emphasizedAction: sap.m.MessageBox.Action.OK,
-                                styleClass: "myUnifiedBtn",
-                                onClose: async (oAction) => {
-                                    if (oAction === sap.m.MessageBox.Action.OK) {
-                                        this.getOwnerComponent()
-                                            .getRouter()
-                                            .navTo("RouteDamage", {
-                                                sPath: "DamageDetails"
-                                            });
-                                    } else {
-                                        this.DM_onPressGeneratePDF();
-                                    }
+                if (!bIsCreate) {
+                    sap.m.MessageToast.show(this.i18nModel.getText("damageUpdated"));
+                } else {
+                    sap.m.MessageBox.confirm(
+                        this.i18nModel.getText("damageCreated"),
+                        {
+                            title: this.i18nModel.getText("confirmation_8552"),
+                            actions: [
+                                sap.m.MessageBox.Action.OK,
+                                this.i18nModel.getText("generatepdf")
+                            ],
+                            styleClass: "myUnifiedBtn",
+                            onClose: async (oAction) => {
+                                if (oAction === sap.m.MessageBox.Action.OK) {
+                                    this.getOwnerComponent()
+                                        .getRouter()
+                                        .navTo("RouteDamage", {
+                                            sPath: "DamageDetails"
+                                        });
+                                } else {
+                                    this.DM_onPressGeneratePDF();
                                 }
                             }
-                        );
-                    })
-                    .catch(err => {
-                        this.closeBusyDialog()
-                        sap.m.MessageToast.show(this.getView().getModel("i18n").getResourceBundle().getText("errorWhileSaving"));
-                        console.error(err);
-                    });
+                        }
+                    );
+                }
+            } catch (err) {
+                sap.m.MessageToast.show(this.i18nModel.getText(
+                    bIsCreate ? "errorWhileSaving" : "errorWhileUpdating_ab30"
+                ));
+                console.error(err);
+            } finally {
+                this._bDamageSaveInProgress = false;
+                this.closeBusyDialog();
             }
         },
 

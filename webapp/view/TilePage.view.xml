@@ -414,21 +414,42 @@
         </items>
         </FlexBox>
         <ToolbarSpacer />
-        	<Button
+	        	<Button
                 id="idMyBookingBtn"
                 text="{i18n>tour_title_mybookings}"
                 press="onMyBookingsPress"
                 class="myUnifiedBtn"
-            />
+            >
+                <layoutData>
+                    <OverflowToolbarLayoutData
+                        priority="{= ${device>/system/phone} ? 'AlwaysOverflow' : 'High' }"
+                    />
+                </layoutData>
+            </Button>
          <Button
-    text="{i18n>Language}"
-    press=".onLanguagePress" 
-     class="myUnifiedBtn"/>
+            text="{i18n>Language}"
+            press=".onLanguagePress"
+            class="myUnifiedBtn"
+        >
+            <layoutData>
+                <OverflowToolbarLayoutData
+                    priority="{= ${device>/system/phone} ? 'AlwaysOverflow' : 'High' }"
+                    closeOverflowOnInteraction="{= !${device>/system/phone} }"
+                />
+            </layoutData>
+        </Button>
         <Button
                 id="AdminusermanualLink"
                 text="{i18n>userManualTitle}"
                 class="myUnifiedBtn"
-                press="onAdminUsermanualPress" />
+                press="onAdminUsermanualPress"
+            >
+                <layoutData>
+                    <OverflowToolbarLayoutData
+                        priority="{= ${device>/system/phone} ? 'AlwaysOverflow' : 'High' }"
+                    />
+                </layoutData>
+            </Button>
 
         <Button
                 id="idRaiseBugFooterBtn"
@@ -437,7 +458,13 @@
             visible="true"
             class="myUnifiedBtn "
             press="onPressbugs"
-        />
+        >
+            <layoutData>
+                <OverflowToolbarLayoutData
+                    priority="{= ${device>/system/phone} ? 'AlwaysOverflow' : 'High' }"
+                />
+            </layoutData>
+        </Button>
 
         <Button
                 id="idResetPasswordFooterBtn"
@@ -446,7 +473,13 @@
                 visible="{= ${LoginModel>/Role} === 'SuperAdmin' }"
                 class="myUnifiedBtn sapUiSmallMarginEnd"
                 press="onResetPasswordPress"
-        />
+        >
+            <layoutData>
+                <OverflowToolbarLayoutData
+                    priority="{= ${device>/system/phone} ? 'AlwaysOverflow' : 'High' }"
+                />
+            </layoutData>
+        </Button>
 
          <!-- visible="{OBTNModel>/Submit}" -->
 

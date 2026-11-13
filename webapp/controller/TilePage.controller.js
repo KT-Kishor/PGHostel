@@ -3038,7 +3038,15 @@ onLanguagePress: function (oEvent) {
         this.getView().addDependent(this._oLanguagePopover);
     }
 
-    this._oLanguagePopover.openBy(oEvent.getSource());
+    var oSource = oEvent.getSource();
+
+    if (sap.ui.Device.system.phone) {
+        this._oLanguageOverflowToolbar = oSource.getParent();
+        this._oLanguagePopover.openBy(oSource);
+        return;
+    }
+
+    this._oLanguagePopover.openBy(oSource);
 },
 onLanguageSelect: function (oEvent) {
 
@@ -3072,6 +3080,16 @@ onLanguageSelect: function (oEvent) {
 
     if (this._oLanguagePopover) {
         this._oLanguagePopover.close();
+    }
+
+    if (this._oLanguageOverflowToolbar) {
+        var oOverflowPopover = this._oLanguageOverflowToolbar.getAggregation("_popover");
+
+        if (oOverflowPopover) {
+            oOverflowPopover.close();
+        }
+
+        this._oLanguageOverflowToolbar = null;
     }
 },
 

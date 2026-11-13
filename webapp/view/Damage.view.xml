@@ -156,7 +156,6 @@
 							inverted="false"
 							text="{Damage>Status}"
 							state="{ path: 'Damage>Status', formatter: '.Formatter.formatObjectStatus'}"
-							class="sapUiTinyMarginBottom"
 							/>
 							<Text text="{path: 'Damage>ReturnDamageDate', formatter: '.Formatter.formatDate'}"/>
 						</cells>

@@ -724,9 +724,11 @@ sap.ui.define([
             }
         },
      
-DM_onPressGeneratePDF: async function () {
+DM_onPressGeneratePDF: async function (bManageBusyDialog = true) {
     try {
-        this.getBusyDialog();
+        if (bManageBusyDialog) {
+            this.getBusyDialog();
+        }
 
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF("portrait", "mm", "a4");
@@ -1058,8 +1060,9 @@ DM_onPressGeneratePDF: async function () {
         throw error;
 
     } finally {
-
-        this.closeBusyDialog();
+        if (bManageBusyDialog) {
+            this.closeBusyDialog();
+        }
     }
 },
 
@@ -1146,8 +1149,7 @@ DM_onPressGeneratePDF: async function () {
             oView
                 .getModel("LoginModel")
                 .getProperty("/EmployeeName");
-     this.getBusyDialog()
-     const pdfBase64 = await this.DM_onPressGeneratePDF();
+     const pdfBase64 = await this.DM_onPressGeneratePDF(false);
 
         const payload = {
 
