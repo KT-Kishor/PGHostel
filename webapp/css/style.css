@@ -7807,6 +7807,14 @@ html, body {
         padding: 0.25rem 0.5rem 0.5rem 0.5rem !important;
     }
 
+    .RoomsPage .vrRoomsSidebar .vrDateFilterTitle {
+        padding-left: 0.5rem !important;
+    }
+
+    .RoomsPage .hostelRoomsSidebar .hostelRoomsFilterTitle {
+        margin-bottom: 0.97rem !important;
+    }
+
     /* Inner FilterBar containers must not re-add horizontal padding. */
     .vrDateFilterSection .vrRoomDateFilterBar .sapUiCompFilterBarItems,
     .vrDateFilterSection .vrRoomDateFilterBar .sapUiCompFilterBarButtons,
