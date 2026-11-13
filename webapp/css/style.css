@@ -6261,8 +6261,9 @@ width: 44px !important;
   box-sizing: border-box;
 }
 
-/* Booking Section Headers */
-.booking-section-header {
+/* Booking and room-category section headers */
+.booking-section-header,
+.vrRoomCategorySection .sapUxAPObjectPageSectionHeader {
   display: block !important;
   width: 100%;
   margin: 1.5rem 0 0.85rem 0 !important;
@@ -6302,7 +6303,8 @@ width: 44px !important;
 .booking-section-header.sapMTitle,
 .booking-section-header .sapMTitle,
 .booking-section-header .sapMTitleStyleAuto,
-.booking-section-header .sapMText {
+.booking-section-header .sapMText,
+.vrRoomCategorySection .sapUxAPObjectPageSectionTitle {
   font-family: "Poppins", "Segoe UI", Arial, sans-serif !important;
   font-size: 1.2rem !important;
   font-weight: 800 !important;
@@ -6346,7 +6348,8 @@ width: 44px !important;
 
 /* Mobile optimizations for booking form */
 @media (max-width: 600px) {
-  .booking-section-header {
+  .booking-section-header,
+  .vrRoomCategorySection .sapUxAPObjectPageSectionHeader {
     margin: 1.25rem 0 0.75rem 0 !important;
     padding: 0.8rem 1rem 0.75rem 1.05rem !important;
     border-left-width: 6px !important;
@@ -6366,7 +6369,8 @@ width: 44px !important;
   .booking-section-header.sapMTitle,
   .booking-section-header .sapMTitle,
   .booking-section-header .sapMTitleStyleAuto,
-  .booking-section-header .sapMText {
+  .booking-section-header .sapMText,
+  .vrRoomCategorySection .sapUxAPObjectPageSectionTitle {
     font-size: 1.15rem !important;
     letter-spacing: 0.05em !important;
   }
@@ -6378,7 +6382,8 @@ width: 44px !important;
 
 /* Tablet optimizations for booking section headers */
 @media (max-width: 900px) {
-  .booking-section-header {
+  .booking-section-header,
+  .vrRoomCategorySection .sapUxAPObjectPageSectionHeader {
     margin: 1.35rem 0 0.8rem 0 !important;
     padding: 0.85rem 1.1rem 0.78rem 1.2rem !important;
     border-left-width: 5px !important;
@@ -6388,7 +6393,8 @@ width: 44px !important;
   .booking-section-header.sapMTitle,
   .booking-section-header .sapMTitle,
   .booking-section-header .sapMTitleStyleAuto,
-  .booking-section-header .sapMText {
+  .booking-section-header .sapMText,
+  .vrRoomCategorySection .sapUxAPObjectPageSectionTitle {
     font-size: 1.18rem !important;
     letter-spacing: 0.045em !important;
   }
@@ -6396,6 +6402,25 @@ width: 44px !important;
   .booking-panel-enhanced {
     margin-bottom: 0.6rem !important;
   }
+}
+
+.vrRoomCategorySection .sapUxAPObjectPageSectionHeader {
+  display: flex !important;
+  align-items: center;
+  width: calc(100% - 0.7rem);
+  height: auto !important;
+  min-height: 3rem;
+  line-height: normal !important;
+  margin: 0.35rem 0.35rem !important;
+  padding-top: 0.8rem !important;
+  padding-bottom: 0.8rem !important;
+  border-radius: 9px 12px 12px 9px;
+}
+
+.vrRoomCategorySection .sapUxAPObjectPageSectionTitle {
+  height: auto !important;
+  line-height: 1.2 !important;
+  margin: 0 !important;
 }
 
 /* Validation feedback styles */
@@ -7506,7 +7531,7 @@ html, body {
     padding-right: 0 !important;
 }
 
-.vrRoomContentSection .sapUxAPObjectPageSectionHeader {
+.vrRoomContentSection:not(.vrRoomCategorySection) .sapUxAPObjectPageSectionHeader {
     padding-left: 0.35rem !important;
     padding-right: 0.35rem !important;
 }

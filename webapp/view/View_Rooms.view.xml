@@ -323,7 +323,7 @@
 							id="VR_id_ACSection"
 							title="{i18n>ACRooms}"
 							titleUppercase="false"
-							class="vrRoomContentSection"
+							class="vrRoomContentSection vrRoomCategorySection"
 							visible="{= ${VisibilityModel>/isDataLoaded} &amp;&amp; ${VisibilityModel>/ACRooms}.length > 0 }">
 							<uxap:subSections>
 								<uxap:ObjectPageSubSection
@@ -415,7 +415,7 @@
 							id="VR_id_NonACSection"
 							title="{i18n>NonACRooms}"
 							titleUppercase="false"
-							class="vrRoomContentSection"
+							class="vrRoomContentSection vrRoomCategorySection"
 							visible="{= ${VisibilityModel>/isDataLoaded} &amp;&amp; ${VisibilityModel>/NonACRooms}.length > 0 }">
 							<uxap:subSections>
 								<uxap:ObjectPageSubSection
