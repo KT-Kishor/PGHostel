@@ -1150,7 +1150,7 @@ DM_onPressGeneratePDF: async function () {
             oView
                 .getModel("LoginModel")
                 .getProperty("/EmployeeName");
-
+     this.getBusyDialog()
      const pdfBase64 = await this.DM_onPressGeneratePDF();
 
         const payload = {

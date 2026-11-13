@@ -630,6 +630,11 @@ try {
     this.closeBusyDialog()
     return;
 }
+       await this.ajaxReadWithJQuery("HM_Rooms", "").then((oData) => {
+                var oFCIAerData = Array.isArray(oData.commentData) ? oData.commentData : [oData.commentData];
+                var model = new JSONModel(oFCIAerData);
+                this.getOwnerComponent().setModel(model, "RoomDetailsModel");
+            })
     this.closeBusyDialog()
 
 
@@ -983,11 +988,7 @@ if (this.data.Status === "Assigned") {
                 }
             }
 
-              await this.ajaxReadWithJQuery("HM_Rooms", "").then((oData) => {
-                var oFCIAerData = Array.isArray(oData.commentData) ? oData.commentData : [oData.commentData];
-                var model = new JSONModel(oFCIAerData);
-                this.getOwnerComponent().setModel(model, "RoomDetailsModel");
-            })
+            
 
             /* ================= ROOM VALIDATION ================= */
 

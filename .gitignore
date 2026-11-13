@@ -1,6 +1,7 @@
 node_modules/
 dist/
 .scp/
+.env
 Makefile*.mta
 mta_archives
 mta-*
@@ -13,4 +14,3 @@ scripts
 .kilo/
 .kilocode/
 kilo.json
-config.bat
