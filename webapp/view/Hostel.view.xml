@@ -860,7 +860,7 @@
             id="roomsAdWrap"
             renderType="Bare"
             class="roomsAdWrap"
-            visible="{= ${AdvertisementModel>/Advertisements}.length > 0 }">
+            visible="{= !${device>/system/phone} &amp;&amp; ${AdvertisementModel>/Advertisements}.length > 0 }">
             <Title
                 text="{i18n>advertisements}"
                 class="roomsAdTitle"

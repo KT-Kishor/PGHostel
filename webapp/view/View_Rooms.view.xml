@@ -247,6 +247,7 @@
 											id="VR_id_AdWrap"
 											renderType="Bare"
 											class="roomsAdWrap"
+											visible="{= !${device>/system/phone} }"
 										>
 											<Title
 												text="{i18n>advertisements}"
