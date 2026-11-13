@@ -1272,7 +1272,7 @@ sap.ui.define([
                     // ---------- ITEM CALCULATION ----------
                     aItems.forEach((item) => {
                         // const baseAmount = parseFloat(item.Total) || 0;
-                        if (item.PreviousTotal === undefined || item.PreviousTotal === null || item.PreviousTotal === "") {
+                        if (item.Particulars.includes("Room Rent") || item.PreviousTotal === undefined || item.PreviousTotal === null || item.PreviousTotal === "") {
                             item.PreviousTotal = item.Total;
                         }
 

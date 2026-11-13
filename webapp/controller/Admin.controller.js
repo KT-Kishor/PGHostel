@@ -1047,6 +1047,7 @@ if (this.data.Status === "Assigned") {
                 Payload = {
                     CustomerEmail: ID.CustomerEmail,
                     RoomNo: selectedRoomNo,
+                    PreviousRoomNo:ID.RoomNo,
                     CustomerName: ID.CustomerName,
                     MemberID: ID.MemberID,
                     Status: "Assigned",

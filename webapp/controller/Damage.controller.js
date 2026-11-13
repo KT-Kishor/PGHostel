@@ -760,11 +760,7 @@ DM_onPressGeneratePDF: async function () {
 
         // ================= HEADER =================
 
-        const documentTitle =
-            oModel.Status === "Damage Claimed"
-                ? "DAMAGE RECEIPT"
-                : "DAMAGE NOTICE";
-
+        const documentTitle = "DAMAGE RECEIPT"
         const titleWidth = doc.getTextWidth(documentTitle);
         const branchMaxWidth = pageWidth - (margin * 2) - titleWidth - 10;
 
