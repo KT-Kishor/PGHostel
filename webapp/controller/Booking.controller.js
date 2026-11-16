@@ -2054,6 +2054,18 @@
                                 ]
                             }).addStyleClass("sapUiSmallMarginBottom sapUiTinyMarginBeginEnd"),
 
+                            new sap.m.MessageStrip({
+                                visible: "{FacilitySelection>/isExtraBed}",
+                                text: {
+                                    path: "HostelModel>/ExtraBed",
+                                    formatter: function (iLimit) {
+                                        return fnFacilityText("extraBedAvailability", [iLimit]);
+                                    }
+                                },
+                                showIcon: true,
+                                showCloseButton: false
+                            }).addStyleClass("sapUiSmallMarginBottom sapUiSmallMarginBeginEnd"),
+
                             new sap.m.HBox({
                                 alignItems: "Center",
                                 visible: {
@@ -2097,18 +2109,6 @@
                                         }.bind(this)
                                     }).addStyleClass("facilityQtyModeStepInput")
                                 ]
-                            }).addStyleClass("sapUiSmallMarginBottom sapUiSmallMarginBeginEnd"),
-
-                            new sap.m.MessageStrip({
-                                visible: "{FacilitySelection>/isExtraBed}",
-                                text: {
-                                    path: "HostelModel>/ExtraBed",
-                                    formatter: function (iLimit) {
-                                        return fnFacilityText("extraBedAvailability", [iLimit]);
-                                    }
-                                },
-                                showIcon: true,
-                                showCloseButton: false
                             }).addStyleClass("sapUiSmallMarginBottom sapUiSmallMarginBeginEnd"),
 
                             new sap.m.VBox({
