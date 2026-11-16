@@ -1913,6 +1913,25 @@ sap.ui.define([
          * true only when Status/AdminUpdated still match what the page loaded.
          * On a mismatch it alerts the user and navigates back to the source page.
          */
+        _isBookingGuardStateCurrent: function (oLatestState) {
+            if (this._bStaleBookingDetected) {
+                return false;
+            }
+            if (!oLatestState) {
+                return true;
+            }
+
+            var bStatusChanged = String(this._sInitialBookingStatus || "") !== oLatestState.Status;
+            var bAdminUpdatedChanged = String(this._sInitialAdminUpdated || "") !== oLatestState.AdminUpdated;
+            if (!bStatusChanged && !bAdminUpdatedChanged) {
+                return true;
+            }
+
+            this._bStaleBookingDetected = true;
+            this._showStaleBookingMessage();
+            return false;
+        },
+
         _verifyBookingStatusUnchanged: async function () {
             if (this._bStaleBookingDetected) {
                 return false;
@@ -1927,16 +1946,7 @@ sap.ui.define([
                     return true;
                 }
 
-                var bStatusChanged = String(this._sInitialBookingStatus || "") !== oLatestState.Status;
-                var bAdminUpdatedChanged = String(this._sInitialAdminUpdated || "") !== oLatestState.AdminUpdated;
-
-                if (!bStatusChanged && !bAdminUpdatedChanged) {
-                    return true;
-                }
-
-                this._bStaleBookingDetected = true;
-                this._showStaleBookingMessage();
-                return false;
+                return this._isBookingGuardStateCurrent(oLatestState);
             } catch (oError) {
                 this.closeBusyDialog();
                 console.warn("Booking status verification failed:", oError);
@@ -2578,12 +2588,6 @@ sap.ui.define([
                 return;
             }
 
-            // Re-verify the server-side booking status before touching the booking,
-            // so a concurrent admin update cannot be overwritten accidentally.
-            if (!await this._verifyBookingStatusUnchanged()) {
-                return;
-            }
-
             // Existing dates are exempt. A changed date range must pass the
             // same room availability check before any update/payment flow.
             if (!await this._ensureEditDateAvailability()) {
@@ -2600,7 +2604,8 @@ sap.ui.define([
                 var oHostelModel = this.getView().getModel("HostelModel");
                 var sBookingID = oHostelModel.getProperty("/BookingID");
 
-                // 1. Fetch current booking data to check payment status
+                // Fetch the booking once. The same response guards against a
+                // concurrent status/admin update and supplies the existing total.
                 var oResponse = await this.ajaxReadWithJQuery("HM_Customer", {
                     BookingID: sBookingID
                 });
@@ -2609,6 +2614,12 @@ sap.ui.define([
                 var aPayments = await this._readEditPaymentsByBookingId(sBookingID);
                 var vBookings = oCustomer.Bookings || oCustomer.Booking;
                 var oBooking = (Array.isArray(vBookings) ? vBookings[0] : vBookings) || {};
+                if (!this._isBookingGuardStateCurrent({
+                    Status: String(oBooking.Status || "").trim(),
+                    AdminUpdated: String(oBooking.AdminUpdated || "").trim()
+                })) {
+                    return;
+                }
                 var fOriginalGrandTotal = parseFloat(oBooking.RentPrice || oBooking.GrandTotal || 0);
                 var oBookingView = this.getView().getModel("BookingView");
 
@@ -2634,7 +2645,7 @@ sap.ui.define([
                 };
 
                 if (sContextToken !== this._getBookingContextToken() ||
-                    !await this._validateExtraBedsForSave(oPayloadData.data[0]) ||
+                    !await this._validateExtraBedsForSave(oPayloadData.data[0], { refreshAuthority: false }) ||
                     sContextToken !== this._getBookingContextToken()) {
                     return;
                 }
@@ -2879,7 +2890,7 @@ sap.ui.define([
                 };
 
                 if (sContextToken !== this._getBookingContextToken() ||
-                    !await this._validateExtraBedsForSave(oPayload.data[0]) ||
+                    !await this._validateExtraBedsForSave(oPayload.data[0], { refreshAuthority: false }) ||
                     sContextToken !== this._getBookingContextToken()) {
                     return;
                 }
