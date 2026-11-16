@@ -584,6 +584,7 @@ sap.ui.define([
                    }
                     return {
                         Name: room.Name,
+                        BedTypeID: room.ID || "",
                         ACType: room.ACType,
                         NoOfPerson: room.NoOfPerson,
                         Description: room.Description || "",
@@ -1055,6 +1056,7 @@ sap.ui.define([
                 const oFullDetails = {
                     RoomNo: oSelected.RoomNo || "",
                     BedType: oSelected.Name || "",
+                    BedTypeID: oSelected.BedTypeID || "",
                     Address: oSelected.Address || "",
                     Area: oSelected.Images?.[0]?.Area,   // hostel's name
                     ACType: oSelected.ACType || "AC",
@@ -2788,6 +2790,7 @@ sap.ui.define([
                 BookingDate: new Date().toISOString(),
                 RoomNo: oData.RoomNo || "",
                 BedType: oData.BedType || "",
+                BedTypeID: oData.BedTypeID || "",
                 ACType: oData.ACType || "",
                 PropertyType: oData.PropertyType || "",
                 PropertySTD: oData.PropertySTD || "",

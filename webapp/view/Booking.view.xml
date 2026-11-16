@@ -121,16 +121,20 @@
                             />
 
                   
-                       <Label text="{i18n>noPersons}" />
-<Input
-    value="{= (${HostelModel>/PropertyType} === 'Hostel' || ${HostelModel>/PropertyType} === 'PG') ? 1 : ${HostelModel>/Capacity} }"
-    editable="false"
-/>
-                               <!-- <Label text="No. of Persons" />
+                            <Label text="{i18n>maximumOccupants}" />
                             <Input
-                                value="{HostelModel>/SelectedPerson}"
+                                value="{BookingView>/maxPersons}"
                                 editable="false"
-                            /> -->
+                            />
+                            <Label
+                                text="{i18n>selectedOccupants}"
+                                visible="{= ${HostelModel>/SelectedExtraBedQuantity} > 0 }"
+                            />
+                            <Input
+                                value="{= ${BookingView>/FamilyMembers}.length }"
+                                editable="false"
+                                visible="{= ${HostelModel>/SelectedExtraBedQuantity} > 0 }"
+                            />
 
                             <Label
                                 text="{i18n>duration}"
@@ -698,7 +702,7 @@
             class="sapUiTinyMarginBottom"
         > -->
                             <Title
-                                text="GSTIN: {HostelModel>/PropertyGSTIN}"
+                                text="{i18n>gstNo}: {HostelModel>/PropertyGSTIN}"
                                 level="H5"
                                 class="sapUiSmallMarginTop sapUiTinyMarginBottom"
                                 visible="{= !!${HostelModel>/EffectiveGSTType} &amp;&amp; !!${HostelModel>/PropertyGSTIN} }"
@@ -727,7 +731,7 @@
                                     >
                                         <header>
                                             <Title
-                                                text="{= 'Amount (' + ${HostelModel>/Currency} + ')' }"
+                                                text="{= ${i18n>amount} + ' (' + ${HostelModel>/Currency} + ')' }"
                                                 level="H6"
                                             />
                                         </header>
@@ -921,7 +925,7 @@
                                     >
                                         <cells>
                                             <Title
-                                                text="{= 'Coupon (' + ${HostelModel>/AppliedCouponCode} + ')' }"
+                                                text="{= ${i18n>bookingCouponLabel} + ' (' + ${HostelModel>/AppliedCouponCode} + ')' }"
                                                 level="H6"
                                                 wrapping="true"
                                             />
@@ -996,7 +1000,7 @@
                                     >
                                         <cells>
                                             <Text
-                                                text="{= ${HostelModel>/EffectiveGSTValue} > 0 ? 'Tax (' + ${HostelModel>/EffectiveGSTValue} + '%)' : 'Tax'}"
+                                                text="{= ${i18n>bookingTaxLabel} + (${HostelModel>/EffectiveGSTValue} > 0 ? ' (' + ${HostelModel>/EffectiveGSTValue} + '%)' : '') }"
                                             />
 
                                             <HBox

@@ -1257,15 +1257,15 @@ sap.ui.define([
                 var aBranchRooms = aRooms.filter(r => normalize(r.BranchCode) === normalize(sBranchCode));
 
                 // ExtraBed lives on the bed-type records (HM_BedType), not on HM_Rooms.
-                // Fetch them for this branch and key the extra-bed count by
+                // Fetch them for this branch and key the bed-type record by
                 // "BedType - ACType" so it can be merged onto each room below.
-                var oExtraBedByBedType = {};
+                var oBedTypesByName = {};
                 try {
                     var oBedTypeResp = await this.ajaxReadWithJQuery("BookingBedTypeRoomReadCall", { BranchCode: sBranchCode });
                     var aBedTypes = (oBedTypeResp && oBedTypeResp.data && oBedTypeResp.data.HM_BedType) || [];
                     aBedTypes.forEach(function (bt) {
                         var sBTKey = normalize((bt.Name || "") + " - " + (bt.ACType || ""));
-                        oExtraBedByBedType[sBTKey] = bt.ExtraBed || 0;
+                        oBedTypesByName[sBTKey] = bt;
                     });
                 } catch (oBedTypeErr) {
                     console.error("Failed to load bed types for ExtraBed:", oBedTypeErr);
@@ -1283,11 +1283,13 @@ sap.ui.define([
                         var iSep = sBedTypeName.lastIndexOf(" - ");
                         var sBedType = iSep > -1 ? sBedTypeName.slice(0, iSep).trim() : sBedTypeName.trim();
                         var sACType = iSep > -1 ? sBedTypeName.slice(iSep + 3).trim() : "";
+                        var oBedType = oBedTypesByName[normalize(sBedTypeName)] || {};
                         oUnique[sKey] = {
                             RoomKey: sKey,
                             RoomText: r.BedTypeName || r.RoomNo,
                             BedTypeName: sBedTypeName,
                             BedType: sBedType,
+                            BedTypeID: oBedType.ID || "",
                             ACType: sACType,
                             BranchCode: r.BranchCode || sBranchCode,
                             Price: r.Price || "",
@@ -1296,8 +1298,8 @@ sap.ui.define([
                             Currency: r.Currency || "",
                             Deposit: r.Deposit || "",
                             DepositCurrency: r.DepositCurrency || "",
-                            NoOfPerson: r.NoofPerson || r.NoOfPerson || "",
-                            ExtraBed: oExtraBedByBedType[normalize(sBedTypeName)] || 0
+                            NoOfPerson: oBedType.NoOfPerson || r.NoofPerson || r.NoOfPerson || "",
+                            ExtraBed: oBedType.ExtraBed || 0
                         };
                     }
                 });
@@ -2036,6 +2038,7 @@ sap.ui.define([
                 BranchName: oBranch.Name || "",
                 RoomType: oRoom.BedTypeName,
                 BedType: oRoom.BedType,
+                BedTypeID: oRoom.BedTypeID || "",
                 ACType: oRoom.ACType,
                 Price: oRoom.Price || 0,
                 MonthPrice: oRoom.MonthPrice || 0,

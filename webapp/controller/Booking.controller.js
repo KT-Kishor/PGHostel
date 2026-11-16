@@ -371,6 +371,10 @@
                 singleOccupantMode: false,
                 primaryGuestName: "",
                 quantity: 1,
+                quantityMax: 10000,
+                availableQuantity: 10000,
+                previousQuantity: 1,
+                isExtraBed: false,
                 singlePersonQty: 0,
                 facilityChargeType: "Entire Booking",
                 selectedPriceType: "",
@@ -400,6 +404,8 @@
             const oFacilitySelectionModel = oView.getModel("FacilitySelection");
             const oPaymentModel = oView.getModel("PaymentModel");
 
+            this._invalidateBookingContext();
+            this._bFacilityCatalogReadFailed = false;
             this._aAllFacilities = [];
             this._iFacilityStartIndex = 0;
             this._mMemberDocumentCache = {};
@@ -633,7 +639,7 @@
         },
 
         _shouldShowFamilySection: function (sPropertyType, iCapacity) {
-            return !this._isSinglePersonOnlyPropertyType(sPropertyType) && Math.max(parseInt(iCapacity, 10) || 1, 1) > 1;
+            return Math.max(parseInt(iCapacity, 10) || 1, 1) > 1;
         },
 
         _validateGSTINField: function (oField) {
@@ -740,12 +746,13 @@
 
         _getOccupantOptions: function () {
             const oBookingView = this.getView().getModel("BookingView");
+            const oBundle = this.getView().getModel("i18n").getResourceBundle();
             const aOccupants = [];
 
             (oBookingView.getProperty("/FamilyMembers") || []).filter(function (oMember) {
                 return oMember.Selected;
             }).forEach(function (oMember) {
-                const sName = oMember.Name || oMember.Relation || "Family Member";
+                const sName = oMember.Name || oMember.Relation || oBundle.getText("familyMemberFallback");
                 const sSalutation = oMember.Salutation || "";
                 const sDisplayName = sSalutation ? sSalutation + " " + sName : sName;
                 aOccupants.push({
@@ -811,6 +818,280 @@
 
         _isFacilityQuantityRequired: function (sSelectionMode) {
             return sSelectionMode === "QTY";
+        },
+
+        _isExtraBedFacility: function (oFacility) {
+            return !!oFacility &&
+                String(oFacility.Type || oFacility.FacilityName || "").trim().toLowerCase() === "extra bed";
+        },
+
+        _isExtraBedQuantityFacility: function (oFacility) {
+            return this._isExtraBedFacility(oFacility) && this._getFacilitySelectionMode(oFacility) === "QTY";
+        },
+
+        _getExtraBedLimit: function () {
+            const iLimit = Number(this.getView().getModel("HostelModel").getProperty("/ExtraBed"));
+            return Number.isSafeInteger(iLimit) && iLimit >= 0 ? iLimit : 0;
+        },
+
+        _getBaseOccupantCapacity: function () {
+            const oModel = this.getView().getModel("HostelModel");
+            return this._isSinglePersonOnlyPropertyType(oModel.getProperty("/PropertyType"))
+                ? 1 : Math.max(parseInt(oModel.getProperty("/Capacity"), 10) || 1, 1);
+        },
+
+        _getSelectedExtraBedQuantity: function (oExcludedFacility) {
+            const aFacilities = this._aAllFacilities || [];
+            const aSelectedFacilities = aFacilities.length
+                ? aFacilities.filter(function (oFacility) { return !!oFacility.Selected; })
+                : this.getView().getModel("HostelModel").getProperty("/AllSelectedFacilities") || [];
+
+            return aSelectedFacilities.reduce(function (iTotal, oFacility) {
+                const iQuantity = Number(oFacility.Quantity);
+                return iTotal + (oFacility !== oExcludedFacility && this._isExtraBedQuantityFacility(oFacility)
+                    && Number.isSafeInteger(iQuantity) && iQuantity > 0 ? iQuantity : 0);
+            }.bind(this), 0);
+        },
+
+        _syncOccupantCapacity: function () {
+            const oModel = this.getView().getModel("HostelModel");
+            const oBookingView = this.getView().getModel("BookingView");
+            const iExtraBeds = this._getSelectedExtraBedQuantity();
+            const iMaxPersons = this._getBaseOccupantCapacity() + Math.min(iExtraBeds, this._getExtraBedLimit());
+
+            oModel.setProperty("/SelectedExtraBedQuantity", iExtraBeds);
+            oModel.setProperty("/NoOfPersonsList", this._buildKeyTextList(iMaxPersons));
+            oBookingView.setProperty("/maxPersons", iMaxPersons);
+            oBookingView.setProperty("/showFamilySection", this._shouldShowFamilySection(oModel.getProperty("/PropertyType"), iMaxPersons));
+        },
+
+        _validateOccupantCapacity: function (iExtraBeds) {
+            const iSelectedExtraBeds = iExtraBeds === undefined ? this._getSelectedExtraBedQuantity() : iExtraBeds;
+            const iMaxPersons = this._getBaseOccupantCapacity() + Math.min(iSelectedExtraBeds, this._getExtraBedLimit());
+            if (this._getOccupantOptions().length > iMaxPersons) {
+                MessageToast.show(this.getView().getModel("i18n").getResourceBundle().getText("bookingOccupantLimit", [iMaxPersons]));
+                return false;
+            }
+            return true;
+        },
+
+        _validateExtraBedOccupantUse: function (iExtraBeds, iOccupants, iBaseCapacity) {
+            const iSelectedExtraBeds = iExtraBeds === undefined
+                ? this._getSelectedExtraBedQuantity() : Number(iExtraBeds);
+            if (!Number.isSafeInteger(iSelectedExtraBeds) || iSelectedExtraBeds < 1) {
+                return true;
+            }
+
+            const iSelectedOccupants = iOccupants === undefined
+                ? this._getOccupantOptions().length : Math.max(Number(iOccupants) || 0, 0);
+            const iBasePersons = iBaseCapacity === undefined
+                ? this._getBaseOccupantCapacity() : Math.max(Number(iBaseCapacity) || 1, 1);
+            const iRequiredOccupants = iBasePersons + iSelectedExtraBeds;
+            if (iSelectedOccupants >= iRequiredOccupants) {
+                return true;
+            }
+
+            MessageBox.information(
+                this.getView().getModel("i18n").getResourceBundle().getText("extraBedOccupantsRequired", [
+                    iSelectedExtraBeds,
+                    iRequiredOccupants,
+                    iRequiredOccupants - iSelectedOccupants
+                ]),
+                {
+                    styleClass: "myUnifiedBtn",
+                    contentWidth: "500px"
+                }
+            );
+            return false;
+        },
+
+        _validateExtraBedChange: function (oFacility, iQuantity, bRemoving) {
+            const iLimit = this._getExtraBedLimit();
+            const iOtherBeds = this._getSelectedExtraBedQuantity(oFacility);
+            const iNextTotal = iOtherBeds + iQuantity;
+            const oBundle = this.getView().getModel("i18n").getResourceBundle();
+
+            if (!Number.isSafeInteger(iQuantity) || iQuantity < (bRemoving ? 0 : 1) || (!bRemoving && iNextTotal > iLimit)) {
+                MessageToast.show(oBundle.getText("extraBedQuantityLimit", [iLimit]));
+                return false;
+            }
+            if (!this._validateOccupantCapacity(iNextTotal)) {
+                return false;
+            }
+            return true;
+        },
+
+        _findBookingBedType: function (aBedTypes, oBookingData) {
+            oBookingData = oBookingData || this.getView().getModel("HostelModel").getData();
+            const fnNormalize = function (sValue) {
+                return String(sValue || "").trim().toLowerCase().replace(/\s+/g, " ");
+            };
+            const sBedType = String(oBookingData.BedType || "").trim();
+            const aParts = sBedType.match(/^(.*?)\s*-\s*(NON-AC|AC)\s*$/i);
+            const sName = fnNormalize(aParts ? aParts[1] : sBedType);
+            const sACType = fnNormalize(aParts ? aParts[2] : oBookingData.ACType);
+            const sBranchCode = fnNormalize(oBookingData.BranchCode);
+            const aMatches = (Array.isArray(aBedTypes) ? aBedTypes : []).filter(function (oBedType) {
+                return sName && fnNormalize(oBedType.Name) === sName &&
+                    (!oBedType.BranchCode || fnNormalize(oBedType.BranchCode) === sBranchCode) &&
+                    (!sACType || fnNormalize(oBedType.ACType) === sACType);
+            });
+            const sBedTypeID = String(oBookingData.BedTypeID || "").trim();
+            return (sBedTypeID && aMatches.find(function (oBedType) {
+                return String(oBedType.ID || "").trim() === sBedTypeID;
+            })) || (aMatches.length === 1 ? aMatches[0] : null);
+        },
+
+        _invalidateBookingContext: function () {
+            const oModel = this.getView().getModel("HostelModel");
+            if (oModel) {
+                // Keep the generation outside model data so restoring a snapshot cannot revive stale requests.
+                oModel._bookingContextVersion = (oModel._bookingContextVersion || 0) + 1;
+            }
+        },
+
+        _getBookingContextToken: function () {
+            const oView = this.getView();
+            const oModel = oView && oView.getModel("HostelModel");
+            const oBookingView = oView && oView.getModel("BookingView");
+            const oData = oModel ? oModel.getData() : {};
+            return JSON.stringify([
+                oModel && oModel._bookingContextVersion,
+                oData.BranchCode, oData.BedType, oData.ACType, oData.PropertyType, oData.BookingID,
+                oData.StartDate, oData.EndDate, oData.SelectedPriceType, oData.SelectedMonths,
+                oData.SelectedPerson, oData.SelectedExtraBedQuantity,
+                (oBookingView ? oBookingView.getProperty("/FamilyMembers") || [] : []).map(function (oMember) {
+                    return [oMember.id || oMember.MemberID, !!oMember.Selected, !!oMember.IsPrimary];
+                })
+            ]);
+        },
+
+        _refreshExtraBedLimit: async function (oBookingData) {
+            const oModel = this.getView().getModel("HostelModel");
+            const sContextToken = this._getBookingContextToken();
+            const fnAssertCurrentContext = function () {
+                const oView = this.getView();
+                if (!oView || oView.getModel("HostelModel") !== oModel || sContextToken !== this._getBookingContextToken()) {
+                    const oError = new Error("Booking context changed");
+                    oError.code = "BOOKING_CONTEXT_CHANGED";
+                    throw oError;
+                }
+            }.bind(this);
+            const sBranchCode = String((oBookingData || oModel.getData()).BranchCode || "").trim();
+            if (!sBranchCode) {
+                throw new Error(this.getView().getModel("i18n").getResourceBundle().getText("extraBedLimitReadFailed"));
+            }
+            let oResponse;
+            try {
+                oResponse = await this.ajaxReadWithJQuery("BookingBedTypeRoomReadCall", { BranchCode: sBranchCode });
+            } catch (oError) {
+                fnAssertCurrentContext();
+                throw oError;
+            }
+            fnAssertCurrentContext();
+            const oBedType = oResponse && oResponse.success !== false &&
+                this._findBookingBedType(oResponse.data && oResponse.data.HM_BedType, oBookingData);
+            const iLimit = oBedType ? Number(oBedType.ExtraBed) : NaN;
+
+            if (oBedType && oBedType !== this._findBookingBedType(oResponse.data.HM_BedType)) {
+                const oError = new Error("Booking context changed");
+                oError.code = "BOOKING_CONTEXT_CHANGED";
+                throw oError;
+            }
+            if (!Number.isSafeInteger(iLimit) || iLimit < 0) {
+                throw new Error(this.getView().getModel("i18n").getResourceBundle().getText("extraBedLimitReadFailed"));
+            }
+            oModel.setProperty("/ExtraBed", iLimit);
+            oModel.setProperty("/BedTypeID", oBedType.ID || "");
+            const iCapacity = Number(oBedType.NoOfPerson);
+            if (Number.isSafeInteger(iCapacity) && iCapacity > 0) {
+                oModel.setProperty("/Capacity", iCapacity);
+            }
+            this._syncOccupantCapacity();
+            return oBedType;
+        },
+
+        _validateExtraBedsForSave: async function (oCustomerData, mOptions) {
+            mOptions = mOptions || {};
+            const bRefreshAuthority = mOptions.refreshAuthority !== false;
+            const oModel = this.getView().getModel("HostelModel");
+            const sContextToken = this._getBookingContextToken();
+            if (this._bFacilityCatalogReadFailed) {
+                MessageBox.error(this.getView().getModel("i18n").getResourceBundle().getText("bookingFacilitiesReadFailed"));
+                return false;
+            }
+            if (oCustomerData && oCustomerData.BookingID &&
+                String(oCustomerData.BookingID) !== String(oModel.getProperty("/BookingID") || "")) {
+                return false;
+            }
+            const aKnownFacilities = (this._aAllFacilities || []).concat(oModel.getProperty("/AllSelectedFacilities") || []);
+            const aExtraBedFacilities = aKnownFacilities.filter(this._isExtraBedQuantityFacility.bind(this));
+            const aExtraBedNames = aExtraBedFacilities.map(function (oFacility) {
+                return String(oFacility.FacilityName || "").trim().toLowerCase();
+            });
+            const aLiveFacilities = this._aAllFacilities || [];
+            const aFacilities = oCustomerData ? oCustomerData.FacilityItems || []
+                : aLiveFacilities.length ? aLiveFacilities.filter(function (oFacility) { return !!oFacility.Selected; })
+                    : oModel.getProperty("/AllSelectedFacilities") || [];
+            const aSelectedExtraBeds = aFacilities.filter(function (oFacility) {
+                return this._isExtraBedQuantityFacility(oFacility) ||
+                    (this._getFacilitySelectionMode(oFacility) === "QTY" &&
+                        aExtraBedNames.includes(String(oFacility.FacilityName || "").trim().toLowerCase()));
+            }.bind(this));
+            const oBookingData = oCustomerData
+                ? (Array.isArray(oCustomerData.Booking) ? oCustomerData.Booking[0] : oCustomerData.Booking) || {}
+                : oModel.getData();
+            const iOccupants = oCustomerData ? Number(oBookingData.NoOfPersons) : this._getOccupantOptions().length;
+            const iExtraBeds = aSelectedExtraBeds.reduce(function (iTotal, oFacility) {
+                return iTotal + Number(oFacility.Quantity);
+            }, 0);
+            if (iExtraBeds > 0 && iOccupants < 1) {
+                this._validateExtraBedOccupantUse(iExtraBeds, iOccupants);
+                return false;
+            }
+            if (!Number.isSafeInteger(iOccupants) || iOccupants < 1) {
+                MessageToast.show(this.getView().getModel("i18n").getResourceBundle().getText("BKK_selectLeastOne"));
+                return false;
+            }
+
+            if (!aExtraBedFacilities.length && !aSelectedExtraBeds.length && iOccupants <= this._getBaseOccupantCapacity()) {
+                return true;
+            }
+
+            if (bRefreshAuthority) {
+                try {
+                    await this._refreshExtraBedLimit(oBookingData);
+                } catch (oError) {
+                    if (oError.code === "BOOKING_CONTEXT_CHANGED" || sContextToken !== this._getBookingContextToken()) {
+                        return false;
+                    }
+                    oModel.setProperty("/ExtraBed", 0);
+                    this._syncOccupantCapacity();
+                    MessageBox.error(this.getView().getModel("i18n").getResourceBundle().getText("extraBedLimitReadFailed"));
+                    return false;
+                }
+                if (sContextToken !== this._getBookingContextToken()) {
+                    return false;
+                }
+            }
+
+            if (aSelectedExtraBeds.some(function (oFacility) {
+                return !Number.isSafeInteger(Number(oFacility.Quantity)) || Number(oFacility.Quantity) < 1;
+            }) || iExtraBeds > this._getExtraBedLimit()) {
+                MessageToast.show(this.getView().getModel("i18n").getResourceBundle().getText("extraBedQuantityLimit", [this._getExtraBedLimit()]));
+                return false;
+            }
+            const iBaseCapacity = this._isSinglePersonOnlyPropertyType(oBookingData.PropertyType)
+                ? 1 : Math.max(parseInt(oModel.getProperty("/Capacity"), 10) || 1, 1);
+            const iMaxPersons = iBaseCapacity + iExtraBeds;
+            if (iOccupants > iMaxPersons) {
+                MessageToast.show(this.getView().getModel("i18n").getResourceBundle().getText("bookingOccupantLimit", [iMaxPersons]));
+                return false;
+            }
+            if (!this._validateExtraBedOccupantUse(iExtraBeds, iOccupants, iBaseCapacity)) {
+                return false;
+            }
+            return true;
         },
 
         _isFacilityPersonQuantityRequired: function (sSelectionMode) {
@@ -1254,11 +1535,15 @@
 
                 this._aAllFacilities = aFacilities
                     .filter(function (oFacility) {
-                        if ((oFacility.Type || "").toLowerCase().trim() === "extra bed") {
-                            return iExtraBed > 0;
+                        if ((oFacility.Type || "").toLowerCase().trim() === "extra bed" || this._isExtraBedQuantityFacility(oFacility)) {
+                            return iExtraBed > 0 || aSelectedFacilities.some(function (oSelectedFacility) {
+                                const sSavedMode = this._getFacilitySelectionMode(oSelectedFacility);
+                                return (sSavedMode === "QTY" || sSavedMode === "SINGLE") &&
+                                    String(oSelectedFacility.FacilityID || "") === String(oFacility.ID || "");
+                            }.bind(this));
                         }
                         return true;
-                    })
+                    }.bind(this))
                     .map(function (oFacility) {
                         const oSelectedFacility = aSelectedFacilities.find(function (oSelected) {
                             return String(oSelected.FacilityID || "") === String(oFacility.ID || "");
@@ -1466,6 +1751,14 @@
             const sPlan = oFacility.CurrentPriceType || "Unit Price";
             const fPrice = oFacility.CurrentPrice || oFacility.UnitPrice || 0;
             const sSelectionMode = oFacility.SelectionMode || this._getFacilitySelectionMode(oFacility);
+            const bIsExtraBed = this._isExtraBedQuantityFacility(oFacility);
+            const iAvailableQuantity = bIsExtraBed
+                ? Math.max(this._getExtraBedLimit() - this._getSelectedExtraBedQuantity(oFacility), 0) : 10000;
+
+            if (bIsExtraBed && !oFacility.Selected && iAvailableQuantity === 0) {
+                MessageToast.show(this.getView().getModel("i18n").getResourceBundle().getText("extraBedQuantityLimit", [this._getExtraBedLimit()]));
+                return;
+            }
             const bIsSingleOccupant = this._isSingleOccupantBooking();
             const oDefaultOccupant = this._getDefaultOccupant();
             const sSelectedOccupantName = oDefaultOccupant && oDefaultOccupant.name ? oDefaultOccupant.name : this._getPrimaryGuestName();
@@ -1529,7 +1822,7 @@
 
             // Check if in edit mode (from BookingView model in EditBooking, or default true in Booking)
             var oBookingView = this.getView().getModel("BookingView");
-            var bEditModeEnabled = oBookingView ? oBookingView.getProperty("/editModeEnabled") : true;
+            var bEditModeEnabled = oBookingView ? oBookingView.getProperty("/editModeEnabled") !== false : true;
 
             oSelectionModel.setData({
                 title: oFacility.DisplayFacilityName || oFacility.FacilityName,
@@ -1544,6 +1837,10 @@
                 singleOccupantMode: bIsSingleOccupant,
                 primaryGuestName: sSelectedOccupantName,
                 quantity: oFacility.Quantity || 1,
+                quantityMax: Math.max(iAvailableQuantity, 1),
+                availableQuantity: iAvailableQuantity,
+                previousQuantity: oFacility.Quantity || 1,
+                isExtraBed: bIsExtraBed,
                 singlePersonQty: iSinglePersonQty,
                 // facilityChargeType: this._getFacilityChargeType(oFacility),
                 selectedPriceType: sPlan,
@@ -1593,7 +1890,7 @@
             // focusing a disabled control leaves focus outside the popup, which
             // prevents UI5 from arming the outside-click autoclose. Falling back
             // to the popover's default focus keeps autoclose working.
-            if (this._oFacilityConfirmButton && bEditModeEnabled) {
+            if (this._oFacilityConfirmButton && bEditModeEnabled && (!bIsExtraBed || iAvailableQuantity > 0)) {
                 oFacilityPopover.setInitialFocus(this._oFacilityConfirmButton);
             } else {
                 oFacilityPopover.setInitialFocus(null);
@@ -1773,12 +2070,22 @@
                                     new sap.m.StepInput({
                                         width: "7rem",
                                         min: 1,
-                                        max: 10000,
+                                        max: "{FacilitySelection>/quantityMax}",
                                         value: "{FacilitySelection>/quantity}",
-                                        enabled: "{FacilitySelection>/editModeEnabled}",
+                                        enabled: "{= ${FacilitySelection>/editModeEnabled} && (!${FacilitySelection>/isExtraBed} || ${FacilitySelection>/availableQuantity} > 0) }",
                                         change: function (oEvent) {
                                             var oStepInput = oEvent.getSource();
                                             var iValue = oEvent.getParameter("value");
+                                            var oSelectionModel = this.getView().getModel("FacilitySelection");
+
+                                            if (oSelectionModel.getProperty("/isExtraBed")) {
+                                                if (!this._validateExtraBedChange(this._oFacilityDialog.data("facilityRef"), Number(iValue))) {
+                                                    oStepInput.setValue(oSelectionModel.getProperty("/previousQuantity"));
+                                                    return;
+                                                }
+                                                oSelectionModel.setProperty("/previousQuantity", Number(iValue));
+                                                return;
+                                            }
 
                                             if (iValue > 10000) {
                                                 oStepInput.setValue(10000);
@@ -1790,6 +2097,18 @@
                                         }.bind(this)
                                     }).addStyleClass("facilityQtyModeStepInput")
                                 ]
+                            }).addStyleClass("sapUiSmallMarginBottom sapUiSmallMarginBeginEnd"),
+
+                            new sap.m.MessageStrip({
+                                visible: "{FacilitySelection>/isExtraBed}",
+                                text: {
+                                    path: "HostelModel>/ExtraBed",
+                                    formatter: function (iLimit) {
+                                        return fnFacilityText("extraBedAvailability", [iLimit]);
+                                    }
+                                },
+                                showIcon: true,
+                                showCloseButton: false
                             }).addStyleClass("sapUiSmallMarginBottom sapUiSmallMarginBeginEnd"),
 
                             new sap.m.VBox({
@@ -1936,7 +2255,7 @@
                                                         text: {
                                                             path: "FacilitySelection>fixedQty",
                                                             formatter: function (iQty) {
-                                                                return "Qty: " + (parseInt(iQty, 10) || 0);
+                                                                return fnFacilityText("Qty") + ": " + (parseInt(iQty, 10) || 0);
                                                             }
                                                         },
                                                         textAlign: "End",
@@ -1994,7 +2313,7 @@
                         this._oFacilityConfirmButton = new sap.m.Button({
                             text: fnFacilityText("confirmation"),
                             type: "Emphasized",
-                            enabled: "{FacilitySelection>/editModeEnabled}",
+                            enabled: "{= ${FacilitySelection>/editModeEnabled} && (!${FacilitySelection>/isExtraBed} || ${FacilitySelection>/availableQuantity} > 0) }",
                             press: this.onFacilityDialogConfirm.bind(this)
                         }).addStyleClass("myUnifiedBtn")
                     ]
@@ -2062,6 +2381,10 @@
             const bIsSingleOccupant = !!oSelectionModel.getProperty("/singleOccupantMode");
             const sPrimaryGuestName = oSelectionModel.getProperty("/primaryGuestName") || "Primary Guest";
             const iQuantity = Math.max(parseInt(oSelectionModel.getProperty("/quantity"), 10) || 1, 1);
+            if (this._isExtraBedQuantityFacility(oFacility) &&
+                !this._validateExtraBedChange(oFacility, Number(oSelectionModel.getProperty("/quantity")))) {
+                return;
+            }
             const fSelectedPrice = oSelectionModel.getProperty("/selectedPrice") || 0;
             const sSelectedPriceType = oSelectionModel.getProperty("/selectedPriceType") || "";
             const iSinglePersonQty = Math.max(parseInt(oSelectionModel.getProperty("/singlePersonQty"), 10) || 0, 0);
@@ -2185,11 +2508,16 @@
         onFacilityDialogRemove: function (oEvent) {
             const oDialog = this._oFacilityDialog;
             const oFacility = oDialog.data("facilityRef");
+            const bIsExtraBed = this._isExtraBedQuantityFacility(oFacility);
+
+            if (bIsExtraBed && !this._validateExtraBedChange(oFacility, 0, true)) {
+                return;
+            }
 
             oFacility.Selected = false;
             oFacility.SelectedPrice = 0;
             oFacility.SelectedPriceType = "";
-            oFacility.Quantity = 1;
+            oFacility.Quantity = bIsExtraBed ? 0 : 1;
             oFacility.FacilityChargeType = "Entire Booking";
             oFacility.SelectedPersonIds = [];
             oFacility.PersonQuantities = [];
@@ -2202,21 +2530,23 @@
             oDialog.close();
         },
 
-        _clearSelectedFacilities: function () {
+        _clearSelectedFacilities: function (bPreserveExtraBeds) {
             (this._aAllFacilities || []).forEach(function (oFacility) {
+                const bIsExtraBed = this._isExtraBedQuantityFacility(oFacility);
+                if (bPreserveExtraBeds && bIsExtraBed) {
+                    return;
+                }
                 oFacility.Selected = false;
                 oFacility.SelectedPrice = 0;
                 oFacility.SelectedPriceType = "";
-                oFacility.Quantity = 1;
+                oFacility.Quantity = bIsExtraBed ? 0 : 1;
                 oFacility.FacilityChargeType = "Entire Booking";
                 oFacility.SelectedPersonIds = [];
                 oFacility.PersonQuantities = [];
                 oFacility.SelectionSummary = "";
-            });
+            }.bind(this));
 
-            this.getView().getModel("HostelModel").setProperty("/AllSelectedFacilities", []);
-            this.getView().getModel("HostelModel").setProperty("/TotalFacilityPrice", 0);
-            this._renderFacilityCards();
+            this._rebuildSelectedFacilities();
         },
 
 
@@ -2384,6 +2714,7 @@
                         FacilityID: oFacility.FacilityID,
                         CatalogFacilityID: oFacility.CatalogFacilityID || oFacility.ID,
                         FacilityName: oFacility.FacilityName,
+                        Type: oFacility.Type,
                         DisplayFacilityName: oFacility.DisplayFacilityName || oFacility.FacilityName,
                         Currency: sCurrency,
                         SelectionMode: sSelectionMode,
@@ -2420,6 +2751,7 @@
                     };
                 }.bind(this));
             oModel.setProperty("/AllSelectedFacilities", aSelectedFacilities);
+            this._syncOccupantCapacity();
             oModel.setProperty("/FacilityDiscounts", []);
             oModel.setProperty("/TotalFacilityDiscount", 0);
             oModel.setProperty("/HasFacilityOfferDiscount", false);
@@ -2845,7 +3177,7 @@
                 id: "SELF",
                 MemberID: oSelfMember && oSelfMember.MemberID || oHostelModel.getProperty("/UserID") || "",
                 Salutation: sSalutation,
-                Name: sName || "Primary Guest",
+                Name: sName || this.getView().getModel("i18n").getResourceBundle().getText("primaryGuest"),
                 Relation: "Self",
                 Age: sAgeOrDOB,
                 Gender: sGender,
@@ -3324,6 +3656,7 @@
             }
 
             const oBookingView = this.getView().getModel("BookingView");
+            this._syncOccupantCapacity();
             const iAllowedFamilyMembers = parseInt(oBookingView.getProperty("/maxPersons"), 10) || 1;
             const aSelectedItems = oTable.getSelectedItems();
 
@@ -3358,6 +3691,7 @@
 
         onConfirmMemberSelection: function () {
             const oBookingView = this.getView().getModel("BookingView");
+            this._syncOccupantCapacity();
             const oTable = this.byId("memberSelectTable");
             const aPreviousOccupantIds = this._getSelectedOccupantIds();
             const aSelectedContexts = oTable ? oTable.getSelectedContexts("BookingView") : [];
@@ -3387,9 +3721,11 @@
                     return sId !== aSelectedOccupantIds[iIndex];
                 });
 
-            if (bOccupantsChanged && this._hasSelectedFacilities()) {
+            if (bOccupantsChanged && this._hasSelectedFacilities(true)) {
                 MessageBox.confirm(
-                    this.getView().getModel("i18n").getResourceBundle().getText("changingOccupantsReset"),
+                    this.getView().getModel("i18n").getResourceBundle().getText(
+                        this._getSelectedExtraBedQuantity() > 0 ? "changingOccupantsPreserveExtraBeds" : "changingOccupantsReset"
+                    ),
                     {
                         title: this.getView().getModel("i18n").getResourceBundle().getText("confirmOccupantChange"),
                         icon: MessageBox.Icon.WARNING,
@@ -3419,7 +3755,7 @@
             oBookingView.setProperty("/FamilyMembers", aSelectedMembers);
             this._syncPrimaryMemberInFamilyMembers();
             if (this._haveOccupantsChanged(aPreviousOccupantIds)) {
-                this._clearSelectedFacilities();
+                this._clearSelectedFacilities(true);
             }
             oBookingView.refresh(true);
             this._updateSelectedPersonsFromFamily();
@@ -5379,6 +5715,7 @@
             oBookingView.setProperty("/FamilyMembers", aSelectedMembers);
             this._syncPrimaryMemberInFamilyMembers();
             this._updateSelectedPersonsFromFamily();
+            this._syncOccupantCapacity();
 
             this._applySelectedPlanPrice();
         },
@@ -5433,15 +5770,8 @@
                 oBookingView.setProperty("/showBusinessGSTSection", false);
             }
 
-            oBookingView.setProperty("/showFamilySection", this._shouldShowFamilySection(sPropertyType, iCapacity));
-
-            // For Hostel/PG, limit to 1 person regardless of room capacity
-            const bIsSinglePersonOnly = this._isSinglePersonOnlyPropertyType(sPropertyType);
-            const iMaxPersons = bIsSinglePersonOnly ? 1 : iCapacity;
-            oBookingView.setProperty("/maxPersons", iMaxPersons);
-
             oBookingView.setProperty("/originalPersonOptions", aOriginalOptions);
-            oModel.setProperty("/NoOfPersonsList", aOriginalOptions);
+            this._syncOccupantCapacity();
 
             this._updateSelectedPersonsFromFamily();
             this._syncSelectedFacilityPersonsWithOccupants();
@@ -5599,6 +5929,11 @@
                 return;
             }
 
+            if (this._getSelectedExtraBedQuantity() > 0 && !this._validateOccupantCapacity(0)) {
+                this._restoreRoomPlanSelection(oComboBox, sPreviousPlan);
+                return;
+            }
+
             if (!bHasSelectedFacilities) {
                 this._sConfirmedRoomPlan = sSelectedPlan;
                 this._applyRoomPlanChange(sSelectedPlan);
@@ -5632,18 +5967,19 @@
             );
         },
 
-        _hasSelectedFacilities: function () {
+        _hasSelectedFacilities: function (bIgnoreExtraBeds) {
             const oModel = this.getView().getModel("HostelModel");
             const oFacilityModel = this.getView().getModel("FacilityModel");
             const aSelectedFacilities = oModel ? oModel.getProperty("/AllSelectedFacilities") || [] : [];
             const aVisibleFacilities = oFacilityModel ? oFacilityModel.getProperty("/Facilities") || [] : [];
 
-            return aSelectedFacilities.length > 0 ||
-                aVisibleFacilities.some(function (oFacility) {
-                    return !!oFacility.Selected;
-                }) ||
-                (this._aAllFacilities || []).some(function (oFacility) {
-                    return !!oFacility.Selected;
+            const fnIncluded = function (oFacility) {
+                return !bIgnoreExtraBeds || !this._isExtraBedQuantityFacility(oFacility);
+            }.bind(this);
+
+            return aSelectedFacilities.some(fnIncluded) ||
+                aVisibleFacilities.concat(this._aAllFacilities || []).some(function (oFacility) {
+                    return !!oFacility.Selected && fnIncluded(oFacility);
                 });
         },
 
@@ -5949,9 +6285,11 @@
             const iIndex = parseInt(sPath.split("/").pop(), 10);
 
             if (!isNaN(iIndex) && iIndex > -1) {
-                if (this._hasSelectedFacilities()) {
+                if (this._hasSelectedFacilities(true)) {
                     MessageBox.confirm(
-                        this.getView().getModel("i18n").getResourceBundle().getText("deletingOccupantReset"),
+                        this.getView().getModel("i18n").getResourceBundle().getText(
+                            this._getSelectedExtraBedQuantity() > 0 ? "deletingOccupantPreserveExtraBeds" : "deletingOccupantReset"
+                        ),
                         {
                             title: this.getView().getModel("i18n").getResourceBundle().getText("confirmOccupantDelete"),
                             icon: MessageBox.Icon.WARNING,
@@ -5981,7 +6319,7 @@
             oModel.setProperty("/FamilyMembers", aMembers);
             this._syncPrimaryMemberInFamilyMembers();
             if (this._haveOccupantsChanged(aPreviousOccupantIds)) {
-                this._clearSelectedFacilities();
+                this._clearSelectedFacilities(true);
             }
             oModel.refresh(true);
             this._updateSelectedPersonsFromFamily();
@@ -6879,6 +7217,7 @@
             const sUnitText = oFacility.UnitText || oFacility.SelectedPriceType || oHostelModel.getProperty("/SelectedPriceType") || "";
             const fUnitPrice = this._getFirstAvailableNumber(oFacility.Price, oFacility.SelectedPrice, oFacility.UnitPrice);
             const sChargeType = oFacility.FacilityChargeType || "";
+            const sPayloadChargeType = this._isExtraBedFacility(oFacility) ? "Extra Bed" : sChargeType;
             const aSelectedPersonIds = Array.isArray(oFacility.SelectedPersonIds) ? oFacility.SelectedPersonIds : [];
             const aPersonQuantities = Array.isArray(oFacility.PersonQuantities) ? oFacility.PersonQuantities : [];
             const iChargeableDays = sChargeType === "DAILY" ? this._getFacilityChargeableDayCount() : 0;
@@ -6908,7 +7247,7 @@
                     MemberName: "",
                     Salutation: "",
                     SelectionMode: oFacility.SelectionMode || "",
-                    FacilityChargeType: sChargeType,
+                    FacilityChargeType: sPayloadChargeType,
                     Quantity: "",
                     UnitText: sUnitText,
                     Currency: sCurrency,
@@ -7207,6 +7546,7 @@
 
         onSubmitPress: async function () {
             const oPaymentModel = this.getView().getModel("PaymentModel");
+            const sContextToken = this._getBookingContextToken();
             const bPayOnCheckIn = (oPaymentModel.getProperty("/PaymentType") || "PayOnCheckIn") === "PayOnCheckIn";
 
             if (!bPayOnCheckIn) {
@@ -7224,7 +7564,7 @@
             // Availability may have changed while the payment dialog was open.
             // Force a fresh backend check before creating the booking.
             const bRoomAvailable = await this._checkRoomAvailabilityForBooking(true);
-            if (bRoomAvailable === false) {
+            if (bRoomAvailable === false || sContextToken !== this._getBookingContextToken()) {
                 return;
             }
 
@@ -7251,26 +7591,31 @@
                         content: pdfBase64
                     }
                 };
+                if (sContextToken !== this._getBookingContextToken() ||
+                    !await this._validateExtraBedsForSave(oPayloadData.data[0]) ||
+                    sContextToken !== this._getBookingContextToken()) {
+                    return;
+                }
                 const oResponse = await this.ajaxCreateWithJQuery("HM_Customer", oPayload);
                 const aBookingDetails = oResponse && oResponse.BookingDetails ? oResponse.BookingDetails : [];
                 // let sMessage = "Booking created successfully.";
-               var oResourceBundle = this.getView()
-    .getModel("i18n")
-    .getResourceBundle();
+                var oResourceBundle = this.getView()
+                    .getModel("i18n")
+                    .getResourceBundle();
 
-var sMessage =
-    oResourceBundle.getText("bookingRequestReceived") +
-    "\n\n" +
-    oResourceBundle.getText("bookingAvailabilityChecking");
+                var sMessage =
+                    oResourceBundle.getText("bookingRequestReceived") +
+                    "\n\n" +
+                    oResourceBundle.getText("bookingAvailabilityChecking");
 
-oHostelModel.setProperty("/BookingPayload", oPayload);
+                oHostelModel.setProperty("/BookingPayload", oPayload);
 
-if (aBookingDetails.length) {
-    sMessage += "\n\n" + aBookingDetails.map(function (oItem) {
-        return oResourceBundle.getText("bookingReferenceNo") +
-            ": " + oItem.BookingID;
-    }).join("\n");
-}
+                if (aBookingDetails.length) {
+                    sMessage += "\n\n" + aBookingDetails.map(function (oItem) {
+                        return oResourceBundle.getText("bookingReferenceNo") +
+                            ": " + oItem.BookingID;
+                    }).join("\n");
+                }
 
                 if (this._oPaymentDialog) {
                     this._oPaymentDialog.close();
@@ -7305,7 +7650,7 @@ if (aBookingDetails.length) {
                     }.bind(this)
                 })
             } catch (oError) {
-                let sErrorMessage = "Unable to create booking.";
+                let sErrorMessage = this.getView().getModel("i18n").getResourceBundle().getText("unableCreateBooking");
 
                 if (oError && oError.responseJSON) {
                     sErrorMessage = oError.responseJSON.message || oError.responseJSON.error || sErrorMessage;
@@ -8094,7 +8439,18 @@ if (aBookingDetails.length) {
             const sCompanyAddress = String(oModel.getProperty("/CompanyAddress") || "").trim();
             let oPaymentTypeGroup;
 
+            if (this._getSelectedExtraBedQuantity() > 0 && this._getOccupantOptions().length < 1 &&
+                !this._validateExtraBedOccupantUse()) {
+                return;
+            }
+
             if (!this._validateBookingBeforePayment()) {
+                return;
+            }
+
+            const sContextToken = this._getBookingContextToken();
+            if (!await this._validateExtraBedsForSave(null, { refreshAuthority: false }) ||
+                sContextToken !== this._getBookingContextToken()) {
                 return;
             }
 
@@ -8102,6 +8458,10 @@ if (aBookingDetails.length) {
             // payment step so a coupon exhausted in the meantime is not carried
             // into the booking. New bookings never skip this check.
             if (!await this._verifyAppliedCouponMaxUsage(false)) {
+                return;
+            }
+
+            if (sContextToken !== this._getBookingContextToken()) {
                 return;
             }
 
@@ -8116,6 +8476,9 @@ if (aBookingDetails.length) {
             });
 
             await this._ensurePaymentDialog();
+            if (sContextToken !== this._getBookingContextToken()) {
+                return;
+            }
             oPaymentTypeGroup = sap.ui.getCore().byId("idPaymentTypeGroup");
 
             if (oPaymentTypeGroup) {

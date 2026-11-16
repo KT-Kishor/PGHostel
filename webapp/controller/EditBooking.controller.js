@@ -348,30 +348,29 @@ sap.ui.define([
                     );
 
                     // Execute all promises in parallel
-                    var aResults = await Promise.all(aPromises);
+                    var aResults = await Promise.allSettled(aPromises);
 
                     // Process results
-                    aResults.forEach(function (oResult) {
+                    aResults.forEach(function (oSettledResult) {
+                        if (oSettledResult.status !== "fulfilled") {
+                            console.warn("Booking metadata read failed:", oSettledResult.reason);
+                            return;
+                        }
+                        var oResult = oSettledResult.value;
                         if (oResult.type === "bedType" && oResult.data) {
                             var aBedTypes = (oResult.data.data && oResult.data.data.HM_BedType) || [];
                             var aRooms = (oResult.data.data && oResult.data.data.HM_Rooms) || [];
 
-                            // Find matching bed type by Name + ACType
-                            var sBedType = oBooking.BedType || "";
-                            var sBedName = sBedType.replace(/\s*-\s*(AC|NON-AC)$/i, "").trim();
-                            var sACType = sBedType.indexOf("NON-AC") >= 0 ? "NON-AC" : "AC";
-                            oRoomData = aBedTypes.find(function (b) {
-                                return b.Name === sBedName && b.BranchCode === sBranchCode && b.ACType === sACType;
-                            }) || aBedTypes.find(function (b) {
-                                return b.BranchCode === sBranchCode;
-                            }) || {};
+                            oRoomData = this._findBookingBedType(aBedTypes, Object.assign({}, oBooking, {
+                                BranchCode: sBranchCode
+                            })) || {};
 
                             // Find matching room for pricing
-                            var sBedTypeName = (oRoomData.Name || sBedName) + " - " + (oRoomData.ACType || sACType);
+                            var sBedTypeName = oRoomData.Name
+                                ? oRoomData.Name + " - " + oRoomData.ACType : String(oBooking.BedType || "");
                             oPricingData = aRooms.find(function (r) {
-                                return r.BranchCode === sBranchCode && r.BedTypeName && r.BedTypeName.trim().toLowerCase() === sBedTypeName.trim().toLowerCase();
-                            }) || aRooms.find(function (r) {
-                                return r.BranchCode === sBranchCode;
+                                return String(r.BranchCode || "").trim().toLowerCase() === String(sBranchCode).trim().toLowerCase() &&
+                                    r.BedTypeName && r.BedTypeName.trim().toLowerCase() === sBedTypeName.trim().toLowerCase();
                             }) || {};
                         } else if (oResult.type === "branch" && oResult.data) {
                             var aBranches = (oResult.data.HM_Branch) || [];
@@ -383,7 +382,7 @@ sap.ui.define([
                         } else if (oResult.type === "facilities" && oResult.data) {
                             oFacilitiesResponse = oResult.data;
                         }
-                    });
+                    }.bind(this));
 
                 } catch (e) {
                     // Any API failure — continue with booking data only
@@ -431,8 +430,8 @@ sap.ui.define([
                 this._storeInitialBookingDetails();
 
                 // Process facilities if we got them in parallel
-                if (oFacilitiesResponse) {
-                    this._aAllFacilities = oFacilitiesResponse.data || [];
+                if (oFacilitiesResponse && oFacilitiesResponse.success !== false && Array.isArray(oFacilitiesResponse.data)) {
+                    this._aAllFacilities = oFacilitiesResponse.data;
                     this._processFacilitiesForEdit();
                 } else {
                     // Fallback: load facilities separately
@@ -1444,15 +1443,8 @@ sap.ui.define([
             var aRawFacilities = oCustomer.FacilityItems || [];
             var aParsedFacilities = this._simplifyFacilityItemsForEdit(aRawFacilities, oBooking);
 
-            // Determine ExtraBed from room data or from selected facilities
-            var iExtraBed = oRoomData.ExtraBed || oBooking.ExtraBed || 0;
-            if (!iExtraBed) {
-                aParsedFacilities.forEach(function (oFac) {
-                    if ((oFac.Type || oFac.FacilityName || "").toLowerCase().indexOf("extra bed") >= 0) {
-                        iExtraBed = 1;
-                    }
-                });
-            }
+            var iExtraBed = Number(oRoomData.ExtraBed);
+            iExtraBed = Number.isSafeInteger(iExtraBed) && iExtraBed >= 0 ? iExtraBed : 0;
 
             // Derive duration in the same unit used by the selected plan.
             // The shared booking flow interprets SelectedMonths as:
@@ -1481,7 +1473,7 @@ sap.ui.define([
             }
 
             // Build NoOfPersonsList from capacity (like onConfirmBooking does)
-            var iCapacity = parseInt(oRoomData.NoOfPerson || oBooking.Capacity || oBooking.NoOfPersons || 1, 10) || 1;
+            var iCapacity = parseInt(oRoomData.NoOfPerson || oBooking.Capacity || 1, 10) || 1;
             var aNoOfPersonsList = [];
             for (var i = 1; i <= iCapacity; i++) {
                 aNoOfPersonsList.push({ key: String(i), text: String(i) });
@@ -1532,6 +1524,7 @@ sap.ui.define([
                 BookingDate: oBooking.BookingDate || new Date().toISOString(),
                 RoomNo: oBooking.RoomNo || "",
                 BedType: oBooking.BedType || "",
+                BedTypeID: oRoomData.ID || "",
                 ACType: oBooking.ACType || "",
                 Status: oBooking.Status || "",
 
@@ -2567,9 +2560,15 @@ sap.ui.define([
                 return this._onPaymentSubmit();
             }
 
+            if (this._getSelectedExtraBedQuantity() > 0 && this._getOccupantOptions().length < 1 &&
+                !this._validateExtraBedOccupantUse()) {
+                return;
+            }
+
             if (!this._validateBookingBeforeUpdate()) {
                 return;
             }
+            const sContextToken = this._getBookingContextToken();
 
             // When a new/different coupon was applied while editing, re-check its
             // remaining uses before the update is written. A coupon that ran out
@@ -2634,6 +2633,12 @@ sap.ui.define([
                     content: pdfBase64
                 };
 
+                if (sContextToken !== this._getBookingContextToken() ||
+                    !await this._validateExtraBedsForSave(oPayloadData.data[0]) ||
+                    sContextToken !== this._getBookingContextToken()) {
+                    return;
+                }
+
                 var aDeletedFacilityIds = this._getDeletedFacilityIdsForUpdate(
                     oCustomer.FacilityItems || [],
                     oPayloadData.data[0].FacilityItems || []
@@ -2653,7 +2658,7 @@ sap.ui.define([
                     await this.ajaxUpdateWithJQuery("HM_Customer", oPayload);
                     await this._deleteRemovedFacilityItems(aDeletedFacilityIds);
 
-                    this._handleEditBookingSuccess("Booking updated successfully.");
+                    this._handleEditBookingSuccess();
                 } else {
                     // Case 2: Online payment - compare new grand total with paid amount
                     var fBalance = fNewGrandTotal - fPaymentPaidAmount;
@@ -2675,7 +2680,7 @@ sap.ui.define([
                         await this._deleteRemovedFacilityItems(aDeletedFacilityIds);
 
                         oBookingView.setProperty("/editModeEnabled", false);
-                        this._handleEditBookingSuccess("Booking updated successfully.", {
+                        this._handleEditBookingSuccess(null, {
                             navigateToManageProfile: false
                         });
                     } else if (fBalance > 0) {
@@ -2694,12 +2699,13 @@ sap.ui.define([
                         await this.ajaxUpdateWithJQuery("HM_Customer", oPayload);
                         await this._deleteRemovedFacilityItems(aDeletedFacilityIds);
 
-                        this._handleEditBookingSuccess("Booking updated successfully.");
+                        this._handleEditBookingSuccess();
                     }
                 }
 
             } catch (oError) {
-                MessageBox.error(this.getView().getModel("i18n").getResourceBundle().getText("unableUpdateBooking", [oError.message || "Unknown error"]));
+                var oBundle = this.getView().getModel("i18n").getResourceBundle();
+                MessageBox.error(oBundle.getText("unableUpdateBooking", [oError.message || oBundle.getText("unknownError")]));
             } finally {
                 this.closeBusyDialog();
             }
@@ -2716,7 +2722,8 @@ sap.ui.define([
                     this._setupPaymentDialog();
                     this._oPaymentDialog.open();
                 }.bind(this)).catch(function (oError) {
-                    MessageBox.error(this.getView().getModel("i18n").getResourceBundle().getText("failedLoadPayment", [oError.message || "Unknown error"]));
+                    var oBundle = this.getView().getModel("i18n").getResourceBundle();
+                    MessageBox.error(oBundle.getText("failedLoadPayment", [oError.message || oBundle.getText("unknownError")]));
                 }.bind(this));
             } else {
                 this._setupPaymentDialog();
@@ -2840,6 +2847,7 @@ sap.ui.define([
         },
 
         _onPaymentSubmit: async function () {
+            const sContextToken = this._getBookingContextToken();
             try {
                 // The payment dialog can stay open for a while, so re-verify the
                 // booking status again before the deferred update is written.
@@ -2869,6 +2877,12 @@ sap.ui.define([
                         BookingID: this._sBookingID
                     }
                 };
+
+                if (sContextToken !== this._getBookingContextToken() ||
+                    !await this._validateExtraBedsForSave(oPayload.data[0]) ||
+                    sContextToken !== this._getBookingContextToken()) {
+                    return;
+                }
 
                 this._prepareEditUpdatePayments(oPayload.data[0], []);
 
@@ -2904,12 +2918,13 @@ sap.ui.define([
 
                 this._oPaymentDialog.close();
 
-                this._handleEditBookingSuccess(bPayOnCheckIn
-                    ? "Booking updated successfully."
-                    : "Payment successful and booking updated.");
+                this._handleEditBookingSuccess(this.getView().getModel("i18n").getResourceBundle().getText(
+                    bPayOnCheckIn ? "bookingUpdated" : "paymentBookingUpdated"
+                ));
 
             } catch (oError) {
-                MessageBox.error(this.getView().getModel("i18n").getResourceBundle().getText("paymentFailed", [oError.message || "Unknown error"]));
+                var oBundle = this.getView().getModel("i18n").getResourceBundle();
+                MessageBox.error(oBundle.getText("paymentFailed", [oError.message || oBundle.getText("unknownError")]));
             } finally {
                 this.closeBusyDialog();
             }
@@ -2962,6 +2977,7 @@ sap.ui.define([
 
         _getEditFacilityOccupants: function () {
             var oBookingView = this.getView().getModel("BookingView");
+            var oBundle = this.getView().getModel("i18n").getResourceBundle();
             var aMembers = oBookingView && Array.isArray(oBookingView.getProperty("/FamilyMembers"))
                 ? oBookingView.getProperty("/FamilyMembers") : [];
 
@@ -2972,7 +2988,7 @@ sap.ui.define([
                 var sMemberId = String(oMember.MemberID || oMember.ID || "").trim();
                 var sName = String(oMember.Name || oMember.FullName || "").trim();
                 var sSalutation = String(oMember.Salutation || "").trim();
-                var sDisplayName = sSalutation && sName ? sSalutation + " " + sName : (sName || oMember.Relation || "Family Member");
+                var sDisplayName = sSalutation && sName ? sSalutation + " " + sName : (sName || oMember.Relation || oBundle.getText("familyMemberFallback"));
                 var aAliases = [
                     sId,
                     sMemberId,
@@ -2980,7 +2996,9 @@ sap.ui.define([
                     oMember.ID,
                     oMember.Name,
                     oMember.FullName,
-                    sDisplayName
+                    sDisplayName,
+                    // Saved allocations may use the original English fallback as an identity alias.
+                    !sName && !oMember.Relation ? "Family Member" : ""
                 ];
 
                 return {
@@ -3390,6 +3408,7 @@ sap.ui.define([
                         FacilityID: oFacility.FacilityID,
                         CatalogFacilityID: oFacility.CatalogFacilityID,
                         FacilityName: oFacility.FacilityName,
+                        Type: oFacility.Type,
                         DisplayFacilityName: oFacility.DisplayFacilityName || oFacility.FacilityName,
                         Currency: sCurrency,
                         SelectionMode: sSelectionMode,
@@ -3430,6 +3449,7 @@ sap.ui.define([
                 }.bind(this));
 
             oModel.setProperty("/AllSelectedFacilities", aSelectedFacilities);
+            this._syncOccupantCapacity();
             oModel.setProperty("/FacilityDiscounts", []);
             oModel.setProperty("/TotalFacilityDiscount", 0);
             oModel.setProperty("/HasFacilityOfferDiscount", false);
@@ -3636,6 +3656,9 @@ sap.ui.define([
             var fnModeMatches = function (oSelected) {
                 var sSelectedMode = String(oSelected.SelectionMode || "").trim().toUpperCase();
 
+                if (sSelectedMode === "QTY" && String(oFacility.Type || "").trim().toLowerCase() === "extra bed") {
+                    return true;
+                }
                 // If old saved data has no SelectionMode, allow name/catalog match.
                 // If it has SelectionMode, it must match the catalog mode.
                 return !sSelectedMode || !sCatalogMode || sSelectedMode === sCatalogMode;
@@ -3747,7 +3770,17 @@ sap.ui.define([
             var sBaseName = oFacility.FacilityName || oFacility.Type || "";
             var sDisplayFacilityName = sBaseName;
             if (bShowUnitTextSuffix && sSelectedPriceType) {
-                sDisplayFacilityName = sBaseName + " (" + sSelectedPriceType + ")";
+                var sPriceLabelKey = {
+                    unitprice: "unitPrice",
+                    perday: "perDay",
+                    permonth: "perMonth",
+                    peryear: "perYear",
+                    perhour: "facilityRatePerHour",
+                    packageprice: "facilityRatePackagePrice"
+                }[String(sSelectedPriceType).replace(/\s+/g, "").toLowerCase()];
+                var sPriceLabel = sPriceLabelKey
+                    ? this.getView().getModel("i18n").getResourceBundle().getText(sPriceLabelKey).trim() : sSelectedPriceType;
+                sDisplayFacilityName = sBaseName + " (" + sPriceLabel + ")";
             }
 
             return {
@@ -3806,11 +3839,15 @@ sap.ui.define([
             // when a catalog facility has multiple UnitText variants in the booking
             var aProcessedFacilities = aFacilities
                 .filter(function (oFacility) {
-                    if ((oFacility.Type || "").toLowerCase().trim() === "extra bed") {
-                        return iExtraBed > 0;
+                    if ((oFacility.Type || "").toLowerCase().trim() === "extra bed" || this._isExtraBedQuantityFacility(oFacility)) {
+                        return iExtraBed > 0 || this._findAllSelectedFacilitiesForEdit(oFacility, aSelectedFacilities)
+                            .some(function (oSelectedFacility) {
+                                var sSavedMode = this._getFacilitySelectionMode(oSelectedFacility);
+                                return sSavedMode === "QTY" || sSavedMode === "SINGLE";
+                            }.bind(this));
                     }
                     return true;
-                })
+                }.bind(this))
                 .reduce(function (aResult, oFacility) {
                     // Find ALL matching selected facilities for this catalog facility
                     var aMatches = this._findAllSelectedFacilitiesForEdit(oFacility, aSelectedFacilities)
@@ -3845,6 +3882,18 @@ sap.ui.define([
                     return aResult;
                 }.bind(this), []);
 
+            // Do not silently drop saved extra beds if their catalog entry was removed.
+            aSelectedFacilities.forEach(function (oSelectedFacility) {
+                if (aConsumedSelectedFacilities.indexOf(oSelectedFacility) < 0 && this._isExtraBedQuantityFacility(oSelectedFacility)) {
+                    aProcessedFacilities.push(this._buildProcessedFacilityEntry({
+                        FacilityName: oSelectedFacility.FacilityName,
+                        Type: oSelectedFacility.Type || "Extra Bed",
+                        SelectionMode: "QTY",
+                        UnitPrice: this._getFirstAvailableNumber(oSelectedFacility.BasicFacilityPrice, oSelectedFacility.Price)
+                    }, oSelectedFacility, true, false));
+                }
+            }.bind(this));
+
             this._aAllFacilities = aProcessedFacilities;
             this._syncSelectedFacilityPersonsWithOccupants();
             this._applyEditFacilityPriceFilter();
@@ -3855,22 +3904,26 @@ sap.ui.define([
             var sBranchCode = oHostelModel.getProperty("/BranchCode");
 
             this._aAllFacilities = [];
+            this._bFacilityCatalogReadFailed = false;
 
             if (!sBranchCode) {
-                this.getView().getModel("FacilityModel").setProperty("/Facilities", []);
-                this._renderFacilityCards();
+                this._bFacilityCatalogReadFailed = true;
+                this._processFacilitiesForEdit();
                 return;
             }
 
             try {
                 var oResponse = await this.ajaxReadWithJQuery("HM_Facilities", { BranchCode: sBranchCode });
-                var aFacilities = oResponse && oResponse.data || [];
+                if (!oResponse || oResponse.success === false || !Array.isArray(oResponse.data)) {
+                    throw new Error("Facility catalog read failed");
+                }
+                var aFacilities = oResponse.data;
                 this._aAllFacilities = aFacilities;
                 this._processFacilitiesForEdit();
             } catch (oError) {
                 console.warn("Failed to load facilities:", oError);
-                this.getView().getModel("FacilityModel").setProperty("/Facilities", []);
-                this._renderFacilityCards();
+                this._bFacilityCatalogReadFailed = true;
+                this._processFacilitiesForEdit();
             }
         },
 
@@ -3971,6 +4024,7 @@ sap.ui.define([
         },
 
         _performCancelEdit: function () {
+            this._invalidateBookingContext();
             var oBookingView = this.getView().getModel("BookingView");
             var oHostelModel = this.getView().getModel("HostelModel");
             var oFacilityModel = this.getView().getModel("FacilityModel");
