@@ -600,6 +600,7 @@ onChekout: function () {
                     STDCode: oCustomer.STDCode || "",
                     Salutation: oCustomer.Salutation || "Mr.",
                     Address: oCustomer.PermanentAddress,
+                    ExtraBed:Deposit.ExtraBed,
                     // RentPrice: oCustomer.Bookings?.[0]?.RentPrice || 0,
                     // OrginalRentPrice: oCustomer.Bookings?.[0]?.RoomPrice || 0,
                     BedType: oCustomer.Bookings?.[0]?.BedType || "",
@@ -1888,6 +1889,27 @@ if (!isValidDay) {
 
             var finalPrice = 0;
             const iCount = oPayload.TotalHour || 1;
+
+            if(this.SelectedFacility.Type==="Extra Bed"){
+               var Booking= this.getView().getModel("Bookingmodel").getData()
+                var bedname = Booking ?.BedTypeName.replace(/\s*-\s*(AC|NON-AC)$/i, "").trim()
+                var acname = Booking ?.BedTypeName.includes("NON-AC") ? "NON-AC" : "AC"
+
+                var abeds=this.getView().getModel("Beddetails").getData().HM_BedType
+
+                var pBed = abeds.find((item) => {
+                    if (item.Name === bedname && item.BranchCode === oCustomerData?.BranchCode &&
+                        item.ACType === acname) {
+                        return item.ExtraBed
+                    }
+                })
+                if(pBed.ExtraBed < Number(oPayload.quantity)){
+                    MessageToast.show(`We have only ${pBed.ExtraBed} extra beds available.`);
+                    return;
+                }
+                  oPayload.FacilityChargeType="Extra Bed"
+
+            }
 
             // CALCULATE PRICE BASED ON UNIT
             if ((oPayload.UnitText === "Per Day" && oPayload.UnitText !== "Unit Price")) {
@@ -11047,11 +11069,11 @@ sap.m.MessageBox.confirm(
 
             var oTable = sap.ui.getCore().byId("abmemberSelectTable");
 
-            if (sPropertyType === "Hostel") {
-                oTable.setMode("SingleSelectLeft");
-            } else {
-                oTable.setMode("MultiSelect");
-            }
+            // if (sPropertyType === "Hostel") {
+            //     oTable.setMode("SingleSelectLeft");
+            // } else {
+            //     oTable.setMode("MultiSelect");
+            // }
 
             oTable.removeSelections(true);
 
@@ -11121,7 +11143,19 @@ sap.m.MessageBox.confirm(
                 .getModel("CustomerData")
                 .getData() || [];
 
-            var iCustomerCount = aDocuments.NoOfPersons;
+     var facilities = aDocuments.AllSelectedFacilities
+    .filter(item => item.FacilityChargeType === "Extra Bed")
+    .reduce((total, item) => total + Number(item.quantity || 0), 0);
+
+    var Extrabed;
+    if(facilities > 0){
+      Extrabed = aDocuments.ExtraBed
+    }
+               if(aDocuments.PropertyType==="Hostel" || aDocuments.PropertyType==="PG"){
+                var iCustomerCount = Extrabed ? 1 + Extrabed : 1;
+               }else{
+                var iCustomerCount = Extrabed ? aDocuments.NoOfPersons + Extrabed : aDocuments.NoOfPersons;
+               }
 
             // Check limit
             if (iSelectedCount > iCustomerCount) {

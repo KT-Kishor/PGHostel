@@ -1131,6 +1131,9 @@ sap.ui.define([
                 const unitText = "Fix"; // default unit
 
                 var GSTvalue=this.getView().byId("GSTValue").getValue()
+                if(GSTvalue==="0"){
+                    GSTvalue=""
+                }
 
                 const newItem = {
                     IndexNo: this.IndexNo,
@@ -1272,10 +1275,12 @@ sap.ui.define([
                     // ---------- ITEM CALCULATION ----------
                     aItems.forEach((item) => {
                         // const baseAmount = parseFloat(item.Total) || 0;
-                        if (item.Particulars.includes("Room Rent") || item.PreviousTotal === undefined || item.PreviousTotal === null || item.PreviousTotal === "") {
+                        if (item.PreviousTotal === undefined || item.PreviousTotal === null || item.PreviousTotal === "") {
                             item.PreviousTotal = item.Total;
                         }
-
+                           if(this.refresh===true && item.Particulars.includes("Room Rent")){
+                              item.PreviousTotal = item.Total;
+                           }
                         const baseAmount = (parseFloat(item.PreviousTotal) < 0) ? (parseFloat(item.Total) || 0) : (parseFloat(item.PreviousTotal) || 0);
 
                         // ---------- DISCOUNT ----------
@@ -4893,7 +4898,10 @@ sap.ui.define([
                     oView.getModel("ManageInvoiceItemModel").setProperty("/ManageInvoiceItem", finalItems);
 
                     // 5. Recalculate invoice totals and balance due
+                    this.refresh=true
                     await this.totalAmountCalculation();
+                    this.refresh=false
+
 
                     // 6. Check if new line items were added AND there is an outstanding due amount
                     const updatedCustomerData = oSelectedModel.getData();

@@ -362,9 +362,7 @@
                                     press="onUploadDocumentFile"
                                     class="myUnifiedBtn"
                                     visible="{VisibleModel>/visible}"
-                                    enabled="{= !(${CustomerData>/Status} === 'Assigned' &amp;&amp;
-    (${CustomerData>/PropertyType} === 'Hostel' ||
-     ${CustomerData>/PropertyType} === 'PG'))}"
+                                  
                                 />
                             </Toolbar>
                         </headerToolbar>
