@@ -2239,6 +2239,7 @@ if (!isValidDay) {
 
         onEditBooking: async function () {
             // this.applyCountryStateCityFilters();
+            this.sMessage=""
 
             const oMobile = this.byId("CD_ID_idPhone");
             const oView = this.getView();
@@ -5945,6 +5946,7 @@ sap.m.MessageBox.confirm(
                 "PropertyEmail": CustomerData.PropertyEmail,
                 "EditedSections": editedSections,
                 "LoginName": this.getOwnerComponent().getModel("LoginModel").getData().UserName || "",
+                "Message":this.sMessage,
                 "pdfAttachment": {
                     "fileName": "BookingVoucher.pdf",
                     "mimeType": "application/pdf",
@@ -6315,91 +6317,89 @@ sap.m.MessageBox.confirm(
             this.UD_Dialog.close();
         },
 
-        onDocumentDelete: function (oEvent) {
-            var oCustomerModel = this.getView().getModel("CustomerData");
-            var aDocs = oCustomerModel.getProperty("/Documents") || [];
-            var oItem = oEvent.getParameter("listItem");
-            var oCtx = oItem.getBindingContext("CustomerData");
-            var oDoc = oCtx.getObject();
+   
+onDocumentDelete: function (oEvent) {
 
-            var that = this;
+    var oModel = this.getView().getModel("CustomerData");
 
-            // If saved document → ask confirmation + AJAX delete
-            // if (oDoc.DocumentID) {
-            //     MessageBox.confirm(
-            //         "This Document is already Saved. Do you want to Delete it?", {
-            //             actions: [MessageBox.Action.YES, MessageBox.Action.NO],
-            //             styleClass: "myUnifiedBtn",
-            //             onClose: function (sAction) {
+    var aDocs = oModel.getProperty("/Documents") || [];
 
-            //                 if (sAction === MessageBox.Action.YES) {
-            //                     that.getBusyDialog();
+    var oItem = oEvent.getParameter("listItem");
+    var oCtx = oItem.getBindingContext("CustomerData");
+    var oDoc = oCtx.getObject();
 
-            //                     that.ajaxDeleteWithJQuery("HM_CustomerDocument", {
-            //                         filters: {
-            //                             DocumentID: oDoc.DocumentID
-            //                         }
-            //                     })
-            //                     .then(function () {
+    // Get previous members before deletion
+    var aOldMembers = oModel.getProperty("/AllMembers") || [];
 
-            //                         // Remove only the deleted document
-            //                         aDocs = aDocs.filter(function (doc) {
-            //                             return doc.DocumentID !== oDoc.DocumentID;
-            //                         });
+    // Remove only the selected local document
+    aDocs = aDocs.filter(function (doc) {
+        return !(
+            doc.MemberID === oDoc.MemberID &&
+            doc.DocumentName === oDoc.DocumentName &&
+            doc.FileName === oDoc.FileName
+        );
+    });
 
-            //                         oCustomerModel.setProperty("/Documents", aDocs);
-            //                         oCustomerModel.refresh(true);
+    // Update Documents
+    oModel.setProperty("/Documents", aDocs);
 
-            //                         that.closeBusyDialog();
+    // Get all MemberIDs present in remaining documents
+    var memberIds = new Set(aDocs.map(doc => doc.MemberID));
 
-            //                         sap.m.MessageToast.show(
-            //                             that.i18nModel.getText("docdeletedSuccess")
-            //                         );
-            //                     })
-            //                     .catch(function () {
-            //                         that.closeBusyDialog();
+    // Keep only members whose MemberID exists in Documents
+    var aCurrentMembers = aOldMembers.filter(function (member) {
+        return memberIds.has(member.MemberID);
+    });
 
-            //                         sap.m.MessageToast.show(
-            //                             that.i18nModel.getText("failedDeleteDocumentfromServer")
-            //                         );
-            //                     });
-            //                 }
-            //             }
-            //         }
-            //     );
-            // } else {
+    // Find removed members
+    var aPreviousMembers = aOldMembers.filter(oldMember =>
+        !aCurrentMembers.some(currentMember =>
+            currentMember.MemberID === oldMember.MemberID
+        )
+    );
 
-            // Remove only the selected local document
-            var oModel = this.getView().getModel("CustomerData");
+    // Find newly added members (normally empty during deletion)
+    var aAddedMembers = aCurrentMembers.filter(currentMember =>
+        !aOldMembers.some(oldMember =>
+            oldMember.MemberID === currentMember.MemberID
+        )
+    );
 
-            // Remove from Documents
-            aDocs = aDocs.filter(function (doc) {
-                return !(
-                    doc.MemberID === oDoc.MemberID &&
-                    doc.DocumentName === oDoc.DocumentName &&
-                    doc.FileName === oDoc.FileName
-                );
-            });
+    // Check whether members changed
+    var bMembersChanged =
+        aPreviousMembers.length > 0 || aAddedMembers.length > 0;
 
-            oModel.setProperty("/Documents", aDocs);
+    if (bMembersChanged) {
 
-            // Update only the affected member in AllMembers
-            var allMembers = oModel.getProperty("/AllMembers") || [];
+        var sOldNames = aOldMembers
+            .map(member => member.Name)
+            .join(", ");
 
-            // Get all MemberIDs present in aDocs
-            var memberIds = new Set(aDocs.map(doc => doc.MemberID));
+        var sNewNames = aCurrentMembers
+            .map(member => member.Name)
+            .join(", ");
 
-            // Keep only members whose MemberID exists in aDocs
-            allMembers = allMembers.filter(function (member) {
-                return memberIds.has(member.MemberID);
-            });
+        this.sMessage = sOldNames +
+            " changed member to " +
+            (sNewNames || "No members");
 
-            oModel.setProperty("/AllMembers", allMembers);
-            oModel.refresh(true);
 
-            sap.m.MessageToast.show(that.i18nModel.getText("documentRemoved"));
-            // }
-        },
+    }
+
+    // Store removed members
+    oModel.setProperty("/PreviousMembers", aPreviousMembers);
+
+    // Update current members
+    oModel.setProperty("/AllMembers", aCurrentMembers);
+
+    oModel.refresh(true);
+
+    sap.m.MessageToast.show(
+        this.i18nModel.getText("documentRemoved")
+    );
+
+},
+
 
         onFileNameLinkPress: async function (oEvent) {
 
@@ -11196,110 +11196,157 @@ sap.m.MessageBox.confirm(
             oBinding.filter(aFilters);
         },
 
-        onConfirmMemberSelection: async function () {
+      
 
-            var oTable = sap.ui.getCore().byId("abmemberSelectTable");
+onConfirmMemberSelection: async function () {
 
-            var aSelectedItems = oTable.getSelectedItems();
+    var oTable = sap.ui.getCore().byId("abmemberSelectTable");
 
-            if (!aSelectedItems || aSelectedItems.length === 0) {
-                sap.m.MessageToast.show(this.i18nModel.getText("Pleaseselectatleastonemember"));
-                return;
+    var aSelectedItems = oTable.getSelectedItems();
+
+    if (!aSelectedItems || aSelectedItems.length === 0) {
+        sap.m.MessageToast.show(
+            this.i18nModel.getText("Pleaseselectatleastonemember")
+        );
+        return;
+    }
+
+    var oModel = this.getView().getModel("CustomerData");
+    var oData = oModel.getData();
+
+    var aDocs = [];
+
+    const primaryMemberID = (oData.MemberID || "")
+        .split(",")[0]
+        .trim();
+
+    this.getBusyDialog();
+
+    try {
+
+        await Promise.all(aSelectedItems.map(async function (oItem) {
+
+            var oContext = oItem.getBindingContext("BookingView");
+            var oMember = oContext.getObject();
+
+            var doc = await this._fetchMemberDocument(oMember.MemberID);
+
+            if (doc.DocumentID) {
+
+                aDocs.push({
+                    DocumentID: doc.DocumentID,
+                    DocumentType: doc.DocumentType,
+                    MemberID: oMember.MemberID,
+                    MemberName: oMember.Name,
+                    Salutation: oMember.Salutation,
+                    FileName: doc.FileName,
+                    FileType: doc.FileType,
+                    File: doc.File,
+                    Relation: oMember.Relation,
+                    Gender: oMember.Gender,
+                    DateOfBirth: Formatter.formatAgeFromDOBOrAge(oMember.DateOfBirth),
+                    IsPrimary: oMember.MemberID === primaryMemberID
+                });
+
+            } else {
+
+                aDocs.push({
+                    MemberID: oMember.MemberID,
+                    MemberName: oMember.Name,
+                    Salutation: oMember.Salutation,
+                    Relation: oMember.Relation,
+                    Gender: oMember.Gender,
+                    DateOfBirth: Formatter.formatAgeFromDOBOrAge(oMember.DateOfBirth),
+                    IsPrimary: oMember.MemberID === primaryMemberID
+                });
+
             }
 
-            var oModel = this.getView().getModel("CustomerData");
-            var oData = oModel.getData();
-            var aDocs = [];
+        }.bind(this)));
 
-            const primaryMemberID = (oData.MemberID || "")
-                .split(",")[0]
-                .trim();
+    } catch (oError) {
 
-            // validate filename before pushing
-            // for (let oItem of aSelectedItems) {
+        MessageToast.show(
+            oError.message ||
+            oError.responseText ||
+            "Unable to load member documents"
+        );
 
-            //     var oContext = oItem.getBindingContext("BookingView");
-            //     var oData = oContext.getObject();
+        return;
 
-            //     var aMemberDocs = oData.Documents || [];
+    } finally {
+
+        this.closeBusyDialog();
+
+    }
+
+    // Store current documents
+    oModel.setProperty("/Documents", aDocs);
+
+    // Get previously selected members
+  
+// Get previously selected members
+var aOldMembers = oModel.getProperty("/AllMembers") || [];
+
+// Get currently selected members
+var aCurrentMembers = aDocs
+    .filter(doc => doc.MemberID && doc.MemberName)
+    .map(doc => ({
+        MemberID: doc.MemberID,
+        Name: doc.MemberName,
+        Gender: doc.Gender,
+        DateOfBirth: doc.DateOfBirth,
+        Relation: doc.Relation,
+        Salutation: doc.Salutation
+    }));
+
+// Find removed members
+var aPreviousMembers = aOldMembers.filter(oldMember =>
+    !aCurrentMembers.some(currentMember =>
+        currentMember.MemberID === oldMember.MemberID
+    )
+);
+
+// Find newly added members
+var aAddedMembers = aCurrentMembers.filter(currentMember =>
+    !aOldMembers.some(oldMember =>
+        oldMember.MemberID === currentMember.MemberID
+    )
+);
+
+// Check whether member selection changed
+var bMembersChanged =
+    aPreviousMembers.length > 0 || aAddedMembers.length > 0;
+
+if (bMembersChanged && aOldMembers.length > 0) {
+
+    var sOldNames = aOldMembers
+        .map(member => member.Name)
+        .join(", ");
+
+    var sNewNames = aCurrentMembers
+        .map(member => member.Name)
+        .join(", ");
+
+    this.sMessage = sOldNames + " changed member to " + sNewNames;
+
+}
+
+// Store removed members
+oModel.setProperty("/PreviousMembers", aPreviousMembers);
+
+// Update current members
+oModel.setProperty("/AllMembers", aCurrentMembers);
 
 
-            //     if (aMemberDocs.length === 0) {
-            //         sap.m.MessageBox.error(
-            //             "Document is missing for member: " + (oData.Name || "")
-            //         );
-            //         return;
-            //     }
-            // }
+    // Close dialog
+    this.UD_Dialog.close();
 
-            this.getBusyDialog();
-            try {
-                await Promise.all(aSelectedItems.map(async function (oItem) {
+    sap.m.MessageToast.show(
+        this.i18nModel.getText("Selectedmemberaddedsuccessfully")
+    );
 
-                    var oContext = oItem.getBindingContext("BookingView");
-                    var oData = oContext.getObject();
-
-                    var doc = await this._fetchMemberDocument(oData.MemberID);
-
-
-                    if (doc.DocumentID) {
-                        aDocs.push({
-                            DocumentID: doc.DocumentID,
-                            DocumentType: doc.DocumentType,
-                            MemberID: oData.MemberID,
-                            MemberName: oData.Name,
-                            Salutation: oData.Salutation,
-                            FileName: doc.FileName,
-                            FileType: doc.FileType,
-                            File: doc.File,
-                            Relation: oData.Relation,
-                            Gender: oData.Gender,
-                            DateOfBirth: Formatter.formatAgeFromDOBOrAge(oData.DateOfBirth),
-                            IsPrimary: oData.MemberID === primaryMemberID
-
-                        });
-                    } else {
-                        aDocs.push({
-                            MemberID: oData.MemberID,
-                            MemberName: oData.Name,
-                            Salutation: oData.Salutation,
-                            Relation: oData.Relation,
-                            Gender: oData.Gender,
-                            DateOfBirth: Formatter.formatAgeFromDOBOrAge(oData.DateOfBirth),
-                            IsPrimary: oData.MemberID === primaryMemberID
-
-                        });
-                    }
-                }.bind(this)));
-            } catch (oError) {
-                MessageToast.show(oError.message || oError.responseText || "Unable to load member documents");
-                return;
-            } finally {
-                this.closeBusyDialog();
-            }
-
-            this.getView().getModel("CustomerData").setProperty("/Documents", aDocs);
-
-
-
-            // keep only valid docs
-            var allMembers = aDocs
-                .filter(doc => doc.MemberID && doc.MemberName)
-                .map(doc => ({
-                    MemberID: doc.MemberID,
-                    Name: doc.MemberName,
-                    Gender: doc.Gender,
-                    DateOfBirth: doc.DateOfBirth,
-                    Relation: doc.Relation,
-                    Salutation: doc.Salutation
-                }));
-
-            oModel.setProperty("/AllMembers", allMembers);
-
-            this.UD_Dialog.close();
-
-            sap.m.MessageToast.show(this.i18nModel.getText("Selectedmemberaddedsuccessfully"));
-        },
+},
 
         onGenerateInvoice: function (oEvent) {
             var CustomerData = this.getView().getModel("CustomerData").getData();
