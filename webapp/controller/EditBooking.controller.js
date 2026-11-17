@@ -2570,11 +2570,6 @@ sap.ui.define([
                 return this._onPaymentSubmit();
             }
 
-            if (this._getSelectedExtraBedQuantity() > 0 && this._getOccupantOptions().length < 1 &&
-                !this._validateExtraBedOccupantUse()) {
-                return;
-            }
-
             if (!this._validateBookingBeforeUpdate()) {
                 return;
             }

@@ -63,7 +63,7 @@
                                     text="{i18n>roomNo}"
                                     class="sapUiSmallMarginBottom"
                                 />
-                                <Text text="{CustomerData>/RoomNo}" />
+                                <ObjectStatus text="{CustomerData>/RoomNo}" />
                             </VBox>
                         </FlexBox>
                         <!-- RIGHT SIDE BUTTONS -->

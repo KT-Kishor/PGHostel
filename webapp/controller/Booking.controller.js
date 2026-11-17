@@ -875,36 +875,6 @@
             return true;
         },
 
-        _validateExtraBedOccupantUse: function (iExtraBeds, iOccupants, iBaseCapacity) {
-            const iSelectedExtraBeds = iExtraBeds === undefined
-                ? this._getSelectedExtraBedQuantity() : Number(iExtraBeds);
-            if (!Number.isSafeInteger(iSelectedExtraBeds) || iSelectedExtraBeds < 1) {
-                return true;
-            }
-
-            const iSelectedOccupants = iOccupants === undefined
-                ? this._getOccupantOptions().length : Math.max(Number(iOccupants) || 0, 0);
-            const iBasePersons = iBaseCapacity === undefined
-                ? this._getBaseOccupantCapacity() : Math.max(Number(iBaseCapacity) || 1, 1);
-            const iRequiredOccupants = iBasePersons + iSelectedExtraBeds;
-            if (iSelectedOccupants >= iRequiredOccupants) {
-                return true;
-            }
-
-            MessageBox.information(
-                this.getView().getModel("i18n").getResourceBundle().getText("extraBedOccupantsRequired", [
-                    iSelectedExtraBeds,
-                    iRequiredOccupants,
-                    iRequiredOccupants - iSelectedOccupants
-                ]),
-                {
-                    styleClass: "myUnifiedBtn",
-                    contentWidth: "500px"
-                }
-            );
-            return false;
-        },
-
         _validateExtraBedChange: function (oFacility, iQuantity, bRemoving) {
             const iLimit = this._getExtraBedLimit();
             const iOtherBeds = this._getSelectedExtraBedQuantity(oFacility);
@@ -1045,10 +1015,6 @@
             const iExtraBeds = aSelectedExtraBeds.reduce(function (iTotal, oFacility) {
                 return iTotal + Number(oFacility.Quantity);
             }, 0);
-            if (iExtraBeds > 0 && iOccupants < 1) {
-                this._validateExtraBedOccupantUse(iExtraBeds, iOccupants);
-                return false;
-            }
             if (!Number.isSafeInteger(iOccupants) || iOccupants < 1) {
                 MessageToast.show(this.getView().getModel("i18n").getResourceBundle().getText("BKK_selectLeastOne"));
                 return false;
@@ -1086,9 +1052,6 @@
             const iMaxPersons = iBaseCapacity + iExtraBeds;
             if (iOccupants > iMaxPersons) {
                 MessageToast.show(this.getView().getModel("i18n").getResourceBundle().getText("bookingOccupantLimit", [iMaxPersons]));
-                return false;
-            }
-            if (!this._validateExtraBedOccupantUse(iExtraBeds, iOccupants, iBaseCapacity)) {
                 return false;
             }
             return true;
@@ -8438,11 +8401,6 @@
             const sCompanyName = String(oModel.getProperty("/CompanyName") || "").trim();
             const sCompanyAddress = String(oModel.getProperty("/CompanyAddress") || "").trim();
             let oPaymentTypeGroup;
-
-            if (this._getSelectedExtraBedQuantity() > 0 && this._getOccupantOptions().length < 1 &&
-                !this._validateExtraBedOccupantUse()) {
-                return;
-            }
 
             if (!this._validateBookingBeforePayment()) {
                 return;
