@@ -4898,9 +4898,18 @@ sap.ui.define([
                     oView.getModel("ManageInvoiceItemModel").setProperty("/ManageInvoiceItem", finalItems);
 
                     // 5. Recalculate invoice totals and balance due
+                 const bookingDetails = oData.commentData.find(item =>
+                            item.BedType
+                        );
+                        
+                  if(bookingDetails.PaymentType==="Per Day"){
                     this.refresh=true
                     await this.totalAmountCalculation();
                     this.refresh=false
+                  }else{
+                    await this.totalAmountCalculation();
+                  }
+                
 
 
                     // 6. Check if new line items were added AND there is an outstanding due amount
