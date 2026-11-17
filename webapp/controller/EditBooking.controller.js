@@ -2206,6 +2206,57 @@ sap.ui.define([
             }
         },
 
+        _getEditMemberChangeMessage: function () {
+            var aOldMembers = this._backupBookingView && Array.isArray(this._backupBookingView.FamilyMembers)
+                ? this._backupBookingView.FamilyMembers.filter(function (oMember) {
+                    return oMember && oMember.Selected !== false;
+                })
+                : [];
+            var oBookingView = this.getView().getModel("BookingView");
+            var aCurrentMembers = oBookingView && Array.isArray(oBookingView.getProperty("/FamilyMembers"))
+                ? oBookingView.getProperty("/FamilyMembers").filter(function (oMember) {
+                    return oMember && oMember.Selected !== false;
+                })
+                : [];
+
+            if (aOldMembers.length === 0) {
+                return "";
+            }
+
+            var fnGetMemberKey = function (oMember) {
+                return String(oMember.id || oMember.MemberID || oMember.ID || oMember.Name || "").trim();
+            };
+            var aOldMemberKeys = aOldMembers.map(fnGetMemberKey).filter(Boolean).sort();
+            var aCurrentMemberKeys = aCurrentMembers.map(fnGetMemberKey).filter(Boolean).sort();
+            var bMembersChanged = aOldMemberKeys.length !== aCurrentMemberKeys.length ||
+                aOldMemberKeys.some(function (sMemberKey, iIndex) {
+                    return sMemberKey !== aCurrentMemberKeys[iIndex];
+                });
+
+            if (!bMembersChanged) {
+                return "";
+            }
+
+            var fnGetMemberName = function (oMember) {
+                return String(oMember.Name || oMember.MemberName || fnGetMemberKey(oMember)).trim();
+            };
+            var sOldNames = aOldMembers.map(fnGetMemberName).filter(Boolean).join(", ");
+            var sNewNames = aCurrentMembers.map(fnGetMemberName).filter(Boolean).join(", ");
+
+            return sOldNames + " changed member to " + sNewNames;
+        },
+
+        _buildBookingCreatePayload: function () {
+            var oPayload = BookingController.prototype._buildBookingCreatePayload.call(this);
+            var sMemberChangeMessage = this._getEditMemberChangeMessage();
+
+            if (sMemberChangeMessage && oPayload && Array.isArray(oPayload.data) && oPayload.data[0]) {
+                oPayload.data[0].Message = sMemberChangeMessage;
+            }
+
+            return oPayload;
+        },
+
         _buildEditUpdatePayload: function (aData, sBookingID) {
             (Array.isArray(aData) ? aData : []).forEach(function (oCustomer) {
                 var aBookings = Array.isArray(oCustomer && oCustomer.Booking) ? oCustomer.Booking : [];
