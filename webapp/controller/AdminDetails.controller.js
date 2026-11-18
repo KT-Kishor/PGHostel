@@ -4380,8 +4380,8 @@ function getDateValue(value) {
 function isDateOverlap(start1, end1, start2, end2) {
 
     return (
-        start1 <= end2 &&
-        start2 <= end1
+        start1 < end2 &&
+        start2 < end1
     );
 }
 
@@ -6379,9 +6379,10 @@ onDocumentDelete: function (oEvent) {
             .map(member => member.Name)
             .join(", ");
 
-        this.sMessage = sOldNames +
-            " changed member to " +
+        this.sMessage = "Members: " + sOldNames +
+            " has been changed to " +
             (sNewNames || "No members");
+
 
 
     }
@@ -11143,13 +11144,15 @@ onDocumentDelete: function (oEvent) {
                 .getModel("CustomerData")
                 .getData() || [];
 
-     var facilities = aDocuments.AllSelectedFacilities
-    .filter(item => item.FacilityChargeType === "Extra Bed")
-    .reduce((total, item) => total + Number(item.quantity || 0), 0);
+   var facilities = Number(
+    aDocuments.AllSelectedFacilities
+        .filter(item => item.FacilityChargeType === "Extra Bed")
+        .at(-1)?.quantity || 0
+);
 
     var Extrabed;
     if(facilities > 0){
-      Extrabed = aDocuments.ExtraBed
+      Extrabed = facilities
     }
                if(aDocuments.PropertyType==="Hostel" || aDocuments.PropertyType==="PG"){
                 var iCustomerCount = Extrabed ? 1 + Extrabed : 1;
@@ -11328,7 +11331,10 @@ if (bMembersChanged && aOldMembers.length > 0) {
         .map(member => member.Name)
         .join(", ");
 
-    this.sMessage = sOldNames + " changed member to " + sNewNames;
+
+          this.sMessage = "Members: " + sOldNames +
+            " has been changed to " +
+            (sNewNames || "No members");
 
 }
 

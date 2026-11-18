@@ -73,6 +73,7 @@
                                             valueStateText="{i18n>selectCustomer}"
                                             showSecondaryValues="true"
                                             selectedKey="{SelectedCustomerModel>/CustomerName}"
+                                            filterSecondaryValues="true"
                                         >
                                             <core:ListItem
                                                 key="{ManageCustomerModel>CustomerName}"

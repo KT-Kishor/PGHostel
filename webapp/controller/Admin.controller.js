@@ -608,7 +608,11 @@ this.getView().getModel("BedModel").setData(uniqueData);
     BranchName: BranchData.Name,
     STDCode: BranchData.STD,
     MobileNo: BranchData.Contact,
-    AdminEmail: BranchData.EmailID  
+    AdminEmail: BranchData.EmailID,
+    StartDate:this.data.StartDate,
+    EndDate:this.data.EndDate,
+    BookingDate:this.data.BookingDate,
+    BedType:this.data.BedType  
 };
 
 this.getBusyDialog()
@@ -1103,6 +1107,7 @@ if (this.data.Status === "Assigned") {
                     AdminEmail: oExistingModel.EmailID,
                     Status: "Assigned",
                     LoginName: oExistingModel.UserName,
+                  
                 };
 
                 oBody = {

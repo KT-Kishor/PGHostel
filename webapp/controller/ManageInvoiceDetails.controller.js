@@ -17,6 +17,7 @@ sap.ui.define([
 
             _onRouteMatched: async function (oEvent) {
                 this.getBusyDialog()
+                this._applyAdminBookingECContainsFilter()
                 this.MonthDate="";
                 var LoginFUnction = await this.commonLoginFunction("ManageVendor");
                 if (!LoginFUnction) return;
@@ -531,6 +532,16 @@ sap.ui.define([
             onHome: function () {
                 this.CommonLogoutFunction();
             },
+                  _applyAdminBookingECContainsFilter: function () {
+            var oCb = this.byId("CID_id_AddCustComboBox");
+            if (!oCb || !oCb.setFilterFunction) return;
+            oCb.setFilterFunction(function (sTerm, oItem) {
+                var sNeedle = String(sTerm || "").toLowerCase();
+                var sEmail = String(oItem.getText() || "").toLowerCase();
+                var sName = String(oItem.getAdditionalText() || "").toLowerCase();
+                return sEmail.indexOf(sNeedle) !== -1 || sName.indexOf(sNeedle) !== -1;
+            });
+        },
 
             onChangeAddCustomer: async function (oEvent) {
                 try {
@@ -610,7 +621,7 @@ sap.ui.define([
 
                     if (!bookingDetails) {
                         sap.m.MessageBox.information(
-                            "This invoice has already been generated.",
+                            "All the invoices has been generated.",
                             {
                                 styleClass: "myUnifiedBtn",
                                 onClose: function () {
