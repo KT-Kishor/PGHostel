@@ -92,6 +92,7 @@ sap.ui.define([
 
                     var Damage = oFCIAerData[0].HM_Damage[0];
                     var Items = oFCIAerData[0].HM_DamageItem;
+                    var fnFormatAmount = this._formatAmountToTwoDecimals.bind(this);
 
                     var aItemsWithIndex = Items.map(function (item, index) {
                         return {
@@ -99,9 +100,9 @@ sap.ui.define([
                             Type: item.Type,
                             ItemName: item.ItemName,
                             Description: item.Description,
-                            Cost: item.Cost,
-                            TotalCost:item.TotalCost,
-                            RecoverCost: item.RecoverCost,
+                            Cost: fnFormatAmount(item.Cost),
+                            TotalCost: fnFormatAmount(item.TotalCost),
+                            RecoverCost: fnFormatAmount(item.RecoverCost),
                             Quantity: item.Quantity,
                             ItemId: item.ItemID
                         };
@@ -443,6 +444,35 @@ onTotalInputLiveChange: function (oEvent) {
     this._calculateTotalCost(oInput);
 },
 
+        _formatAmountToTwoDecimals: function (vValue) {
+            if (vValue === null || vValue === undefined || String(vValue).trim() === "") {
+                return "";
+            }
+
+            var fValue = Number(vValue);
+            return isNaN(fValue) ? "" : fValue.toFixed(2);
+        },
+
+        onAmountInputChange: function (oEvent) {
+            var oInput = oEvent.getSource();
+            var sFormattedValue = this._formatAmountToTwoDecimals(oInput.getValue());
+            var oContext = oInput.getBindingContext("DamageModel");
+            var oValueBinding = oInput.getBinding("value");
+
+            oInput.setValue(sFormattedValue);
+
+            if (oContext && oValueBinding) {
+                oContext.getModel().setProperty(
+                    oContext.getPath() + "/" + oValueBinding.getPath(),
+                    sFormattedValue
+                );
+            }
+
+            if (oValueBinding && oValueBinding.getPath() === "Cost") {
+                this._calculateTotalCost(oInput);
+            }
+        },
+
 _calculateTotalCost: function (oInput) {
     var oContext = oInput.getBindingContext("DamageModel");
 
@@ -460,7 +490,7 @@ _calculateTotalCost: function (oInput) {
     // Update TotalCost in model
     oContext.getModel().setProperty(
         oContext.getPath() + "/TotalCost",
-        fTotalCost
+        fTotalCost.toFixed(2)
     );
       var oContext = oInput.getBindingContext("DamageModel");
             var oModel = this.getView().getModel("DamageModel");

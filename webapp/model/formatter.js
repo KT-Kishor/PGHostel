@@ -895,17 +895,17 @@ formatTaxAmount: function (sIGST, sCGST, sSGST, sCurrency) {
     };
 
     if (sIGST) {
-        return "IGST: " + format(sIGST) + " " + sCurrency;
+        return "IGST : " + format(sIGST) + " " + sCurrency;
     }
 
     var aTaxes = [];
 
     if (sCGST) {
-        aTaxes.push("CGST: " + format(sCGST) + " " + sCurrency);
+        aTaxes.push("CGST : " + format(sCGST) + " " + sCurrency);
     }
 
     if (sSGST) {
-        aTaxes.push("SGST: " + format(sSGST) + " " + sCurrency);
+        aTaxes.push("SGST : " + format(sSGST) + " " + sCurrency);
     }
 
     return aTaxes.join(" | ");

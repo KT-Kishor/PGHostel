@@ -60,15 +60,15 @@
                     />
                     <IconTabFilter
                         key="Members"
-                        text="{= ${myBookings>/memberCount} > 0 ? ${i18n>members} +' (' + ${myBookings>/memberCount} + ')' : ${i18n>members} }"
+                        text="{= ${myBookings>/memberCount} > 0 ? ${i18n>members} +' (' + ${myBookings>/memberCount} + ')' : ${i18n>Members} }"
                     />
                     <IconTabFilter
                         key="Payment"
-                        text="{= ${myBookings>/paymentCount} > 0 ? ${i18n>payment} +' (' + ${myBookings>/paymentCount} + ')' : ${i18n>payment} }"
+                        text="{= ${myBookings>/paymentCount} > 0 ? ${i18n>payment} +' (' + ${myBookings>/paymentCount} + ')' : ${i18n>Payment} }"
                     />
                     <IconTabFilter
                         key="Complaints"
-                        text="{= ${myBookings>/complainCount} > 0 ? ${i18n>complaints} +' (' + ${myBookings>/complainCount} + ')' : ${i18n>complaints} }"
+                        text="{= ${myBookings>/complainCount} > 0 ? ${i18n>complaints} +' (' + ${myBookings>/complainCount} + ')' : ${i18n>Complaints} }"
                     />
                     <IconTabFilter
                         key="Damage"

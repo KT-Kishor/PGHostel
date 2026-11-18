@@ -206,6 +206,13 @@
                         />
                         <ToolbarSpacer />
 
+                        <Button
+                            text="{i18n>manageBooking}"
+                            tooltip="{i18n>manageBooking}"
+                            press="onNavigateToBookingList"
+                            class="myUnifiedBtn"
+                        />
+
                         <!-- Return Deposit Button -->
 
                          <!-- <Button

@@ -1156,6 +1156,12 @@ sap.ui.define([
             // Intentionally empty to prevent auto-search
         },
 
+        onNavigateToBookingList: function () {
+            this.getOwnerComponent().getRouter().navTo("RouteAdmin", {
+                sPath: "TilePage"
+            });
+        },
+
        onNavBack: function () {
     var oRouter = this.getOwnerComponent().getRouter();
     if (this._sFrom === "Invoice") {

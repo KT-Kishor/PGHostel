@@ -170,7 +170,9 @@
 							formatter: '.Formatter.formatPrice'}"/>
 							<Text text="{parts: ['RoomDetailsModel>YearPrice','RoomDetailsModel>Currency'],
 							formatter: '.Formatter.formatPrice'}"/>
-							<Text text="{RoomDetailsModel>Status}" />
+							<ObjectStatus
+								text="{RoomDetailsModel>Status}"
+								state="{path: 'RoomDetailsModel>Status', formatter: '.Formatter.formatStatusState'}" />
 
 						</cells>
 					</ColumnListItem>
