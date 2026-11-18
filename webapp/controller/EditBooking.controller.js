@@ -2243,7 +2243,7 @@ sap.ui.define([
             var sOldNames = aOldMembers.map(fnGetMemberName).filter(Boolean).join(", ");
             var sNewNames = aCurrentMembers.map(fnGetMemberName).filter(Boolean).join(", ");
 
-            return "Members: " + sOldNames + " Has been changed to: " + sNewNames;
+            return "Members: " + sOldNames + " has been changed to: " + sNewNames;
         },
 
         _buildBookingCreatePayload: function () {

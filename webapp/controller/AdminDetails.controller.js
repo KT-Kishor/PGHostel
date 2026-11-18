@@ -11333,7 +11333,7 @@ if (bMembersChanged && aOldMembers.length > 0) {
 
 
           this.sMessage = "Members: " + sOldNames +
-            " Has been changed to: " +
+            " has been changed to: " +
             (sNewNames || "No members");
 
 }
