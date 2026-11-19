@@ -9358,10 +9358,24 @@ onDocumentDelete: function (oEvent) {
                 });
         },
 
+        _formatPdfExtraBedQuantity: function (sUnitText, iQuantity) {
+            const oBundle = this.getView().getModel("i18n").getResourceBundle();
+            const mQuantityKeys = {
+                "per day": "facilityQtyPerDay",
+                "daily": "facilityQtyPerDay",
+                "per month": "facilityQtyPerMonth",
+                "monthly": "facilityQtyPerMonth",
+                "per year": "facilityQtyPerYear",
+                "yearly": "facilityQtyPerYear"
+            };
+            const sQuantityKey = mQuantityKeys[String(sUnitText || "").trim().toLowerCase()] || "facilityQtyValue";
+
+            return oBundle.getText(sQuantityKey, [String(iQuantity)]);
+        },
+
         onGeneratePDF: async function (Status) {
             const data = this.getView().getModel("CustomerData").getData();
             var oBookingModel = this.getView().getModel("Bookingmodel").getData();
-            const oResourceBundle = this.getView().getModel("i18n").getResourceBundle();
 
             const aMembers = data.Documents || [];
 
@@ -9770,7 +9784,7 @@ onDocumentDelete: function (oEvent) {
                     });
                     const iQuantity = Math.max(parseInt(item.quantity || item.Quantity, 10) || 1, 1);
                     const sExtraBedQuantity = bIsExtraBed
-                        ? `\n(${oResourceBundle.getText("facilityQtyValue", [String(iQuantity)])})`
+                        ? `\n${this._formatPdfExtraBedQuantity(sUnitText, iQuantity)}`
                         : "";
 
                     if (item.StartDate && item.EndDate) {
