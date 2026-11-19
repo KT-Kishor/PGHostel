@@ -809,31 +809,31 @@ sap.ui.define([
                     });
 
                     // REFUND PROCESSED LINE ITEM AUTO CREATE
-                    const refundAmount = parseFloat(oData.data.ManageInvoice?.[0]?.RefundAmount || 0);
-                    const refundProcessed = oData.data.ManageInvoice?.[0]?.RefundProcessed;
+                    // const refundAmount = parseFloat(oData.data.ManageInvoice?.[0]?.RefundAmount || 0);
+                    // const refundProcessed = oData.data.ManageInvoice?.[0]?.RefundProcessed;
 
-                    if (refundAmount > 0 && (!refundProcessed || refundProcessed === "")) {
-                        finalInvoiceItems.push({
-                            IndexNo: finalInvoiceItems.length + 1,
-                            InvNo: this.newID,
-                            Particulars: `Refund Processed for Invoice No :  ${oData.data.ManageInvoice[0].InvNo}`,
-                            UnitText: "Fix",
-                            DurationText: "-",
-                            SAC: "996322",
-                            GSTCalculation: "NO",
-                            Discount: "",
-                            GrossPrice: -refundAmount,
-                            Total: -refundAmount,
-                            StartDate: this.Formatter.DateFormat(new Date()),
-                            EndDate: this.Formatter.DateFormat(new Date()),
-                            Currency: bookingDetails.Currency,
-                            GrossPriceEditable: false,
-                            UnitEditable: false,
-                            DurationEditable: false,
-                            StartDateEditable: false,
-                            EndDateEditable: false
-                        });
-                    }
+                    // if (refundAmount > 0 && (!refundProcessed || refundProcessed === "")) {
+                    //     finalInvoiceItems.push({
+                    //         IndexNo: finalInvoiceItems.length + 1,
+                    //         InvNo: this.newID,
+                    //         Particulars: `Refund Processed for Invoice No :  ${oData.data.ManageInvoice[0].InvNo}`,
+                    //         UnitText: "Fix",
+                    //         DurationText: "-",
+                    //         SAC: "996322",
+                    //         GSTCalculation: "NO",
+                    //         Discount: "",
+                    //         GrossPrice: -refundAmount,
+                    //         Total: -refundAmount,
+                    //         StartDate: this.Formatter.DateFormat(new Date()),
+                    //         EndDate: this.Formatter.DateFormat(new Date()),
+                    //         Currency: bookingDetails.Currency,
+                    //         GrossPriceEditable: false,
+                    //         UnitEditable: false,
+                    //         DurationEditable: false,
+                    //         StartDateEditable: false,
+                    //         EndDateEditable: false
+                    //     });
+                    // }
                     finalInvoiceItems.sort((a, b) => {
                         return (
                             this._parseDate(a.StartDate) - this._parseDate(b.StartDate) ||

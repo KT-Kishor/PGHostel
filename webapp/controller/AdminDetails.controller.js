@@ -1581,6 +1581,8 @@ oEnd = new Date(targetYear, targetMonth, endDay);
                 }
             }
             if (oEnd && iDays === 0) {
+                oEnd.setHours(0, 0, 0, 0);
+                oStart.setHours(0, 0, 0, 0);
                 iDays = Math.floor((oEnd - oStart) / (1000 * 60 * 60 * 24));
             }
                
@@ -3174,18 +3176,19 @@ onDeleteFacilityDetails: function () {
             {
                 actions: [
                     sap.m.MessageBox.Action.OK,
-                    "Continue"
+                    sap.m.MessageBox.Action.CANCEL,
+
                 ],
                 emphasizedAction: sap.m.MessageBox.Action.OK,
                 styleClass: "myUnifiedBtn",
                 onClose: function (sAction) {
 
-                    if (sAction === sap.m.MessageBox.Action.OK) {
+                    if (sAction === sap.m.MessageBox.Action.CANCEL) {
                         // Close message and stop deletion
                         return;
                     }
 
-                    if (sAction === "Continue") {
+                    if (sAction === sap.m.MessageBox.Action.OK) {
                         // Continue with deletion confirmation
                         fnContinueDelete();
                     }
@@ -4276,6 +4279,20 @@ onDeleteFacilityDetails: function () {
     f.MemberID &&
     !validMemberIds.has(f.MemberID)
 );
+
+
+
+   var facilities = Number(
+    facilityItems
+        .filter(item => item.FacilityChargeType === "Extra Bed")
+        .at(-1)?.quantity || 0
+);
+
+if(CustomerData.AllMembers.length > facilities + 1){
+    MessageBox.error(`This booking allows at most ${facilities + 1} occupants. Reduce the selected occupants or select enough extra beds before continuing.`);
+    return;
+}
+   
 
 if (toDelete.length === 0) {
     this.onSaveBooking1();
@@ -7780,6 +7797,18 @@ onDocumentDelete: function (oEvent) {
             // var GSTValue = GSTType === "IGST"
             //     ? Number(CustData.orgGSTValue)
             //     : Number(CustData.orgGSTValue) / 2;
+             var Ncustomergstin=sap.ui.getCore().byId("idGSTNumber").getValue()
+            var smessage
+            var GSTStatus
+
+            if(CustData.CustomerGSTIN){
+              smessage = `Customer GSTIN updated from: ${CustData.CustomerGSTIN} to: ${Ncustomergstin}.`;
+              GSTStatus="GST Updated"
+            }else{
+              smessage = `Customer GSTIN added: ${Ncustomergstin}.`;
+              GSTStatus="GST Added"
+
+            }
 
             var payload = {
                 CustomerGSTIN: sap.ui.getCore().byId("idGSTNumber").getValue(),
@@ -7787,6 +7816,8 @@ onDocumentDelete: function (oEvent) {
                 CustCompanyAddress: sap.ui.getCore().byId("idCompanyAddress").getValue(),
                 BookingID: CustData.BookingID,
                 Message:true,
+                GSTStatus:GSTStatus,
+                Textmessage:smessage,
                 LoginName: this.getOwnerComponent().getModel("LoginModel").getData().UserName || "",
 
                 // GSTType: this.sSelectedText,
