@@ -9259,6 +9259,7 @@ onDocumentDelete: function (oEvent) {
         onGeneratePDF: async function (Status) {
             const data = this.getView().getModel("CustomerData").getData();
             var oBookingModel = this.getView().getModel("Bookingmodel").getData();
+            const oResourceBundle = this.getView().getModel("i18n").getResourceBundle();
 
             const aMembers = data.Documents || [];
 
@@ -9658,6 +9659,17 @@ onDocumentDelete: function (oEvent) {
                 let tableBody = facilities.map((item, index) => {
 
                     let sUnitText = item.UnitText || "-";
+                    const bIsExtraBed = [
+                        item.FacilityName,
+                        item.FacilityChargeType,
+                        item.Type
+                    ].some(function (sValue) {
+                        return String(sValue || "").trim().toLowerCase().replace(/[^a-z0-9]/g, "") === "extrabed";
+                    });
+                    const iQuantity = Math.max(parseInt(item.quantity || item.Quantity, 10) || 1, 1);
+                    const sExtraBedQuantity = bIsExtraBed
+                        ? `\n(${oResourceBundle.getText("facilityQtyValue", [String(iQuantity)])})`
+                        : "";
 
                     if (item.StartDate && item.EndDate) {
                         const startDate = new Date(item.StartDate.split('/').reverse().join('-'));
@@ -9666,14 +9678,14 @@ onDocumentDelete: function (oEvent) {
                         // Difference in days (inclusive)
                         const diffDays = Math.floor((endDate - startDate) / (1000 * 60 * 60 * 24));
 
-                        if (sUnitText === "Unit Price") {
-                            sUnitText = `${sUnitText}\n(${item.quantity || 1} Qty)`;
+                        if (sUnitText === "Unit Price" && !bIsExtraBed) {
+                            sUnitText = `${sUnitText}\n(${iQuantity} Qty)`;
                         } else if (sUnitText === "Package Price") {
                             if (item.FacilityChargeType === "Entire Booking") {
-                                this.qty = `(${item.quantity || 1} Qty / Entire Booking)`
+                                this.qty = `(${iQuantity} Qty / Entire Booking)`
                                 sUnitText = `${sUnitText}`;
                             } else {
-                                const dailyQty = Number(item.quantity) || 1;
+                                const dailyQty = iQuantity;
                                 const totalQty = dailyQty * diffDays;
                                 this.qty = `(${dailyQty} Qty / day)`
                                 sUnitText = `${sUnitText}\n(${diffDays} days)`;
@@ -9704,8 +9716,8 @@ onDocumentDelete: function (oEvent) {
                     return [
                         (index + 1).toString(),
                         item.MemberName
-                            ? `${item.FacilityName}\n(Member: ${item.MemberName})${showQty ? `\n${this.qty}` : ""}`
-                            : (item.FacilityName || "-"),
+                            ? `${item.FacilityName}\n(Member: ${item.MemberName})${showQty ? `\n${this.qty}` : ""}${sExtraBedQuantity}`
+                            : `${item.FacilityName || "-"}${sExtraBedQuantity}`,
                         item.StartDate,
                         item.EndDate,
                         `${Formatter.fromatNumber(

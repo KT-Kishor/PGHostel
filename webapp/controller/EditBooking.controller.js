@@ -5072,6 +5072,11 @@ sap.ui.define([
                 let tableBody = facilities.map((item, index) => {
 
                     let sUnitText = item.UnitText || "-";
+                    const bIsExtraBed = this._isExtraBedFacility(item);
+                    const iQuantity = Math.max(parseInt(item.Quantity, 10) || 1, 1);
+                    const sExtraBedQuantity = bIsExtraBed
+                        ? `\n(${oResourceBundle.getText("facilityQtyValue", [String(iQuantity)])})`
+                        : "";
 
                     if (item.StartDate && item.EndDate) {
                         const startDate = new Date(item.StartDate);
@@ -5080,7 +5085,7 @@ sap.ui.define([
                         // Difference in days (inclusive)
                         const diffDays = Math.floor((endDate - startDate) / (1000 * 60 * 60 * 24));
 
-                        if (sUnitText === "Unit Price") {
+                        if (sUnitText === "Unit Price" && !bIsExtraBed) {
                             sUnitText = `${sUnitText} (${oResourceBundle.getText("facilityQtyValue", [String(item.Quantity || 1)])})`;
                         } else if (sUnitText === "Package Price") {
                             if (item.FacilityChargeType === "Entire Booking") {
@@ -5115,8 +5120,8 @@ sap.ui.define([
                     return [
                         (index + 1).toString(),
                         item.MemberName
-                            ? `${item.FacilityName}\n(${oResourceBundle.getText("facilityMemberPrefix", [item.MemberName])})${showQty ? `\n${this.qty}` : ""}`
-                            : (item.FacilityName || "-"),
+                            ? `${item.FacilityName}\n(${oResourceBundle.getText("facilityMemberPrefix", [item.MemberName])})${showQty ? `\n${this.qty}` : ""}${sExtraBedQuantity}`
+                            : `${item.FacilityName || "-"}${sExtraBedQuantity}`,
                         Formatter.formatDate(item.StartDate) || "-",
                         Formatter.formatDate(item.EndDate) || "-",
                         `${Formatter.fromatNumber(parseFloat(item.BasicFacilityPrice) || 0)} ${oHostelModel.Currency}`,

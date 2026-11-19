@@ -821,8 +821,13 @@
         },
 
         _isExtraBedFacility: function (oFacility) {
-            return !!oFacility &&
-                String(oFacility.Type || oFacility.FacilityName || "").trim().toLowerCase() === "extra bed";
+            return !!oFacility && [
+                oFacility.Type,
+                oFacility.FacilityName,
+                oFacility.FacilityChargeType
+            ].some(function (sValue) {
+                return String(sValue || "").trim().toLowerCase().replace(/[^a-z0-9]/g, "") === "extrabed";
+            });
         },
 
         _isExtraBedQuantityFacility: function (oFacility) {
@@ -865,11 +870,23 @@
             oBookingView.setProperty("/showFamilySection", this._shouldShowFamilySection(oModel.getProperty("/PropertyType"), iMaxPersons));
         },
 
+        _showBookingOccupantLimitMessage: function (iMaxPersons) {
+            const oBundle = this.getView().getModel("i18n").getResourceBundle();
+            MessageBox.information(
+                oBundle.getText("bookingOccupantLimit", [iMaxPersons]),
+                {
+                    title: oBundle.getText("maximumOccupants"),
+                    styleClass: "myUnifiedBtn",
+                    contentWidth: "500px"
+                }
+            );
+        },
+
         _validateOccupantCapacity: function (iExtraBeds) {
             const iSelectedExtraBeds = iExtraBeds === undefined ? this._getSelectedExtraBedQuantity() : iExtraBeds;
             const iMaxPersons = this._getBaseOccupantCapacity() + Math.min(iSelectedExtraBeds, this._getExtraBedLimit());
             if (this._getOccupantOptions().length > iMaxPersons) {
-                MessageToast.show(this.getView().getModel("i18n").getResourceBundle().getText("bookingOccupantLimit", [iMaxPersons]));
+                this._showBookingOccupantLimitMessage(iMaxPersons);
                 return false;
             }
             return true;
@@ -1051,7 +1068,7 @@
                 ? 1 : Math.max(parseInt(oModel.getProperty("/Capacity"), 10) || 1, 1);
             const iMaxPersons = iBaseCapacity + iExtraBeds;
             if (iOccupants > iMaxPersons) {
-                MessageToast.show(this.getView().getModel("i18n").getResourceBundle().getText("bookingOccupantLimit", [iMaxPersons]));
+                this._showBookingOccupantLimitMessage(iMaxPersons);
                 return false;
             }
             return true;
@@ -7649,6 +7666,7 @@
             const booking = data.Booking?.[0] || data;
             const facilities = data.FacilityItems || [];
             const oHostelModel = this.getView().getModel("HostelModel").getData() || {};
+            const oResourceBundle = this.getView().getModel("i18n").getResourceBundle();
 
             let filter = { BranchID: [booking.BranchCode] };
             const oCompanyDetailsModel = await this.ajaxReadWithJQuery("HM_Branch", filter,);
@@ -8040,6 +8058,11 @@
                 let tableBody = facilities.map((item, index) => {
 
                     let sUnitText = item.UnitText || "-";
+                    const bIsExtraBed = this._isExtraBedFacility(item);
+                    const iQuantity = Math.max(parseInt(item.Quantity, 10) || 1, 1);
+                    const sExtraBedQuantity = bIsExtraBed
+                        ? `\n(${oResourceBundle.getText("facilityQtyValue", [String(iQuantity)])})`
+                        : "";
 
                     if (item.StartDate && item.EndDate) {
                         const startDate = new Date(item.StartDate);
@@ -8048,7 +8071,7 @@
                         // Difference in days (inclusive)
                         const diffDays = Math.floor((endDate - startDate) / (1000 * 60 * 60 * 24));
 
-                        if (sUnitText === "Unit Price") {
+                        if (sUnitText === "Unit Price" && !bIsExtraBed) {
                             sUnitText = `${sUnitText}\n(${item.Quantity || 1} Qty)`;
                         } else if (sUnitText === "Package Price") {
                             if (item.FacilityChargeType === "Entire Booking") {
@@ -8082,8 +8105,8 @@
                     return [
                         (index + 1).toString(),
                         item.MemberName
-                            ? `${item.FacilityName}\n(Member: ${item.MemberName})${showQty ? `\n${this.qty}` : ""}`
-                            : (item.FacilityName || "-"),
+                            ? `${item.FacilityName}\n(Member: ${item.MemberName})${showQty ? `\n${this.qty}` : ""}${sExtraBedQuantity}`
+                            : `${item.FacilityName || "-"}${sExtraBedQuantity}`,
 
                         Formatter.formatDate(item.StartDate) || "-",
                         Formatter.formatDate(item.EndDate) || "-",

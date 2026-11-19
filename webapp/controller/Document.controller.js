@@ -544,7 +544,9 @@ sap.ui.define([
 
                 this.MM_Dialog.close();
 
-                sap.m.MessageToast.show("Document uploaded successfully");
+                sap.m.MessageToast.show(
+                    this.i18nModel.getText("documentAttachedSubmitToSave")
+                );
             },
             onRemoveButtonPress: function () {
 
@@ -1343,7 +1345,11 @@ sap.ui.define([
 
 
             // },
-            OnSubmit: function () {
+            OnSubmit: async function () {
+                if (this._bDocumentSubmitInProgress) {
+                    return;
+                }
+
                 var oController = this;
 
                 // Get Members data from model
@@ -1394,14 +1400,44 @@ sap.ui.define([
                 };
 
 
-                // Call CAP/OData Service
-                this.ajaxUpdateWithJQuery(
-                    "HM_Document", {
-                    data: [oPayload],
+                var oResponse;
+                var sSubmitError = "";
 
+                this._bDocumentSubmitInProgress = true;
+                this.getBusyDialog();
+
+                try {
+                    oResponse = await this.ajaxUpdateWithJQuery("HM_Document", {
+                        data: [oPayload]
+                    });
+
+                    if (oResponse && (oResponse.success === false || oResponse.error)) {
+                        var vBackendError = oResponse.error;
+                        var sBackendError = typeof vBackendError === "string"
+                            ? vBackendError
+                            : vBackendError && vBackendError.message;
+                        throw new Error(oResponse.message || sBackendError || this.i18nModel.getText("errorUploadingDocuments"));
+                    }
+                } catch (oError) {
+                    console.error("Document submission failed:", oError);
+                    var vResponseError = oError && oError.responseJSON && oError.responseJSON.error;
+                    sSubmitError = oError && oError.responseJSON && oError.responseJSON.message ||
+                        (typeof vResponseError === "string" ? vResponseError : vResponseError && vResponseError.message) ||
+                        oError && oError.message ||
+                        this.i18nModel.getText("errorUploadingDocuments");
+                } finally {
+                    this._bDocumentSubmitInProgress = false;
+                    this.closeBusyDialog();
                 }
-                );
-                MessageBox.information("Documents submitted successfully", {
+
+                if (sSubmitError) {
+                    MessageBox.error(sSubmitError, {
+                        styleClass: "myUnifiedBtn"
+                    });
+                    return;
+                }
+
+                MessageBox.information(oResponse && oResponse.message || "Documents submitted successfully", {
                     title: "Success",
                     actions: [MessageBox.Action.OK],
                     emphasizedAction: MessageBox.Action.OK,
