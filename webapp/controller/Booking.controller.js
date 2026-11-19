@@ -830,6 +830,21 @@
             });
         },
 
+        _formatPdfExtraBedQuantity: function (sUnitText, iQuantity) {
+            const oBundle = this.getView().getModel("i18n").getResourceBundle();
+            const mQuantityKeys = {
+                "per day": "facilityQtyPerDay",
+                "daily": "facilityQtyPerDay",
+                "per month": "facilityQtyPerMonth",
+                "monthly": "facilityQtyPerMonth",
+                "per year": "facilityQtyPerYear",
+                "yearly": "facilityQtyPerYear"
+            };
+            const sQuantityKey = mQuantityKeys[String(sUnitText || "").trim().toLowerCase()] || "facilityQtyValue";
+
+            return oBundle.getText(sQuantityKey, [String(iQuantity)]);
+        },
+
         _isExtraBedQuantityFacility: function (oFacility) {
             return this._isExtraBedFacility(oFacility) && this._getFacilitySelectionMode(oFacility) === "QTY";
         },
@@ -7666,7 +7681,6 @@
             const booking = data.Booking?.[0] || data;
             const facilities = data.FacilityItems || [];
             const oHostelModel = this.getView().getModel("HostelModel").getData() || {};
-            const oResourceBundle = this.getView().getModel("i18n").getResourceBundle();
 
             let filter = { BranchID: [booking.BranchCode] };
             const oCompanyDetailsModel = await this.ajaxReadWithJQuery("HM_Branch", filter,);
@@ -8061,7 +8075,7 @@
                     const bIsExtraBed = this._isExtraBedFacility(item);
                     const iQuantity = Math.max(parseInt(item.Quantity, 10) || 1, 1);
                     const sExtraBedQuantity = bIsExtraBed
-                        ? `\n(${oResourceBundle.getText("facilityQtyValue", [String(iQuantity)])})`
+                        ? `\n${this._formatPdfExtraBedQuantity(sUnitText, iQuantity)}`
                         : "";
 
                     if (item.StartDate && item.EndDate) {

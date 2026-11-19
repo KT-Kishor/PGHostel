@@ -5075,7 +5075,7 @@ sap.ui.define([
                     const bIsExtraBed = this._isExtraBedFacility(item);
                     const iQuantity = Math.max(parseInt(item.Quantity, 10) || 1, 1);
                     const sExtraBedQuantity = bIsExtraBed
-                        ? `\n(${oResourceBundle.getText("facilityQtyValue", [String(iQuantity)])})`
+                        ? `\n${this._formatPdfExtraBedQuantity(sUnitText, iQuantity)}`
                         : "";
 
                     if (item.StartDate && item.EndDate) {
