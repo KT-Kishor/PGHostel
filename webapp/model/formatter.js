@@ -599,7 +599,8 @@ var sStartingAt = oBundle.getText("StartingAt");
     var oResourceBundle = this.getView().getModel("i18n").getResourceBundle();
     return oResourceBundle.getText(sDescKey);
 },
-        formatDateTime: function (sDate) {
+ 
+formatDateTime: function (sDate) {
     if (!sDate) {
         return "";
     }
@@ -610,18 +611,30 @@ var sStartingAt = oBundle.getText("StartingAt");
         return "";
     }
 
-    var day = String(oDate.getDate()).padStart(2, "0");
-    var month = String(oDate.getMonth() + 1).padStart(2, "0");
-    var year = oDate.getFullYear();
-
-    var time = oDate.toLocaleTimeString("en-IN", {
+    var aParts = new Intl.DateTimeFormat("en-IN", {
+        timeZone: "Asia/Kolkata",
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
         hour: "numeric",
         minute: "2-digit",
         hour12: true
+    }).formatToParts(oDate);
+
+    var oParts = {};
+
+    aParts.forEach(function (oPart) {
+        oParts[oPart.type] = oPart.value;
     });
 
-    return day + "/" + month + "/" + year + " " + time;
+    return oParts.day + "/" +
+        oParts.month + "/" +
+        oParts.year + " " +
+        oParts.hour + ":" +
+        oParts.minute + " " +
+        oParts.dayPeriod.toUpperCase();
 },
+
         getDurationValue: function (sType, iTotalDays, iSelectedMonths) {
 
             if (!sType) {

@@ -3327,9 +3327,9 @@ sap.ui.define([
                         });
 
                     const head = showSAC ? [
-                        ['Sl.No.', 'Particulars', 'SAC', 'Start Date', 'End Date', 'Gross Price', 'Unit Text', 'Discount', 'Total']
+                        ['Sl.No.', 'Particulars', 'SAC', 'Start Date', 'End Date', 'Gross Price', 'Unit', 'Discount', 'Total']
                     ] : [
-                        ['Sl.No.', 'Particulars', 'Start Date', 'End Date', 'Gross Price', 'Unit Text', 'Discount', 'Total']
+                        ['Sl.No.', 'Particulars', 'Start Date', 'End Date', 'Gross Price', 'Unit', 'Discount', 'Total']
                     ];
 
                     doc.autoTable({
@@ -3537,6 +3537,7 @@ sap.ui.define([
                         });
                         const paymentBody = aSortedPayments.map((item, index) => ([
                             index + 1,
+                            item.InvNo,
                             Formatter.formatDate(item.Date),
                             item.PaymentType || "",
                             item.Payment || "",
@@ -3548,7 +3549,7 @@ sap.ui.define([
                         doc.autoTable({
                             startY: currentY,
                             head: [
-                                ['Sl.No', 'Date', 'Payment Type', 'Refund / Paid', 'Colleted By / Transaction ID', 'Amount', 'Currency']
+                                ['Sl.No','Invoice No', 'Date', 'Payment Type', 'Refund / Paid', 'Colleted By / Transaction ID', 'Amount', 'Currency']
                             ],
                             body: paymentBody,
                             theme: 'grid',
@@ -3963,9 +3964,9 @@ sap.ui.define([
 
                     //  ITEMS TABLE WITH DISCOUNT COLUMN 
                     const head = showSAC ? [
-                        ['Sl.No.', 'Particulars', 'SAC', 'Start Date', 'End Date', 'Gross Price', 'Unit Text', 'Discount', 'Total']
+                        ['Sl.No.', 'Particulars', 'SAC', 'Start Date', 'End Date', 'Gross Price', 'Unit', 'Discount', 'Total']
                     ] : [
-                        ['Sl.No.', 'Particulars', 'Start Date', 'End Date', 'Gross Price', 'Unit Text', 'Discount', 'Total']
+                        ['Sl.No.', 'Particulars', 'Start Date', 'End Date', 'Gross Price', 'Unit', 'Discount', 'Total']
                     ];
 
                     const body = [...aInvoiceItems]
@@ -4580,10 +4581,11 @@ sap.ui.define([
                         doc.autoTable({
                             startY: 25,
                             head: [
-                                ['Sl.No', 'Date', 'Payment Type', 'Refund / Paid ', 'Colleted By / Transaction ID', 'Amount', 'Currency']
+                                ['Sl.No','Invoice No','Date', 'Payment Type', 'Refund / Paid ', 'Colleted By / Transaction ID', 'Amount', 'Currency']
                             ],
                             body: sortedPaymentData.map((p, i) => ([
                                 i + 1,
+                                p.InvNo,
                                 Formatter.formatDate(p.Date),
                                 p.PaymentType,
                                 p.Payment || "-",

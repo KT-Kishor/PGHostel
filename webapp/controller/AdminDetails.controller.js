@@ -3042,93 +3042,164 @@ iMonths = Math.max(iMonths, 1);
 
         },
 
-        onDeleteFacilityDetails: function () {
-            var oTable = this.byId("Ad_id_idFacilityRoomTableDetails");
-            var oSelectedItem = oTable.getSelectedItem();
+     
+onDeleteFacilityDetails: function () {
+    var that = this;
 
-            if (!oSelectedItem) {
-                sap.m.MessageToast.show(this.i18nModel.getText("pleaseSelectFacilitytoDelete"));
-                return;
-            }
+    var oTable = this.byId("Ad_id_idFacilityRoomTableDetails");
+    var oSelectedItem = oTable.getSelectedItem();
 
-            var oCustomerModel = this.getView().getModel("CustomerData");
-            var oCustomerData = oCustomerModel.getData();
+    if (!oSelectedItem) {
+        sap.m.MessageToast.show(
+            this.i18nModel.getText("pleaseSelectFacilitytoDelete")
+        );
+        return;
+    }
 
-            var oContext = oSelectedItem.getBindingContext("CustomerData");
-            var oSelectedData = oContext.getObject();
+    var oCustomerModel = this.getView().getModel("CustomerData");
+    var oCustomerData = oCustomerModel.getData();
 
-            var sFacilityID = oSelectedData.FacilityID;
-            var aFacilities = oCustomerData.AllSelectedFacilities;
+    var oContext = oSelectedItem.getBindingContext("CustomerData");
+    var oSelectedData = oContext.getObject();
 
-            // Determine delete index
-            var deleteIndex = -1;
+    var sFacilityID = oSelectedData.FacilityID;
+    var aFacilities = oCustomerData.AllSelectedFacilities;
 
-            if (sFacilityID) {
-                deleteIndex = aFacilities.findIndex(f => f.FacilityID === sFacilityID);
-            }
+    // Determine delete index
+    var deleteIndex = -1;
 
-            // fallback by index if FacilityID not found
-            if (deleteIndex === -1) {
-                deleteIndex = parseInt(oContext.getPath().split("/").pop());
-            }
+    if (sFacilityID) {
+        deleteIndex = aFacilities.findIndex(
+            f => f.FacilityID === sFacilityID
+        );
+    }
 
-            var that = this;
+    // Fallback by index
+    if (deleteIndex === -1) {
+        deleteIndex = parseInt(oContext.getPath().split("/").pop());
+    }
 
-            if (sFacilityID) {
-                sap.m.MessageBox.confirm(
-                    this.i18nModel.getText("AreyousureyouwanttoDeletethisFacility"), {
+    // Continue deletion logic
+    var fnContinueDelete = function () {
+
+        if (sFacilityID) {
+
+            sap.m.MessageBox.confirm(
+                this.i18nModel.getText(
+                    "AreyousureyouwanttoDeletethisFacility"
+                ),
+                {
                     title: "Confirm Delete",
-                    actions: [sap.m.MessageBox.Action.OK, sap.m.MessageBox.Action.CANCEL],
+                    actions: [
+                        sap.m.MessageBox.Action.OK,
+                        sap.m.MessageBox.Action.CANCEL
+                    ],
                     styleClass: "myUnifiedBtn",
+
                     onClose: function (oAction) {
+
                         if (oAction === sap.m.MessageBox.Action.OK) {
 
-                            // Backend call
-                            that.getBusyDialog()
-                            that.ajaxDeleteWithJQuery("HM_BookingFacilityItems", {
-                                filters: {
-                                    FacilityID: sFacilityID
-                                }
-                            })
-                                .then(function () {
-                                    // Remove from model
-                                    if (deleteIndex > -1) {
-                                        aFacilities.splice(deleteIndex, 1);
+                            that.getBusyDialog();
+
+                            that.ajaxDeleteWithJQuery(
+                                "HM_BookingFacilityItems",
+                                {
+                                    filters: {
+                                        FacilityID: sFacilityID
                                     }
+                                }
+                            )
+                            .then(function () {
 
-                                    that._recalculateFacilityTotals(oCustomerData);
-                                    that.closeBusyDialog()
+                                if (deleteIndex > -1) {
+                                    aFacilities.splice(deleteIndex, 1);
+                                }
 
-                                    // Force UI update
-                                    oCustomerModel.refresh(true);
-                                    oTable.removeSelections(true);
+                                that._recalculateFacilityTotals(oCustomerData);
 
-                                    sap.m.MessageToast.show(this.i18nModel.getText("facilityDeletedSuccessfully"));
-                                })
-                                .catch(function () {
-                                    sap.m.MessageToast.show(this.i18nModel.getText("failedtoDeleteFacilityfromServer"));
-                                });
+                                that.closeBusyDialog();
 
+                                oCustomerModel.refresh(true);
+                                oTable.removeSelections(true);
+
+                                sap.m.MessageToast.show(
+                                    that.i18nModel.getText(
+                                        "facilityDeletedSuccessfully"
+                                    )
+                                );
+
+                            })
+                            .catch(function () {
+
+                                that.closeBusyDialog();
+
+                                sap.m.MessageToast.show(
+                                    that.i18nModel.getText(
+                                        "failedtoDeleteFacilityfromServer"
+                                    )
+                                );
+
+                            });
                         }
                     }
                 }
-                );
+            );
 
-                return;
+            return;
+        }
+
+        // Delete local facility
+        if (deleteIndex > -1) {
+            aFacilities.splice(deleteIndex, 1);
+        }
+
+        that._recalculateFacilityTotals(oCustomerData);
+
+        oCustomerModel.refresh(true);
+        oTable.removeSelections(true);
+
+        sap.m.MessageToast.show(
+            that.i18nModel.getText("facilityRemovedSuccessfully")
+        );
+
+    }.bind(this);
+
+
+    // Extra Bed validation
+    if (oSelectedData.FacilityChargeType === "Extra Bed") {
+
+        sap.m.MessageBox.warning(
+            "Please check the associated member before deleting this Extra Bed facility.",
+            {
+                actions: [
+                    sap.m.MessageBox.Action.OK,
+                    "Continue"
+                ],
+                emphasizedAction: sap.m.MessageBox.Action.OK,
+                styleClass: "myUnifiedBtn",
+                onClose: function (sAction) {
+
+                    if (sAction === sap.m.MessageBox.Action.OK) {
+                        // Close message and stop deletion
+                        return;
+                    }
+
+                    if (sAction === "Continue") {
+                        // Continue with deletion confirmation
+                        fnContinueDelete();
+                    }
+                }
             }
+        );
 
-            if (deleteIndex > -1) {
-                aFacilities.splice(deleteIndex, 1);
-            }
+        return;
+    }
 
-            this._recalculateFacilityTotals(oCustomerData);
-            this.closeBusyDialog()
+    // Normal facility deletion
+    fnContinueDelete();
+},
 
-            oCustomerModel.refresh(true);
-            oTable.removeSelections(true);
-
-            sap.m.MessageToast.show(this.i18nModel.getText("facilityRemovedSuccessfully"));
-        },
 
         // Helper: Total Calculation
         _recalculateFacilityTotals: function (oCustomerData) {
@@ -6380,11 +6451,8 @@ onDocumentDelete: function (oEvent) {
             .join(", ");
 
         this.sMessage = "Members: " + sOldNames +
-            " has been changed to " +
+            " has been changed to: " +
             (sNewNames || "No members");
-
-
-
     }
 
     // Store removed members
@@ -7717,7 +7785,10 @@ onDocumentDelete: function (oEvent) {
                 CustomerGSTIN: sap.ui.getCore().byId("idGSTNumber").getValue(),
                 CustCompanyName: sap.ui.getCore().byId("idCompanyName").getValue(),
                 CustCompanyAddress: sap.ui.getCore().byId("idCompanyAddress").getValue(),
-                BookingID: CustData.BookingID
+                BookingID: CustData.BookingID,
+                Message:true,
+                LoginName: this.getOwnerComponent().getModel("LoginModel").getData().UserName || "",
+
                 // GSTType: this.sSelectedText,
                 // GSTValue: GSTValue,
                 // GST: ""
