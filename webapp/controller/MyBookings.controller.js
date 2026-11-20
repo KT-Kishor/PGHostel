@@ -2363,6 +2363,7 @@
             }
 
             var oUser = this._getLoggedInUser();
+            var sLoggedInEmail = String(oUser.EmailID || "").trim();
             var oComplaintData = {
                 UserID: this._getLoggedInUserId(),
                 RaisedBy: oUser.UserName || oUser.EmployeeName || "",
@@ -2376,7 +2377,8 @@
                 FileType: oData.FileType || "",
                 File: oData.FileContent || "",
                 BookingID: oData.BookingID,
-                CustomerName: oData.CustomerName
+                CustomerName: oData.CustomerName,
+                emailIds: sLoggedInEmail
             };
 
             this.getBusyDialog();
@@ -2390,7 +2392,8 @@
                             BranchCode: oComplaintData.BranchCode,
                             FileName: oComplaintData.FileName,
                             FileType: oComplaintData.FileType,
-                            File: oComplaintData.File
+                            File: oComplaintData.File,
+                            emailIds: oComplaintData.emailIds
                         },
                         filters: { ComplaintID: oData.ComplaintID }
                     });
