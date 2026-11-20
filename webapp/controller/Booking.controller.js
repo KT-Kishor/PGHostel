@@ -830,7 +830,7 @@
             });
         },
 
-        _formatPdfExtraBedQuantity: function (sUnitText, iQuantity) {
+        _formatPdfFacilityQuantity: function (sUnitText, iQuantity) {
             const oBundle = this.getView().getModel("i18n").getResourceBundle();
             const mQuantityKeys = {
                 "per day": "facilityQtyPerDay",
@@ -838,7 +838,9 @@
                 "per month": "facilityQtyPerMonth",
                 "monthly": "facilityQtyPerMonth",
                 "per year": "facilityQtyPerYear",
-                "yearly": "facilityQtyPerYear"
+                "yearly": "facilityQtyPerYear",
+                "per hour": "facilityQtyPerHour",
+                "hourly": "facilityQtyPerHour"
             };
             const sQuantityKey = mQuantityKeys[String(sUnitText || "").trim().toLowerCase()] || "facilityQtyValue";
 
@@ -8073,9 +8075,12 @@
 
                     let sUnitText = item.UnitText || "-";
                     const bIsExtraBed = this._isExtraBedFacility(item);
+                    const bIsQuantityFacility = String(item.SelectionMode || "").trim().toUpperCase() === "QTY";
                     const iQuantity = Math.max(parseInt(item.Quantity, 10) || 1, 1);
-                    const sExtraBedQuantity = bIsExtraBed
-                        ? `\n${this._formatPdfExtraBedQuantity(sUnitText, iQuantity)}`
+                    const bShowQuantityInParticular = bIsExtraBed ||
+                        (bIsQuantityFacility && sUnitText !== "Unit Price");
+                    const sFacilityQuantity = bShowQuantityInParticular
+                        ? `\n${this._formatPdfFacilityQuantity(sUnitText, iQuantity)}`
                         : "";
 
                     if (item.StartDate && item.EndDate) {
@@ -8085,7 +8090,7 @@
                         // Difference in days (inclusive)
                         const diffDays = Math.floor((endDate - startDate) / (1000 * 60 * 60 * 24));
 
-                        if (sUnitText === "Unit Price" && !bIsExtraBed) {
+                        if (sUnitText === "Unit Price" && bIsQuantityFacility && !bIsExtraBed) {
                             sUnitText = `${sUnitText}\n(${item.Quantity || 1} Qty)`;
                         } else if (sUnitText === "Package Price") {
                             if (item.FacilityChargeType === "Entire Booking") {
@@ -8119,8 +8124,8 @@
                     return [
                         (index + 1).toString(),
                         item.MemberName
-                            ? `${item.FacilityName}\n(Member: ${item.MemberName})${showQty ? `\n${this.qty}` : ""}${sExtraBedQuantity}`
-                            : `${item.FacilityName || "-"}${sExtraBedQuantity}`,
+                            ? `${item.FacilityName}\n(Member: ${item.MemberName})${showQty ? `\n${this.qty}` : ""}${sFacilityQuantity}`
+                            : `${item.FacilityName || "-"}${sFacilityQuantity}`,
 
                         Formatter.formatDate(item.StartDate) || "-",
                         Formatter.formatDate(item.EndDate) || "-",

@@ -630,7 +630,7 @@
                                                 demandPopin="true"
                                                 width="8rem"
                                             >
-                                                <m:Text text="{i18n>duration}" />
+                                                <m:Text text="{i18n>durationQuantity}" />
                                             </m:Column>
                                             <m:Column
                                                 minScreenWidth="Tablet"

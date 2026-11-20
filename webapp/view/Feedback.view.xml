@@ -4,7 +4,7 @@
         xmlns:f="sap.ui.layout.form"
         xmlns:core="sap.ui.core"
         displayBlock="true">
-        <Page title="Feedback"
+        <Page title="{i18n>feedbackPageTitle}"
             showHeader="true"
             enableScrolling="true"
             class="feedbackPageWrapper sapUiNoContentPadding"
@@ -14,7 +14,7 @@
             <content>
              <VBox class="Feedbackpage">
                 <VBox class="sapUiSmallMargin">
-                    <Title text="How was your stay?"
+                    <Title text="{i18n>feedbackStayQuestion}"
                         level="H2" wrapping="true"
                         class="custom-feedback sapUiTinyMarginBottom heroFeedBox"
                     />
@@ -35,10 +35,10 @@
                     >
                             <f:content>
                                 <!-- Ratings Section -->
-                                <Title text="Please rate your experience on a scale of 1 to 5" wrapping="true"
+                                <Title text="{i18n>feedbackRatingPrompt}" wrapping="true"
                                 titleStyle="H4" level="H4" class="sapUiSmallMarginBottom"/>
                                 <Label
-                                text="1. Overall Experience"
+                                text="{i18n>feedbackOverallLabel}"
                                 required="true"
                             />
                                 <RatingIndicator
@@ -49,7 +49,7 @@
                                 change="onOverallRatingChange"
                             />
                                 <Label
-                                text="2. Room Cleanliness"
+                                text="{i18n>feedbackCleanlinessLabel}"
                                 required="true"
                             />
                                 <RatingIndicator
@@ -60,7 +60,7 @@
                                 change="onCleanlinessRatingChange"
                             />
                                 <Label
-                                text="3. Staff Service"
+                                text="{i18n>feedbackStaffLabel}"
                                 required="true"
                             />
                                 <RatingIndicator
@@ -71,7 +71,7 @@
                                 change="onStaffRatingChange"
                             />
                                 <Label
-                                text="4. Amenities &amp; Facilities"
+                                text="{i18n>feedbackAmenitiesLabel}"
                                 required="true"
                             />
                                 <RatingIndicator
@@ -83,7 +83,7 @@
                             />
 
                                 <Label
-                                text="5. Value for Money"
+                                text="{i18n>feedbackValueLabel}"
                                 required="true"
                             />
                                 <RatingIndicator
@@ -96,7 +96,7 @@
 
                             />
                                 <Label
-                                text="Would you recommend our hostel?"
+                                text="{i18n>feedbackRecommendQuestion}"
                                 required="true" 
                             />
                                 <RadioButtonGroup
@@ -108,15 +108,15 @@
                                     <buttons>
                                         <RadioButton
                                         id="rbYes"
-                                        text="Yes" 
+                                        text="{i18n>yes}"
                                     />
                                         <RadioButton
                                         id="rbNo"
-                                        text="No" 
+                                        text="{i18n>no}"
                                     />
                                     </buttons>
                                 </RadioButtonGroup>
-                                <Label text="Would you stay with us again?" />
+                                <Label text="{i18n>feedbackVisitAgainQuestion}" />
                                 <RadioButtonGroup
                                 id="rgVisitAgain"
                                 columns="2"
@@ -125,23 +125,23 @@
                                     <buttons>
                                         <RadioButton
                                         id="rbAgainYes"
-                                        text="Yes" 
+                                        text="{i18n>yes}"
                                     />
                                         <RadioButton
                                         id="rbAgainNo"
                                 class="sapUiTinyMarginBottom"
-                                        text="No" 
+                                        text="{i18n>no}"
                                     />
                                     </buttons>
                                 </RadioButtonGroup>
 
 
-                                <Label text="Additional Comments" />
+                                <Label text="{i18n>feedbackAdditionalComments}" />
                                 <TextArea
                                 id="feedbackComments"
                                 width="100%"
                                 rows="3"
-                                placeholder="Share your comments..."
+                                placeholder="{i18n>feedbackCommentsPlaceholder}"
                                 growing="true"
                                 liveChange="onCommentsChange"
                                 class="sapUiSmallMarginBottom"
@@ -149,13 +149,13 @@
                             />
                                 <Label text=""/>
                                 <Button
-                        text="Submit Feedback"
+                        text="{i18n>feedbackSubmit}"
                         class="myUnifiedBtn"
                         type="Emphasized"
                         press="onSubmitFeedback"
                     />
                                 <Button
-                        text="Cancel"
+                        text="{i18n>actionCancel}"
                         press="BI_onButtonPress"
                         class="myUnifiedBtn"
                     />

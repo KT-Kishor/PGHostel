@@ -2243,7 +2243,7 @@ sap.ui.define([
             var sOldNames = aOldMembers.map(fnGetMemberName).filter(Boolean).join(", ");
             var sNewNames = aCurrentMembers.map(fnGetMemberName).filter(Boolean).join(", ");
 
-            return "Members: " + sOldNames + " has been changed to: " + sNewNames;
+            return "Members " + sOldNames + " has been changed to " + sNewNames;
         },
 
         _buildBookingCreatePayload: function () {
@@ -4209,6 +4209,7 @@ sap.ui.define([
 
                         // Build update payload with filters
                         var oPayload = that._buildEditUpdatePayload(oPayloadData.data, sBookingID);
+                        oPayload.data[0].LoginName = that.getOwnerComponent().getModel("LoginModel").getProperty("/UserName") || "";
 
                         that.getBusyDialog();
                         await that.ajaxUpdateWithJQuery("HM_Customer", oPayload);
@@ -5073,9 +5074,12 @@ sap.ui.define([
 
                     let sUnitText = item.UnitText || "-";
                     const bIsExtraBed = this._isExtraBedFacility(item);
+                    const bIsQuantityFacility = String(item.SelectionMode || "").trim().toUpperCase() === "QTY";
                     const iQuantity = Math.max(parseInt(item.Quantity, 10) || 1, 1);
-                    const sExtraBedQuantity = bIsExtraBed
-                        ? `\n${this._formatPdfExtraBedQuantity(sUnitText, iQuantity)}`
+                    const bShowQuantityInParticular = bIsExtraBed ||
+                        (bIsQuantityFacility && sUnitText !== "Unit Price");
+                    const sFacilityQuantity = bShowQuantityInParticular
+                        ? `\n${this._formatPdfFacilityQuantity(sUnitText, iQuantity)}`
                         : "";
 
                     if (item.StartDate && item.EndDate) {
@@ -5085,7 +5089,7 @@ sap.ui.define([
                         // Difference in days (inclusive)
                         const diffDays = Math.floor((endDate - startDate) / (1000 * 60 * 60 * 24));
 
-                        if (sUnitText === "Unit Price" && !bIsExtraBed) {
+                        if (sUnitText === "Unit Price" && bIsQuantityFacility && !bIsExtraBed) {
                             sUnitText = `${sUnitText} (${oResourceBundle.getText("facilityQtyValue", [String(item.Quantity || 1)])})`;
                         } else if (sUnitText === "Package Price") {
                             if (item.FacilityChargeType === "Entire Booking") {
@@ -5120,8 +5124,8 @@ sap.ui.define([
                     return [
                         (index + 1).toString(),
                         item.MemberName
-                            ? `${item.FacilityName}\n(${oResourceBundle.getText("facilityMemberPrefix", [item.MemberName])})${showQty ? `\n${this.qty}` : ""}${sExtraBedQuantity}`
-                            : `${item.FacilityName || "-"}${sExtraBedQuantity}`,
+                            ? `${item.FacilityName}\n(${oResourceBundle.getText("facilityMemberPrefix", [item.MemberName])})${showQty ? `\n${this.qty}` : ""}${sFacilityQuantity}`
+                            : `${item.FacilityName || "-"}${sFacilityQuantity}`,
                         Formatter.formatDate(item.StartDate) || "-",
                         Formatter.formatDate(item.EndDate) || "-",
                         `${Formatter.fromatNumber(parseFloat(item.BasicFacilityPrice) || 0)} ${oHostelModel.Currency}`,
