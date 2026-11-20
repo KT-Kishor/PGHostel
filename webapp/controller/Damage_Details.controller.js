@@ -751,7 +751,7 @@ _calculateTotalCost: function (oInput) {
                     Currency: oData.Currency,
                     Status: "Damage Raised",
                     BedTypeName: oData.BedTypeName,
-                    TotalCost: oData.Cost,
+                    TotalCost: oData.Cost || oData.TotalCost,
                     RecoverCost: oData.RecoverCost,
                     BranchCode: oData.BranchCode
                 },

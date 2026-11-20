@@ -1266,6 +1266,19 @@ onChekout: function () {
             // 8. Set filtered data back to RateType model
             oRateTypeModel.setData(aFilteredRateTypes);
 
+         MessageBox.show(
+    "This facility is not available for the selected booking plan.",
+    {
+        icon: MessageBox.Icon.INFORMATION,
+        title: "Information",
+        actions: [MessageBox.Action.OK],
+        onClose: () => {
+            sap.ui.getCore().byId("editFacilityName").setSelectedKey("");
+        },
+        styleClass: "myUnifiedBtn"
+    }
+);
+
             // 9. Show UnitType dropdown
         },
 
@@ -4282,16 +4295,16 @@ onDeleteFacilityDetails: function () {
 
 
 
-   var facilities = Number(
-    facilityItems
-        .filter(item => item.FacilityChargeType === "Extra Bed")
-        .at(-1)?.quantity || 0
-);
+//    var facilities = Number(
+//     facilityItems
+//         .filter(item => item.FacilityChargeType === "Extra Bed")
+//         .at(-1)?.quantity || 0
+// );
 
-if(CustomerData.AllMembers.length > facilities + 1){
-    MessageBox.error(`This booking allows at most ${facilities + 1} occupants. Reduce the selected occupants or select enough extra beds before continuing.`);
-    return;
-}
+// if(CustomerData.AllMembers.length > facilities + 1){
+//     MessageBox.error(`This booking allows at most ${facilities + 1} occupants. Reduce the selected occupants or select enough extra beds before continuing.`);
+//     return;
+// }
    
 
 if (toDelete.length === 0) {
@@ -7802,10 +7815,10 @@ onDocumentDelete: function (oEvent) {
             var GSTStatus
 
             if(CustData.CustomerGSTIN){
-              smessage = `Customer GSTIN updated from: ${CustData.CustomerGSTIN} to: ${Ncustomergstin}.`;
+              smessage = `Customer GSTIN updated from ${CustData.CustomerGSTIN} to ${Ncustomergstin}.`;
               GSTStatus="GST Updated"
             }else{
-              smessage = `Customer GSTIN added: ${Ncustomergstin}.`;
+              smessage = `Customer GSTIN added ${Ncustomergstin}.`;
               GSTStatus="GST Added"
 
             }
