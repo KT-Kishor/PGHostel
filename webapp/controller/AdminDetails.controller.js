@@ -9842,7 +9842,7 @@ onDocumentDelete: function (oEvent) {
                         }
                         else if (sUnitText === "Per Hour") {
 
-                            sUnitText = `${sUnitText}\n(${item.TotalHour} Hour${Number(item.TotalHour) > 1 ? "s" : ""})`;
+                            sUnitText = `${sUnitText}\n(${item.TotalHour} Hour${Number(item.TotalHour) > 1 ? "s" : ""} x ${diffDays} day${diffDays === 1 ? "" : "s"})`;
                         }
                     }
 
