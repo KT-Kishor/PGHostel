@@ -2364,6 +2364,8 @@
 
             var oUser = this._getLoggedInUser();
             var sLoggedInEmail = String(oUser.EmailID || "").trim();
+            var oSelectedBranch = oBranch.getSelectedItem();
+            var sBranchName = oSelectedBranch ? String(oSelectedBranch.getText() || "").trim() : "";
             var oComplaintData = {
                 UserID: this._getLoggedInUserId(),
                 RaisedBy: oUser.UserName || oUser.EmployeeName || "",
@@ -2378,6 +2380,8 @@
                 File: oData.FileContent || "",
                 BookingID: oData.BookingID,
                 CustomerName: oData.CustomerName,
+                CustomerEmail: sLoggedInEmail,
+                BranchName: sBranchName,
                 emailIds: sLoggedInEmail
             };
 
@@ -2388,6 +2392,8 @@
                         data: {
                             ComplaintType: oComplaintData.ComplaintType,
                             Description: oComplaintData.Description,
+                            CustomerEmail: oComplaintData.CustomerEmail,
+                            BranchName: oComplaintData.BranchName,
                             RoomNo: oComplaintData.RoomNo,
                             BranchCode: oComplaintData.BranchCode,
                             FileName: oComplaintData.FileName,

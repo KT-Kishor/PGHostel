@@ -25,6 +25,26 @@
                 showFilterConfiguration="false"
                 filterContainerWidth="auto"
 				class="filterBarTheme">
+				<fb:filterGroupItems>
+					<fb:FilterGroupItem
+						name="BranchCode"
+						label="{i18n>propertyName}"
+						groupName="Group"
+						visibleInFilterBar="true">
+						<fb:control>
+							<ComboBox
+								id="DM_id_PropertyName"
+								items="{BranchModel>/}"
+								showClearIcon="true"
+								showSecondaryValues="true">
+								<core:ListItem
+									key="{BranchModel>BranchID}"
+									text="{BranchModel>BranchID} - {BranchModel>Name}"
+									additionalText="{BranchModel>City}"/>
+							</ComboBox>
+						</fb:control>
+					</fb:FilterGroupItem>
+				</fb:filterGroupItems>
 					<fb:filterGroupItems>
 					<fb:FilterGroupItem
                         name="Customer Name"

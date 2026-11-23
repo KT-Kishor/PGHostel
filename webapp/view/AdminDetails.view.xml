@@ -633,6 +633,8 @@
                 : ${CustomerData>UnitText} === 'Per Hour'
                     ? Number(${CustomerData>TotalHour}) + ' ' +
                       (Number(${CustomerData>TotalHour}) === 1 ? 'Hour' : 'Hours') +
+                      ' x ' + Number(${CustomerData>TotalDays}) + ' ' +
+                      (Number(${CustomerData>TotalDays}) === 1 ? 'day' : 'days') +
                       (Number(${CustomerData>quantity}) ? ' / ' + Number(${CustomerData>quantity}) + ' Qty' : '')
 
                 : Number(${CustomerData>quantity}) + ' Qty'

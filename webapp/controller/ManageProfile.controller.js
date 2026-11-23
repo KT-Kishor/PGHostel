@@ -4739,6 +4739,7 @@ if (sLocale) {
             }
             const sUserID = this._oLoggedInUser.UserID;
             const sUserName = this._oLoggedInUser.UserName; // RaisedBy
+            const sCustomerEmail = String(this._oLoggedInUser.EmailID || "").trim();
 
             const sToday = new Date().toISOString().split("T")[0];
 
@@ -4770,10 +4771,10 @@ if (sLocale) {
                 File: oData.FileContent || "",
                 BookingID: oData.BookingID,
                 CustomerName: oData.CustomerName,
-                CustomerEmail:this._oLoggedInUser.EmailID,
+                CustomerEmail: sCustomerEmail,
                 emailIds: emailIds,
                 BranchName: sBranchName,
-                ccmailids :this._oLoggedInUser.EmailID
+                ccmailids: sCustomerEmail
             };
 
             let payload;
@@ -4783,6 +4784,7 @@ if (sLocale) {
                         ComplaintType: sComplaintType,
                         Description: oData.Description,
                         CustomerName: oData.CustomerName,
+                        CustomerEmail: sCustomerEmail,
                         BookingID: oData.BookingID,
                         RoomNo: oData.RoomNo,
                         BranchCode: sBranchCode, // ← also here
@@ -4791,7 +4793,7 @@ if (sLocale) {
                         File: oData.FileContent || "",
                         emailIds: emailIds,
                         BranchName: sBranchName,
-                        ccmailids :this._oLoggedInUser.EmailID
+                        ccmailids: sCustomerEmail
                     },
                     filters: {
                         ComplaintID: oData.ComplaintID

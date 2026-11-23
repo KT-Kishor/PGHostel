@@ -38,6 +38,24 @@ this.getView().setModel(
 );
 
         },
+        formatBookingHistoryStatusState: function (sStatus) {
+            const sNormalizedStatus = String(sStatus || "").trim().toLowerCase();
+
+            if (sNormalizedStatus === "new") {
+                return "Information";
+            }
+            if (["confirmed", "assigned", "assinged"].includes(sNormalizedStatus)) {
+                return "Warning";
+            }
+            if (sNormalizedStatus === "completed") {
+                return "Success";
+            }
+            if (sNormalizedStatus.startsWith("cancel") || sNormalizedStatus.startsWith("reject")) {
+                return "Error";
+            }
+
+            return "None";
+        },
         onNavBack: function () {
                this.getOwnerComponent().getRouter().navTo("RouteAdminDetails", {
                 sPath: encodeURIComponent(this.BookingID),

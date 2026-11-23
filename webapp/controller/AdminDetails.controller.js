@@ -1266,18 +1266,20 @@ onChekout: function () {
             // 8. Set filtered data back to RateType model
             oRateTypeModel.setData(aFilteredRateTypes);
 
-         MessageBox.show(
-    "This facility is not available for the selected booking plan.",
-    {
-        icon: MessageBox.Icon.INFORMATION,
-        title: "Information",
-        actions: [MessageBox.Action.OK],
-        onClose: () => {
-            sap.ui.getCore().byId("editFacilityName").setSelectedKey("");
-        },
-        styleClass: "myUnifiedBtn"
-    }
-);
+            if(aFilteredRateTypes.length===0){
+                    MessageBox.show(
+                    "This facility is not available for the selected booking plan.",
+                    {
+                        icon: MessageBox.Icon.INFORMATION,
+                        title: "Information",
+                        actions: [MessageBox.Action.OK],
+                        onClose: () => {
+                            sap.ui.getCore().byId("editFacilityName").setSelectedKey("");
+                        },
+                        styleClass: "myUnifiedBtn"
+                    }
+                );
+            }
 
             // 9. Show UnitType dropdown
         },
@@ -9840,7 +9842,7 @@ onDocumentDelete: function (oEvent) {
                         }
                         else if (sUnitText === "Per Hour") {
 
-                            sUnitText = `${sUnitText}\n(${item.TotalHour} Hour${Number(item.TotalHour) > 1 ? "s" : ""})`;
+                            sUnitText = `${sUnitText}\n(${item.TotalHour} Hour${Number(item.TotalHour) > 1 ? "s" : ""} x ${diffDays} day${diffDays === 1 ? "" : "s"})`;
                         }
                     }
 

@@ -63,6 +63,7 @@
                                             change="onChangeAddCustomer"
                                             items="{CustomerModel>/}"
                                             showSecondaryValues="true"
+                                            filterSecondaryValues="true"
                                             selectedKey="{DamageModel>/BookingID}"
                                             valueStateText="{i18n>bookingIDValueState}"
                                         >

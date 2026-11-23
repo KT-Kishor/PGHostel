@@ -85,8 +85,8 @@
                             <ObjectStatus
                                 inverted="false"
                                 text="{BookingModel>Status}"
-                                state="{ path: 'BookingModel>Status', formatter: '.Formatter.formatObjectStatus'}"
-                                class="sapUiTinyMarginBottom"
+                                state="{ path: 'BookingModel>Status', formatter: '.formatBookingHistoryStatusState'}"
+                                class="bookingHistoryStatus sapUiTinyMarginBottom"
                             />
 					
 						</cells>

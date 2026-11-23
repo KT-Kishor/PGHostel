@@ -329,7 +329,7 @@ sap.ui.define([
             }
         },
         DamageOnsearch: function () {
-            if (!this.byId("Dm_id_CustomerName").getSelectedKey() && !this.byId("DM_id_RoomNo").getSelectedKey() && !this.byId("DM_id_Status").getSelectedKey()) {
+            if (!this.byId("DM_id_PropertyName").getSelectedKey() && !this.byId("Dm_id_CustomerName").getSelectedKey() && !this.byId("DM_id_RoomNo").getSelectedKey() && !this.byId("DM_id_Status").getSelectedKey()) {
 
                 this.Onsearch("true");
             } else {
@@ -428,6 +428,7 @@ sap.ui.define([
             const omainModel = this.getOwnerComponent().getModel("mainModel")?.getData() || [];
             var oView = this.getView();
 
+            var sBranchCode = oView.byId("DM_id_PropertyName").getSelectedKey();
             var sRCustomerName = oView.byId("Dm_id_CustomerName").getSelectedKey() || oView.byId("Dm_id_CustomerName").getValue();
             var sRoomNo = oView.byId("DM_id_RoomNo").getSelectedKey() || oView.byId("DM_id_RoomNo").getValue();
             var sStatus = oView.byId("DM_id_Status").getSelectedKey() || oView.byId("DM_id_Status").getValue();
@@ -451,6 +452,10 @@ sap.ui.define([
                 filters.BranchCode = "";
             } else {
                 filters.BranchCode = oExistingModel.BranchCode;
+            }
+
+            if (sBranchCode) {
+                filters.BranchCode = sBranchCode;
             }
 
             if (sRoomNo) {
@@ -529,6 +534,8 @@ sap.ui.define([
         },
 
         HD_onPressClear: function () {
+            this.getView().byId("DM_id_PropertyName").setSelectedKey("")
+            this.getView().byId("DM_id_PropertyName").setValue("")
             this.getView().byId("Dm_id_CustomerName").setSelectedKey("")
             this.getView().byId("DM_id_RoomNo").setSelectedKey("")
             this.getView().byId("DM_id_Status").setSelectedKey("")
