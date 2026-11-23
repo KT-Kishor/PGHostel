@@ -19,6 +19,20 @@ sap.ui.define([
             this.getOwnerComponent().getRouter().getRoute("RouteDamageDetails").attachMatched(this._onRouteMatched, this);
         },
 
+        onAfterRendering: function () {
+            const oBookingComboBox = this.byId("HD_id_BookingID1");
+
+            if (oBookingComboBox) {
+                oBookingComboBox.setFilterFunction(function (sTerm, oItem) {
+                    const sQuery = String(sTerm || "").trim().toLowerCase();
+                    const sCustomerName = String(oItem.getText() || "").toLowerCase();
+                    const sBookingID = String(oItem.getAdditionalText() || "").toLowerCase();
+
+                    return sCustomerName.includes(sQuery) || sBookingID.includes(sQuery);
+                });
+            }
+        },
+
         _onRouteMatched: async function (oEvent) {
             try {
                 this.getBusyDialog();

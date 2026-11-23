@@ -56,6 +56,9 @@ sap.ui.define(
                 }
             },
             _clearInvoiceFilters: function () {
+                const oPropertyName =
+                    this.byId("CI_id_PropertyName");
+
                 const oInvoiceNo =
                     this.byId("CI_id_InvNo");
 
@@ -67,6 +70,11 @@ sap.ui.define(
 
                 const oDateRange =
                     this.byId("CI_id_InvoiceDatePicker");
+
+                if (oPropertyName) {
+                    oPropertyName.setSelectedKey("");
+                    oPropertyName.setValue("");
+                }
 
                 if (oInvoiceNo) {
                     oInvoiceNo.setSelectedKey("");
@@ -226,6 +234,27 @@ sap.ui.define(
                             return;
                         }
 
+                        if (sKey === "BranchCode") {
+                            let sBranchCode = oControl.getSelectedKey();
+                            const sTypedValue = oControl.getValue().trim().toLowerCase();
+
+                            if (!sBranchCode && sTypedValue) {
+                                const oMatchedItem = oControl.getItems().find(function (oItem) {
+                                    return String(oItem.getText() || "").trim().toLowerCase() === sTypedValue ||
+                                        String(oItem.getAdditionalText() || "").trim().toLowerCase() === sTypedValue ||
+                                        String(oItem.getKey() || "").trim().toLowerCase() === sTypedValue;
+                                });
+
+                                sBranchCode = oMatchedItem ? oMatchedItem.getKey() : "";
+                            }
+
+                            if (sBranchCode) {
+                                params.BranchCode = sBranchCode;
+                            }
+
+                            return;
+                        }
+
                         if (typeof oControl.getValue === "function") {
                             const sValue =
                                 oControl.getValue().trim();
@@ -349,6 +378,8 @@ sap.ui.define(
             },
 
             onPressClear: function () {
+                this.byId("CI_id_PropertyName").setSelectedKey("");
+                this.byId("CI_id_PropertyName").setValue("");
                 this.byId("CI_id_InvNo").setValue("");
                 this.byId("CI_id_InvoiceDatePicker").setValue("");
                 this.byId("CI_id_CustomerNameComboBox").setValue("");

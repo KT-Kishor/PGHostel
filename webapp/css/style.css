@@ -15749,3 +15749,9 @@ body.svVendorScope .sapMSltPicker .sapMSelectList:focus {
         flex-wrap: wrap;
     }
 }
+
+/* Booking History statuses outside the defined semantic groups. */
+.bookingHistoryStatus.sapMObjStatusNone .sapMObjStatusText,
+.bookingHistoryStatus.sapMObjStatusNone .sapMObjStatusIcon {
+    color: #795548 !important;
+}

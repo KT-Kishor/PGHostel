@@ -192,7 +192,19 @@ sap.ui.define([
         },
 
         TileV_onpresscustomerreview: function () {
-            var oRouter = this.getOwnerComponent().getRouter();
+            var oComponent = this.getOwnerComponent();
+            var oSelectedBedType = oComponent.getModel("SelectedBedType");
+
+            if (!oSelectedBedType) {
+                oSelectedBedType = new JSONModel({});
+                oComponent.setModel(oSelectedBedType, "SelectedBedType");
+            }
+
+            oSelectedBedType.setData({
+                fromRoute: "TilePage"
+            });
+
+            var oRouter = oComponent.getRouter();
             oRouter.navTo("RouteCustomerReview");
         },
 

@@ -34,7 +34,7 @@
             </fb:FilterBar>
             <Table id="idPOTable1" sticky="ColumnHeaders,HeaderToolbar" mode="SingleSelectLeft" width="auto" busyIndicatorDelay="0" updateFinished="onTableUpdateFinished" items="{path: 'ComplaintModel>/',  sorter: [{
                     path: 'BranchName', group: true },
-					    { path: 'BookingDate', descending: true },
+					    { path: 'ComplaintRaisedDate', descending: true },
 						 { path: 'CustomerID', descending: true }],groupHeaderFactory: '.getGroupHeader'}">
                 <headerToolbar>
                     <OverflowToolbar>

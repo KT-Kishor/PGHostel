@@ -19,6 +19,26 @@
                 class="filterBarTheme">
 				<fb:filterGroupItems>
 					<fb:FilterGroupItem
+						name="BranchCode"
+						label="{i18n>propertyName}"
+						groupName="ConsultantInvoice"
+						visibleInFilterBar="true">
+						<fb:control>
+							<ComboBox
+								id="CI_id_PropertyName"
+								items="{BranchModel>/}"
+								showSecondaryValues="true"
+								showClearIcon="true">
+								<core:ListItem
+									key="{BranchModel>BranchID}"
+									text="{BranchModel>BranchID} - {BranchModel>Name}"
+									additionalText="{BranchModel>City}"/>
+							</ComboBox>
+						</fb:control>
+					</fb:FilterGroupItem>
+				</fb:filterGroupItems>
+				<fb:filterGroupItems>
+					<fb:FilterGroupItem
                         name="InvNo"
                         label="{i18n>invoiceNo}"
                         groupName="ConsultantInvoice"

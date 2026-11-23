@@ -7,6 +7,10 @@ sap.ui.define([
     return BaseController.extend("sap.ui.com.project1.controller.CustomerReview", {
         Formatter: Formatter,
         onInit: function () {
+            this.getView().setModel(new sap.ui.model.json.JSONModel({
+                reviewCount: 0,
+                showBranchFilter: false
+            }), "CustomerReviewUI");
             this.getOwnerComponent().getRouter().getRoute("RouteCustomerReview").attachMatched(this._onRouteMatched, this);
         },
 
@@ -26,6 +30,7 @@ sap.ui.define([
                 this.i18nModel = this.getView().getModel("i18n").getResourceBundle();
                 // this.commonLoginFunction();
                 this.data = this.getOwnerComponent().getModel("SelectedBedType") ? this.getOwnerComponent().getModel("SelectedBedType").getData() : {};
+                this.getView().getModel("CustomerReviewUI").setProperty("/showBranchFilter", this.data?.fromRoute === "TilePage");
                 this._resetFiltersOnEntry();
                 await this._loadCustomers();
                 await this._buildBranchMap();
@@ -112,6 +117,7 @@ sap.ui.define([
 
             this._iReviewRequestId = iRequestId;
             oBox.removeAllItems();
+            this.getView().getModel("CustomerReviewUI").setProperty("/reviewCount", 0);
             this.getBusyDialog()
 
             const dFrom = oDRS.getDateValue();
@@ -238,8 +244,13 @@ sap.ui.define([
 
         _applyFilters: function () {
             const oBox = this.byId("CR_id_ReviewContainer");
+            const sSortKey = this.byId("CR_id_Sort").getSelectedKey();
             oBox.removeAllItems();
             let aFiltered = this._aAllFeedbacks || [];
+            if (!sSortKey) {
+                aFiltered = this._sortFeedbacksDefault(aFiltered);
+            }
+            this.getView().getModel("CustomerReviewUI").setProperty("/reviewCount", aFiltered.length);
             if (aFiltered.length === 0) {
                 this._showIllustration(
                     sap.m.IllustratedMessageType.NoData,

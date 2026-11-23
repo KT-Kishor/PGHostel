@@ -20,7 +20,7 @@
         <content>
             <VBox class="sapUiSmallMargin">
                 <Title
-                    text="{i18n>customerSReview}"
+                    text="{= ${i18n>customerSReview} + ' (' + ${CustomerReviewUI>/reviewCount} + ')' }"
                     level="H3"
                     class="sapUiTinyMarginBottom"
                 />
@@ -38,7 +38,7 @@
                             name="BranchCode"
                             label="{i18n>branchIdName}"
                             groupName="Group"
-                            visibleInFilterBar="true"
+                            visibleInFilterBar="{CustomerReviewUI>/showBranchFilter}"
                         >
                             <fb:control>
                                 <ComboBox
