@@ -329,7 +329,11 @@ sap.ui.define([
             }
         },
         DamageOnsearch: function () {
-            if (!this.byId("DM_id_PropertyName").getSelectedKey() && !this.byId("Dm_id_CustomerName").getSelectedKey() && !this.byId("DM_id_RoomNo").getSelectedKey() && !this.byId("DM_id_Status").getSelectedKey()) {
+            var oCustomerBookingFilter = this.byId("Dm_id_CustomerName");
+            var bHasCustomerBookingFilter = oCustomerBookingFilter.getSelectedKey() ||
+                oCustomerBookingFilter.getValue().trim();
+
+            if (!this.byId("DM_id_PropertyName").getSelectedKey() && !bHasCustomerBookingFilter && !this.byId("DM_id_RoomNo").getSelectedKey() && !this.byId("DM_id_Status").getSelectedKey()) {
 
                 this.Onsearch("true");
             } else {
@@ -429,7 +433,11 @@ sap.ui.define([
             var oView = this.getView();
 
             var sBranchCode = oView.byId("DM_id_PropertyName").getSelectedKey();
-            var sRCustomerName = oView.byId("Dm_id_CustomerName").getSelectedKey() || oView.byId("Dm_id_CustomerName").getValue();
+            var oCustomerBookingCombo = oView.byId("Dm_id_CustomerName");
+            var sBookingID = oCustomerBookingCombo.getSelectedKey();
+            var sCustomerBookingQuery = sBookingID ? "" :
+                oCustomerBookingCombo.getValue().trim().toLowerCase();
+
             var sRoomNo = oView.byId("DM_id_RoomNo").getSelectedKey() || oView.byId("DM_id_RoomNo").getValue();
             var sStatus = oView.byId("DM_id_Status").getSelectedKey() || oView.byId("DM_id_Status").getValue();
 
@@ -462,9 +470,6 @@ sap.ui.define([
                 filters.RoomNo = sRoomNo
             }
 
-            if (sRCustomerName) {
-                filters.CustomerName = sRCustomerName
-            }
             if (sStatus) {
                 filters.Status = sStatus
             }
@@ -476,13 +481,25 @@ sap.ui.define([
                 const branchData = this.getView().getModel("BranchModel")?.getData() || [];
 
                 // Map BranchCode → BranchName
-                const mappedData = roomData.map(bed => {
+                let mappedData = roomData.map(bed => {
                     const branch = branchData.find(br => br.BranchID === bed.BranchCode);
                     return {
                         ...bed,
                         BranchName: branch ? branch.Name : bed.BranchID
                     };
                 });
+
+                if (sBookingID) {
+                    mappedData = mappedData.filter(function (oDamage) {
+                        return String(oDamage.BookingID || "").trim().toLowerCase() ===
+                            String(sBookingID).trim().toLowerCase();
+                    });
+                } else if (sCustomerBookingQuery) {
+                    mappedData = mappedData.filter(function (oDamage) {
+                        return String(oDamage.CustomerName || "").toLowerCase().includes(sCustomerBookingQuery) ||
+                            String(oDamage.BookingID || "").toLowerCase().includes(sCustomerBookingQuery);
+                    });
+                }
 
                 if (flag === "true" && this.sPath === "TilePage") {
                     this._originalRoomdata = JSON.parse(JSON.stringify(mappedData));
@@ -508,28 +525,54 @@ sap.ui.define([
         },
 
         _populateUniqueFilterValues: function (data) {
-            let uniqueValues = {
-                Dm_id_CustomerName: new Set(),
-                DM_id_RoomNo: new Set(),
+            var mCustomerBookings = new Map();
+            var oCustomerBookingCombo = this.byId("Dm_id_CustomerName");
+            var oRoomCombo = this.byId("DM_id_RoomNo");
+            var aRoomNumbers = new Set();
 
-            };
+            data.forEach(function (oItem) {
+                var sBookingID = String(oItem.BookingID || "").trim();
+                var sCustomerName = String(oItem.CustomerName || "").trim();
+                var sRoomNo = String(oItem.RoomNo || "").trim();
 
-            data.forEach(item => {
-                uniqueValues.Dm_id_CustomerName.add(item.CustomerName);
-                uniqueValues.DM_id_RoomNo.add(item.RoomNo);
+                if (sBookingID && !mCustomerBookings.has(sBookingID)) {
+                    mCustomerBookings.set(sBookingID, {
+                        BookingID: sBookingID,
+                        CustomerName: sCustomerName
+                    });
+                }
 
+                if (sRoomNo) {
+                    aRoomNumbers.add(sRoomNo);
+                }
             });
 
-            let oView = this.getView();
-            ["Dm_id_CustomerName", "DM_id_RoomNo"].forEach(field => {
-                let oComboBox = oView.byId(field);
-                oComboBox.destroyItems();
-                Array.from(uniqueValues[field]).sort().forEach(value => {
-                    oComboBox.addItem(new sap.ui.core.Item({
-                        key: value,
-                        text: value
+            oCustomerBookingCombo.destroyItems();
+            Array.from(mCustomerBookings.values())
+                .sort(function (a, b) {
+                    return a.CustomerName.localeCompare(b.CustomerName) ||
+                        a.BookingID.localeCompare(b.BookingID);
+                })
+                .forEach(function (oCustomer) {
+                    oCustomerBookingCombo.addItem(new sap.ui.core.ListItem({
+                        key: oCustomer.BookingID,
+                        text: oCustomer.CustomerName,
+                        additionalText: oCustomer.BookingID
                     }));
                 });
+
+            oCustomerBookingCombo.setFilterFunction(function (sTerm, oItem) {
+                var sNormalizedTerm = String(sTerm || "").toLowerCase();
+                return String(oItem.getText() || "").toLowerCase().includes(sNormalizedTerm) ||
+                    String(oItem.getAdditionalText() || "").toLowerCase().includes(sNormalizedTerm);
+            });
+
+            oRoomCombo.destroyItems();
+            Array.from(aRoomNumbers).sort().forEach(function (sRoomNo) {
+                oRoomCombo.addItem(new sap.ui.core.Item({
+                    key: sRoomNo,
+                    text: sRoomNo
+                }));
             });
         },
 
@@ -537,6 +580,7 @@ sap.ui.define([
             this.getView().byId("DM_id_PropertyName").setSelectedKey("")
             this.getView().byId("DM_id_PropertyName").setValue("")
             this.getView().byId("Dm_id_CustomerName").setSelectedKey("")
+            this.getView().byId("Dm_id_CustomerName").setValue("")
             this.getView().byId("DM_id_RoomNo").setSelectedKey("")
             this.getView().byId("DM_id_Status").setSelectedKey("")
         },

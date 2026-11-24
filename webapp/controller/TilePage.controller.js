@@ -975,6 +975,9 @@ sap.ui.define([
         // ─── Admin Booking ("Book for Yourself") ──────────────────────────────────
 
         TileV_onpressBookForYourself: function () {
+            // Re-read HM_LoginUser on every open so newly created customers are available.
+            this._aAdminBookingExistingCustomersCache = undefined;
+
             if (!this.getView().getModel("AdminBookingModel")) {
                 this.getView().setModel(new JSONModel(this._getAdminBookingInitialData()), "AdminBookingModel");
             }
@@ -2409,6 +2412,9 @@ sap.ui.define([
                     confirmPassword: ""
                 }), "RPModel");
             }
+
+            // Drop the previous user list before HM_LoginUser is read again below.
+            this.getView().getModel("RPModel").setProperty("/users", []);
 
             if (!this._oResetPasswordDialog) {
                 sap.ui.core.Fragment.load({

@@ -47,18 +47,16 @@
 				</fb:filterGroupItems>
 					<fb:filterGroupItems>
 					<fb:FilterGroupItem
-                        name="Customer Name"
-                        label="{i18n>customerName}"
-                        groupName="Group"
-                        visibleInFilterBar="true">
+						name="BookingID"
+						label="{i18n>customerNamebookingid}"
+						groupName="Group"
+						visibleInFilterBar="true">
 						<fb:control>
 							<ComboBox
                                 id="Dm_id_CustomerName"
-                                items="{CustomerModel1>/}"
-                                showClearIcon="true">
-								<core:ListItem
-                                    key="{CustomerModel1>CustomerName}"
-                                    text="{CustomerModel1>CustomerName}"/>
+								showClearIcon="true"
+								showSecondaryValues="true"
+								filterSecondaryValues="true">
 							</ComboBox>
 						</fb:control>
 					</fb:FilterGroupItem>

@@ -16,6 +16,23 @@ sap.ui.define(
                 this.getOwnerComponent().getRouter().getRoute("RouteManageInvoice").attachMatched(this._onRouteMatched, this);
             },
 
+            onAfterRendering: function () {
+                ["CI_id_CustomerNameComboBox", "CI_id_InvNo"].forEach(function (sControlId) {
+                    const oCombo = this.byId(sControlId);
+                    if (!oCombo || !oCombo.setFilterFunction) {
+                        return;
+                    }
+
+                    oCombo.setFilterFunction(function (sTerm, oItem) {
+                        const sQuery = String(sTerm || "").trim().toLowerCase();
+                        const sPrimaryText = String(oItem.getText() || "").toLowerCase();
+                        const sSecondaryText = String(oItem.getAdditionalText() || "").toLowerCase();
+
+                        return sPrimaryText.includes(sQuery) || sSecondaryText.includes(sQuery);
+                    });
+                }.bind(this));
+            },
+
             _onRouteMatched: async function (oEvent) {
                 try {
                     this.getBusyDialog();
@@ -255,6 +272,36 @@ sap.ui.define(
                             return;
                         }
 
+                        if (sKey === "CustomerName") {
+                            const sTypedValue = oControl.getValue().trim();
+                            let oSelectedItem = oControl.getSelectedItem();
+
+                            if (!oSelectedItem && sTypedValue) {
+                                const sNormalizedValue = sTypedValue.toLowerCase();
+                                oSelectedItem = oControl.getItems().find(function (oItem) {
+                                    return String(oItem.getAdditionalText() || "").trim().toLowerCase() === sNormalizedValue;
+                                });
+                            }
+
+                            if (oSelectedItem) {
+                                const oContext = oSelectedItem.getBindingContext("CustomerFilterModel");
+                                const oCustomer = oContext ? oContext.getObject() : {};
+                                const sCustomerName = String(oCustomer.CustomerName || oSelectedItem.getText() || "").trim();
+                                const sBookingID = String(oCustomer.BookingID || oSelectedItem.getAdditionalText() || "").trim();
+
+                                if (sCustomerName) {
+                                    params.CustomerName = sCustomerName;
+                                }
+                                if (sBookingID) {
+                                    params.BookingID = sBookingID;
+                                }
+                            } else if (sTypedValue) {
+                                params.CustomerName = sTypedValue;
+                            }
+
+                            return;
+                        }
+
                         if (typeof oControl.getValue === "function") {
                             const sValue =
                                 oControl.getValue().trim();
@@ -378,12 +425,7 @@ sap.ui.define(
             },
 
             onPressClear: function () {
-                this.byId("CI_id_PropertyName").setSelectedKey("");
-                this.byId("CI_id_PropertyName").setValue("");
-                this.byId("CI_id_InvNo").setValue("");
-                this.byId("CI_id_InvoiceDatePicker").setValue("");
-                this.byId("CI_id_CustomerNameComboBox").setValue("");
-                this.byId("CI_id_StatusComboBox").setValue("");
+                this._clearInvoiceFilters();
                 this._isClearPressed = true;
             },
 
