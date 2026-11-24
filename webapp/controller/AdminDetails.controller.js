@@ -4050,91 +4050,243 @@ onDeleteFacilityDetails: function () {
 
 
 
-        HM_ConfirmRoom: async function (oEvent) {
-            this.getBusyDialog();
+         
+HM_ConfirmRoom: async function (oEvent) {
+    this.getBusyDialog();
 
-            await this.AD_onSearch()
-            var ID = this.getView().getModel("CustomerData").getData()
+    try {
+        await this.AD_onSearch();
+
+        var ID = this.getView().getModel("CustomerData").getData();
+
+        var sBookingStatus = String(ID.Status || "").trim().toLowerCase();
+        var sCouponCode = String(ID.CouponCode || "").trim();
+
+        var bRequiresCouponCheck = sCouponCode &&
+            (
+                sBookingStatus === "rejected" ||
+                sBookingStatus === "cancel" ||
+                sBookingStatus === "cancelled"
+            );
+
+        if (bRequiresCouponCheck) {
+
+            var oCoupon;
+
+            try {
+                this.getBusyDialog()
+                var oCouponResponse = await this.ajaxReadWithJQuery(
+                    "HM_CouponBookingCount",
+                    {
+                        CouponCode: sCouponCode,
+                        Status: "Active"
+                    }
+                );
+                this.closeBusyDialog()
+
+                var vCouponData = oCouponResponse && oCouponResponse.data;
+
+                var aCoupons = Array.isArray(vCouponData)
+                    ? vCouponData
+                    : (vCouponData ? [vCouponData] : []);
+
+                var sBranchCode = String(ID.BranchCode || "").trim();
+
+                oCoupon = aCoupons.find(function (oCouponData) {
+                    return oCouponData &&
+                        String(oCouponData.CouponCode || "").trim().toUpperCase() ===
+                        sCouponCode.toUpperCase() &&
+                        String(oCouponData.BranchCode || "").trim() === sBranchCode;
+                });
+
+            } catch (oError) {
+
+                MessageBox.error(
+                    this.i18nModel.getText("unableVerifyCoupon"),
+                    {
+                        styleClass: "myUnifiedBtn"
+                    }
+                );
+
+                return;
+            }
+
+            var bCouponExpired = !!oCoupon &&
+                (
+                    String(oCoupon.Status || "").trim().toLowerCase() === "expired" ||
+                    this._isCouponExpired(oCoupon.EndDate)
+                );
+
+            var bCouponInvalid = !oCoupon ||
+                String(oCoupon.Status || "").trim().toLowerCase() !== "active" ||
+                this._isCouponNotStarted(oCoupon.StartDate) ||
+                Number(oCoupon.couponUsedCount || 0) >= Number(oCoupon.MaxUses || 0);
+
+            if (bCouponExpired || bCouponInvalid) {
+
+                // Remove applied coupon
+                this.oncancelCoupon();
+
+                this.getView().getModel("CustomerData")
+                    .setProperty("/OriginalCouponCode", "");
+
+                this.getView().getModel("CustomerData")
+                    .setProperty("/OriginalCouponDiscount", 0);
+
+                this.getView().getModel("Bookingmodel")
+                    .setProperty("/OriginalCouponCode", "");
+
+                this.getView().getModel("Bookingmodel")
+                    .setProperty("/OriginalCouponDiscount", 0);
+
+                var sCouponErrorMessage = this.i18nModel.getText(
+                    bCouponExpired ? "Couponisexpired" : "ExpireCouponCode"
+                );
 
 
-            var RoomData = this.getOwnerComponent().getModel("RoomDetailsModel").getData()
-            var HostelData = this.getOwnerComponent().getModel("HostelModelcheckrooms").getData().filter((item) => {
 
-                return (item.Status === "Assigned" || item.Status === "Confirmed") &&
+                    ID.CouponCode = "";
+                    ID.CouponCount = "";
+
+              
+                // Show message and wait until user clicks OK
+                await new Promise((resolve) => {
+
+                    MessageBox.information(sCouponErrorMessage, {
+                        actions: [MessageBox.Action.OK],
+                        styleClass: "myUnifiedBtn",
+
+                        onClose: function () {
+                            resolve();
+                        }
+                    });
+
+                });
+
+                // After clicking OK, execution continues below
+            }
+        }
+
+        // Room details
+        var RoomData = this.getOwnerComponent()
+            .getModel("RoomDetailsModel").getData();
+
+        var HostelData = this.getOwnerComponent()
+            .getModel("HostelModelcheckrooms").getData().filter((item) => {
+
+                return (
+                    (item.Status === "Assigned" || item.Status === "Confirmed") &&
                     item.BedType === ID.BedType &&
                     item.BranchCode === ID.BranchCode
+                );
 
-            })
+            });
 
-            var SelectedRoom = RoomData.filter((item) => {
+        var SelectedRoom = RoomData.filter((item) => {
 
-                return item.BedTypeName === ID.BedType &&
-                    item.BranchCode === ID.BranchCode
-            })
+            return item.BedTypeName === ID.BedType &&
+                item.BranchCode === ID.BranchCode;
 
-            // if (SelectedRoom[0].NoofPerson <= HostelData.length) {
-            //     sap.m.MessageBox.error("No rooms available for the selected bed type. Please assign a different bed type or check room availability.");
-            //     return;
-            // }
+        });
 
-            const pdfBase64 = await this.onGeneratePDF("Confirmed");
-            this.closeBusyDialog();
-            var Payload = {
-                Status: "Confirmed",
-                CustomerName: ID.CustomerName,
-                Salutation: ID.Salutation,
-                BookingID: ID.BookingID,
-                CustomerEmail: ID.CustomerEmail || "",
-                BedType: ID.BedType || "",
-                BookingDate: new Date(ID.BookingDate).toISOString().split('T')[0],
-                StartDate: ID.StartDate.split('/').reverse().join('-'),
-                EndDate: ID.EndDate.split('/').reverse().join('-'),
-                MemberID: ID.MemberID || "",
-                Guests: ID.MemberID ? ID.MemberID.split(",").length : 1,
-                RentPrice: ID.GrandTotal || 0,
-                PropertyName: ID.BranchName || "",
-                PropertySTD: ID.PropertySTD || "",
-                PropertyMobileNo: ID.PropertyMobileNo || "",
-                PropertyEmail: ID.PropertyEmail || "",
-                PropertyType: ID.PropertyType,
-                Currency: ID.Currency || "",
-                LoginName: this.getOwnerComponent().getModel("LoginModel").getData().UserName || "",
-                pdfAttachment: {
-                    fileName: "BookingVoucher.pdf",
-                    mimeType: "application/pdf",
-                    content: pdfBase64
-                }
-            };
+        // Generate confirmation PDF
+        const pdfBase64 = await this.onGeneratePDF("Confirmed");
 
-            var oBody = {
-                data: Payload,
-                filters: {
-                    BookingID: ID.BookingID
-                }
-            };
+        var Payload = {
+            Status: "Confirmed",
+            CustomerName: ID.CustomerName,
+            Salutation: ID.Salutation,
+            BookingID: ID.BookingID,
+            CustomerEmail: ID.CustomerEmail || "",
+            BedType: ID.BedType || "",
+            BookingDate: new Date(ID.BookingDate).toISOString().split("T")[0],
+            StartDate: ID.StartDate.split("/").reverse().join("-"),
+            EndDate: ID.EndDate.split("/").reverse().join("-"),
+            MemberID: ID.MemberID || "",
+            Guests: ID.MemberID ? ID.MemberID.split(",").length : 1,
+            RentPrice: ID.GrandTotal || 0,
+            PropertyName: ID.BranchName || "",
+            PropertySTD: ID.PropertySTD || "",
+            PropertyMobileNo: ID.PropertyMobileNo || "",
+            PropertyEmail: ID.PropertyEmail || "",
+            PropertyType: ID.PropertyType,
+            Currency: ID.Currency || "",
+            CouponCount:ID.CouponCount || "",
+            CouponCode:ID.CouponCode,
+            LoginName: this.getOwnerComponent()
+                .getModel("LoginModel").getData().UserName || "",
 
-            var that = this;
+            pdfAttachment: {
+                fileName: "BookingVoucher.pdf",
+                mimeType: "application/pdf",
+                content: pdfBase64
+            }
+        };
 
-            sap.m.MessageBox.confirm(
-                 this.i18nModel.getText("Areyousureyouwanttoconfirmthisroombooking"), {
-                actions: [sap.m.MessageBox.Action.YES, sap.m.MessageBox.Action.NO],
-                   actions: [
-            that.i18nModel.getText("YesButton"),
-            that.i18nModel.getText("NoButton")
-        ],
+        var oBody = {
+            data: Payload,
+            filters: {
+                BookingID: ID.BookingID
+            }
+        };
+
+        var that = this;
+
+        // Final room confirmation message
+        sap.m.MessageBox.confirm(
+            this.i18nModel.getText("Areyousureyouwanttoconfirmthisroombooking"),
+            {
+                actions: [
+                    that.i18nModel.getText("YesButton"),
+                    that.i18nModel.getText("NoButton")
+                ],
+
                 styleClass: "myUnifiedBtn",
+
                 onClose: async function (oAction) {
+
                     if (oAction === that.i18nModel.getText("YesButton")) {
+
                         that.getBusyDialog();
-                        await that.ajaxUpdateWithJQuery("HM_Booking", oBody);
-                        that.getView().getModel("CustomerData").setProperty("/Status", "Confirmed")
-                        that.closeBusyDialog()
-                        // that.AD_onSearch();
+
+                        try {
+
+                            await that.ajaxUpdateWithJQuery("HM_Booking", oBody);
+
+                            that.getView().getModel("CustomerData")
+                                .setProperty("/Status", "Confirmed");
+
+                        } catch (oError) {
+
+                            MessageBox.error(
+                                "Unable to confirm booking.",
+                                {
+                                    styleClass: "myUnifiedBtn"
+                                }
+                            );
+
+                        } finally {
+                            that.closeBusyDialog();
+                        }
                     }
                 }
             }
-            );
-        },
+        );
+
+    } catch (oError) {
+
+        MessageBox.error(
+            oError.message || "Something went wrong while confirming the booking.",
+            {
+                styleClass: "myUnifiedBtn"
+            }
+        );
+
+    } finally {
+        this.closeBusyDialog();
+    }
+},
+
 
         HM_RejectRoom:async function (oEvent) {
             this.getBusyDialog()
