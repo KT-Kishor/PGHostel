@@ -2392,6 +2392,8 @@
                         data: {
                             ComplaintType: oComplaintData.ComplaintType,
                             Description: oComplaintData.Description,
+                            BookingID: oComplaintData.BookingID,
+                            CustomerName: oComplaintData.CustomerName,
                             CustomerEmail: oComplaintData.CustomerEmail,
                             BranchName: oComplaintData.BranchName,
                             RoomNo: oComplaintData.RoomNo,
