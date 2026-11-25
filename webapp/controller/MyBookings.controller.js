@@ -2401,7 +2401,9 @@
                             FileName: oComplaintData.FileName,
                             FileType: oComplaintData.FileType,
                             File: oComplaintData.File,
-                            emailIds: oComplaintData.emailIds
+                            emailIds: oComplaintData.emailIds,
+                            Updated:true,
+                            Status: "Pending",
                         },
                         filters: { ComplaintID: oData.ComplaintID }
                     });

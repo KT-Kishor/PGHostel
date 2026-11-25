@@ -5436,7 +5436,7 @@ sap.ui.define([
 
                         case "per year":
                             facilityAmount =
-                                calculateYearAmount(qty);
+                                calculateYearAmount();
                             break;
                     }
 

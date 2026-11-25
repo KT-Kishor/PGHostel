@@ -4255,6 +4255,7 @@ HM_ConfirmRoom: async function (oEvent) {
 
                             that.getView().getModel("CustomerData")
                                 .setProperty("/Status", "Confirmed");
+                                MessageToast.show("Booking Confirmed Successfully")
 
                         } catch (oError) {
 
@@ -4283,6 +4284,7 @@ HM_ConfirmRoom: async function (oEvent) {
         );
 
     } finally {
+
         this.closeBusyDialog();
     }
 },
@@ -4372,6 +4374,8 @@ HM_ConfirmRoom: async function (oEvent) {
 
             // this.AD_onSearch();
             this.getView().getModel("CustomerData").setProperty("/Status", "Rejected")
+
+            MessageToast.show("Booking Rejected Successfully")
 
             this.closeBusyDialog();
 

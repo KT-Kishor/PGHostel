@@ -1226,6 +1226,7 @@ DM_onPressGeneratePDF: async function (bManageBusyDialog = true) {
             TotalCost:oDamage.TotalCost,
             CustomerEmail:oDamage.CustomerEmail,
             BranchEmail:this.BranchEmailID,
+            BranchCode:oDamage.BranchCode,
              pdfAttachment: {
                 fileName: "Damage.pdf",
                 mimeType: "application/pdf",
