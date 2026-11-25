@@ -166,7 +166,8 @@
         formatter: '.Formatter.formatTaxAmount'
     }" />
 							<ObjectStatus text="{ManageInvoiceModel>Status}" inverted="false"
-                            state="{path: 'ManageInvoiceModel>Status', formatter: '.Formatter.formatObjectStatus'}" class="PayByDateClass"/>
+                            state="{= ${ManageInvoiceModel>Status} === 'Submitted' ? 'Information' : ${ManageInvoiceModel>Status} === 'Payment Partially' ? 'Warning' : ${ManageInvoiceModel>Status} === 'Payment Received' ? 'Success' : 'None' }"
+                            class="PayByDateClass"/>
 						</cells>
 					</ColumnListItem>
 				</items>
