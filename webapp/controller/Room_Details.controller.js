@@ -193,7 +193,7 @@ sap.ui.define([
             })
         },
 
-        _populateUniqueFilterValues: function (data) {
+        _populateUniqueFilterValues: function (data, bedTypeData) {
 
             let oView = this.getView();
 
@@ -220,12 +220,14 @@ sap.ui.define([
                     );
                 });
 
-            // ===== Bed Type Unique =====
-            let oBedTypeCombo = oView.byId("RD_id_CompanyName1");
+            this._populateBedTypeFilterValues(bedTypeData || data);
+        },
+
+        _populateBedTypeFilterValues: function (data) {
+            const oBedTypeCombo = this.byId("RD_id_CompanyName1");
+            const uniqueBedTypes = new Set();
+
             oBedTypeCombo.destroyItems();
-
-            let uniqueBedTypes = new Set();
-
             data.forEach(item => {
                 if (item.BedTypeName) {
                     uniqueBedTypes.add(item.BedTypeName);
@@ -243,6 +245,21 @@ sap.ui.define([
                     );
                 });
         },
+
+        RD_onBranchSelectionChange: function (oEvent) {
+            const oSelectedItem = oEvent.getParameter("selectedItem");
+            const sBranchCode = oSelectedItem ? oSelectedItem.getKey() : "";
+            const aRoomData = this._originalRoomdata || [];
+            const aBedTypeData = sBranchCode
+                ? aRoomData.filter(room => room.BranchCode === sBranchCode)
+                : aRoomData;
+            const oBedTypeCombo = this.byId("RD_id_CompanyName1");
+
+            oBedTypeCombo.setSelectedKey("");
+            oBedTypeCombo.setValue("");
+            this._populateBedTypeFilterValues(aBedTypeData);
+        },
+
    HM_Active: function () {
 
     var oTable = this.byId("id_ARD_Table");
@@ -1144,7 +1161,12 @@ if (Payload._isEditing) {
                 }
                 var model = new JSONModel(mappedData);
                 this.getView().setModel(model, "RoomDetailsModel");
-                this._populateUniqueFilterValues(this._originalRoomdata);
+                const sSelectedBranchCode = sBranchCode ? sBranchCode.split("-")[0].trim() : "";
+                const aBedTypeData = sSelectedBranchCode
+                    ? this._originalRoomdata.filter(room => room.BranchCode === sSelectedBranchCode)
+                    : this._originalRoomdata;
+
+                this._populateUniqueFilterValues(this._originalRoomdata, aBedTypeData);
                 this.closeBusyDialog()
             })
         },
@@ -1182,6 +1204,9 @@ if (Payload._isEditing) {
             this.getView().byId("RD_id_CustomerName1").setSelectedKey("")
             this.getView().byId("RD_id_CompanyName1").setSelectedKey("")
             this.getView().byId("PO_id_RBranch").setSelectedKey("")
+            if (this._originalRoomdata) {
+                this._populateUniqueFilterValues(this._originalRoomdata);
+            }
         },
 
         onRoomNoInputLiveChange: function (oEvent) {

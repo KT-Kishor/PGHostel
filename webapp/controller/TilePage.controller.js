@@ -1599,6 +1599,7 @@ sap.ui.define([
                 this._confirmAdminBookingReuseExisting(oExisting);
             } catch (err) {
                 this.closeBusyDialog();
+                this._clearAdminBookingHostelState();
                 // A failed pre-check shouldn't block creating a new customer;
                 // the Book Now path still guards against duplicates.
             }
@@ -2011,9 +2012,18 @@ sap.ui.define([
             ].join("/");
         },
 
+        _clearAdminBookingHostelState: function () {
+            var oHostelModel = sap.ui.getCore().getModel("HostelModel");
+            if (oHostelModel && oHostelModel.getProperty("/ReturnRoute") === "TilePage") {
+                oHostelModel.setData({});
+                oHostelModel.refresh(true);
+            }
+        },
+
         // Seed the room/branch part of HostelModel that is common to every mode.
         // Returns the seeded core HostelModel, or null if branch/room/plan invalid.
         _seedAdminBookingHostelModel: function () {
+            this._clearAdminBookingHostelState();
             var oModel = this.getView().getModel("AdminBookingModel");
             var sBranchCode = oModel.getProperty("/BranchCode");
             var sRoomKey = oModel.getProperty("/RoomKey");
@@ -2106,10 +2116,12 @@ sap.ui.define([
         onAdminBookingBookNow: function () {
             var sType = this.getView().getModel("AdminBookingModel").getProperty("/CustomerType");
             if (!this._validateAdminBookingBaseFields()) {
+                this._clearAdminBookingHostelState();
                 MessageToast.show(sType ? this.i18nModel.getText("adminBookingSelectBranchRoomPlan") : this.i18nModel.getText("adminBookingSelectCustomerType"));
                 return;
             }
             if (!sType) {
+                this._clearAdminBookingHostelState();
                 MessageToast.show(this.i18nModel.getText("adminBookingSelectCustomerType"));
                 return;
             }
@@ -2127,7 +2139,7 @@ sap.ui.define([
             var oHostelModel = this._seedAdminBookingHostelModel();
             if (!oHostelModel) return;
             oHostelModel.setProperty("/BookingOnBehalf", false);
-            this.onAdminBookingCancel();
+            this._closeAdminBookingDialog();
             this.getOwnerComponent().getRouter().navTo("RouteBooking");
         },
 
@@ -2142,11 +2154,12 @@ sap.ui.define([
         // exists, offer to reuse that record (the booking itself associates them
         // with this branch).
         _adminBookingBookNowNewCustomer: async function () {
-            if (!this._seedAdminBookingHostelModel()) return;
             if (!this._validateAdminBookingNewCustomer()) {
+                this._clearAdminBookingHostelState();
                 MessageToast.show(this.i18nModel.getText("adminBookingNCFillAllFields"));
                 return;
             }
+            if (!this._seedAdminBookingHostelModel()) return;
 
             var oModel = this.getView().getModel("AdminBookingModel");
             var oNC = oModel.getProperty("/NC");
@@ -2192,9 +2205,10 @@ sap.ui.define([
                     if (sAction === MessageBox.Action.OK) {
                         var oHostelModel = sap.ui.getCore().getModel("HostelModel");
                         this._applyAdminBookingCustomerIdentity(oHostelModel, oExisting);
-                        this.onAdminBookingCancel();
+                        this._closeAdminBookingDialog();
                         this.getOwnerComponent().getRouter().navTo("RouteBooking");
                     } else {
+                        this._clearAdminBookingHostelState();
                         // Declined reuse → clear the email so they can enter another.
                         var oModel = this.getView().getModel("AdminBookingModel");
                         oModel.setProperty("/NC/EmailID", "");
@@ -2240,6 +2254,7 @@ sap.ui.define([
                 this.getBusyDialog();
                 var oResp = await this.ajaxCreateWithJQuery("HM_Login", payload);
                 if (oResp && oResp.success === false) {
+                    this._clearAdminBookingHostelState();
                     MessageBox.error(oResp.message || this.i18nModel.getText("adminBookingRegisterFailed"), {
                         title: this.getView().getModel("i18n").getResourceBundle().getText("registrationFailed"),
                         styleClass: "myUnifiedBtn"
@@ -2255,6 +2270,7 @@ sap.ui.define([
                 });
                 var oUser = (Array.isArray(oRead.data) ? oRead.data[0] : oRead.data) || null;
                 if (!oUser || !oUser.UserID) {
+                    this._clearAdminBookingHostelState();
                     MessageBox.error(this.i18nModel.getText("adminBookingCustomerReadFailed"), {
                         title: this.getView().getModel("i18n").getResourceBundle().getText("registrationFailed"),
                         styleClass: "myUnifiedBtn"
@@ -2266,9 +2282,10 @@ sap.ui.define([
                 this._applyAdminBookingCustomerIdentity(oHostelModel, oUser);
 
                 this.closeBusyDialog();
-                this.onAdminBookingCancel();
+                this._closeAdminBookingDialog();
                 this.getOwnerComponent().getRouter().navTo("RouteBooking");
             } catch (err) {
+                this._clearAdminBookingHostelState();
                 var sMsg = (err && err.responseJSON && err.responseJSON.message) ||
                     this.i18nModel.getText("adminBookingRegisterFailed");
                 MessageBox.error(sMsg, { title: this.getView().getModel("i18n").getResourceBundle().getText("registrationFailed"), styleClass: "myUnifiedBtn" });
@@ -2283,6 +2300,7 @@ sap.ui.define([
             var oModel = this.getView().getModel("AdminBookingModel");
             var oEC = oModel.getProperty("/EC");
             if (!oEC || !oEC.UserID || !oEC.EmailID) {
+                this._clearAdminBookingHostelState();
                 this.byId("AB_id_EC_Email").setValueState("Error");
                 MessageToast.show(this.i18nModel.getText("adminBookingSelectCustomerEmail"));
                 return;
@@ -2290,14 +2308,19 @@ sap.ui.define([
             var oHostelModel = this._seedAdminBookingHostelModel();
             if (!oHostelModel) return;
             this._applyAdminBookingCustomerIdentity(oHostelModel, oEC);
-            this.onAdminBookingCancel();
+            this._closeAdminBookingDialog();
             this.getOwnerComponent().getRouter().navTo("RouteBooking");
         },
 
-        onAdminBookingCancel: function () {
+        _closeAdminBookingDialog: function () {
             if (this._AdminBookingDialog) {
                 this._AdminBookingDialog.close();
             }
+        },
+
+        onAdminBookingCancel: function () {
+            this._clearAdminBookingHostelState();
+            this._closeAdminBookingDialog();
         },
 
         onPressbugs:function(){

@@ -7376,10 +7376,9 @@
             const oHostelModel = this.getView().getModel("HostelModel");
             const oBookingView = this.getView().getModel("BookingView");
             const aFamilyMembers = oBookingView.getProperty("/FamilyMembers") || [];
-            // Get logged-in user's name from LoginModel (SELF)
-            const oLoginModel = sap.ui.getCore().getModel("LoginModel");
-            const oUser = oLoginModel ? oLoginModel.getData() || {} : {};
-            const sLoggedInUserName = oUser.UserName || oHostelModel.getProperty("/FullName") || "";
+            const oLoginModel = this.getOwnerComponent().getModel("LoginModel") || sap.ui.getCore().getModel("LoginModel");
+            const bIsCreateBooking = this._bEditMode !== true;
+            const sLoggedInUserName = oLoginModel ? oLoginModel.getProperty("/UserName") || "" : "";
             const sPrimaryOccupantName = this.formatPrimaryOccupantName(aFamilyMembers) || oHostelModel.getProperty("/FullName") || "";
             const oPrimaryOccupant = aFamilyMembers.find(function (oMember) {
                 return oMember && oMember.IsPrimary === true;
@@ -7403,6 +7402,7 @@
                     State: oHostelModel.getProperty("/State") || "",
                     City: oHostelModel.getProperty("/City") || "",
                     PermanentAddress: oHostelModel.getProperty("/Address") || "",
+                    ...(bIsCreateBooking ? { LoginName: sLoggedInUserName } : {}),
                     Documents: [],
                     Booking: this._buildBookingItemsPayload(),
                     FacilityItems: this._buildFacilityItemsPayload(),

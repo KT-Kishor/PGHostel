@@ -35,7 +35,8 @@
                         <fb:control>
                             <ComboBox
                                 id="PO_id_RBranch"
-                                 items="{BranchModel>/}"
+                                items="{BranchModel>/}"
+                                selectionChange="RD_onBranchSelectionChange"
                                 showClearIcon="true"
                                 showSecondaryValues="true"
                             >
@@ -90,7 +91,7 @@
                 mode="MultiSelect"
                 width="auto"
                 busyIndicatorDelay="0"
-                items="{path: 'RoomDetailsModel>/', sorter: {path: 'BranchName',descending: false,group: true},groupHeaderFactory: '.getGroupHeader'}">
+                items="{path: 'RoomDetailsModel>/', sorter: [{path: 'BranchName', descending: false, group: true}, {path: 'BedTypeName', descending: false}], groupHeaderFactory: '.getGroupHeader'}">
 				<headerToolbar>
 					<OverflowToolbar>
 						<Title text="{i18n>roomList} ({= ${RoomDetailsModel>/}.length})"/>
