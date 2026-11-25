@@ -317,10 +317,15 @@ sap.ui.define([
             this.byId("CD_id_Comments").setVisible(false);
 
             if (data.Status === "Pending") {
-                this.byId("CD_id_Assignedto").setVisible(true).setSelectedKey("").setValueState("None");
+                this.byId("CD_id_Assignedto").setVisible(true).setSelectedKey("").setValueState("None") ;
                 this.byId("CD_id_EstimatedDate").setVisible(true).setValue("").setMinDate(new Date(data.ComplaintRaisedDate)).setValueState("None");
             } else {
-                this.byId("CD_id_Assignedto").setVisible(true).setSelectedKey(data.AssignedBy).setValueState("None");
+                this.byId("CD_id_Assignedto").setValueState("None");
+                var oAssignedTo = this.byId("CD_id_Assignedto");
+oAssignedTo.setVisible(true);
+oAssignedTo.setSelectedItem(
+    oAssignedTo.getItems().find(item => item.getText() === data.AssignedBy)
+);
                 this.byId("CD_id_EstimatedDate").setVisible(true).setValue(Formatter.formatDate(data.EstimatDate)).setMinDate(new Date(data.ComplaintRaisedDate)).setValueState("None");
             }
         },
@@ -475,6 +480,11 @@ sap.ui.define([
                     CustomerName: Complaint.CustomerName
 
                 };
+            }
+            if(Complaint.Status === "In Progress" && this.flag === false){
+                payload.Updated=true
+            }else{
+                payload.Updated=false
             }
             if ((Complaint.Status === "In Progress" || Complaint.Status === "Resolved") && this.flag === true) {
                 this.getBusyDialog()
