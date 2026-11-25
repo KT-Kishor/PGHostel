@@ -4774,7 +4774,9 @@ if (sLocale) {
                 CustomerEmail: sCustomerEmail,
                 emailIds: emailIds,
                 BranchName: sBranchName,
-                ccmailids: sCustomerEmail
+                ccmailids: sCustomerEmail,
+                Updated:false
+
             };
 
             let payload;
@@ -4793,7 +4795,9 @@ if (sLocale) {
                         File: oData.FileContent || "",
                         emailIds: emailIds,
                         BranchName: sBranchName,
-                        ccmailids: sCustomerEmail
+                        ccmailids: sCustomerEmail,
+                        Updated:true,
+                        Status: "Pending",
                     },
                     filters: {
                         ComplaintID: oData.ComplaintID
