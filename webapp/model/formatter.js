@@ -700,6 +700,11 @@ formatDateTime: function (sDate) {
             return status !== "in progress" && status !== "resolved";
         },
 
+        canEditComplaintForBooking: function (sBookingStatus) {
+            const sStatus = String(sBookingStatus || "").trim().toLowerCase();
+            return !!sStatus && sStatus !== "completed";
+        },
+
         canEditSupport: function (sStatus) {
             if (!sStatus) {
                 return false;

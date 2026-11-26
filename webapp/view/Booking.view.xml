@@ -355,12 +355,9 @@
                                       >
                                         <Text text="{i18n>Relationship}" />
                                     </Column>
-                                    <!-- <Column minScreenWidth="Tablet" demandPopin="true">
-                                            <Text text="Document Type" />
-                                        </Column>
-                                        <Column minScreenWidth="Desktop" demandPopin="true" width="14rem">
-                                            <Text text="Document" />
-                                        </Column> -->
+                                    <Column minScreenWidth="Tablet" demandPopin="true">
+                                        <Text text="{i18n>document}" />
+                                    </Column>
                                     <Column width="6rem" id="actionColumn"  > 
                                        
                                     </Column>
@@ -393,24 +390,12 @@
                                                 text="{BookingView>Relation}"
                                             />
 
-                                            <!-- <Select selectedKey="{BookingView>DocumentType}" items="{BookingView>/DocumentTypeOptions}">
-                                                    <core:Item key="{BookingView>key}" text="{BookingView>text}" />
-                                                </Select>
-                                                <<HBox alignItems="Center" wrap="Wrap">
-                                                    <unified:FileUploader
-                                                        width="8rem"
-                                                        buttonOnly="true"
-                                                        maximumFileSize="2"
-                                                        sameFilenameAllowed="true"
-                                                        change="onFamilyDocumentChange"
-                                                        typeMissmatch="onDocumentUploadTypeMismatch"
-                                                        fileSizeExceed="onDocumentUploadSizeExceed"
-                                                        buttonText="Upload"
-                                                        fileType="pdf,jpg,jpeg,png,webp"
-                                                        class="myUnifiedBtn sapUiTinyMarginEnd"
-                                                    />
-                                                    <Text text="{BookingView>DocumentName}" />
-                                                </HBox> -->
+                                            <Link
+                                                text="{i18n>view}"
+                                                press="MS_viewimage"
+                                                enabled="{= !!${BookingView>MemberID} }"
+                                                class="documentLink"
+                                            />
                                             <Button
                                                 icon="sap-icon://delete"
                                                 tooltip="{i18n>removeMember}"

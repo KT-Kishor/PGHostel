@@ -31,6 +31,60 @@ sap.ui.define([
       });
     },
 
+    async _readComplaintsWithBookingStatus(sUserID) {
+      const oFilter = { UserID: sUserID };
+      const [oComplaintResponse, oBookingResponse] = await Promise.all([
+        this.ajaxReadWithJQuery("HM_Complaint", oFilter),
+        this.ajaxReadWithJQuery("CustomerAndPayment", oFilter).catch(() => null)
+      ]);
+      const aBookings = Array.isArray(oBookingResponse?.BookingData) ? oBookingResponse.BookingData : [];
+      const mBookingStatuses = new Map(aBookings.map(oBooking => [
+        String(oBooking?.BookingID ?? "").trim(),
+        String(oBooking?.Status || oBooking?.BookingStatus || "").trim()
+      ]));
+
+      const vData = oComplaintResponse?.data;
+      const aComplaints = Array.isArray(vData) ? vData : (vData ? [vData] :
+        (Array.isArray(oComplaintResponse?.ComplaintData) ? oComplaintResponse.ComplaintData :
+          (Array.isArray(oComplaintResponse?.commentData) ? oComplaintResponse.commentData : [])));
+
+      return aComplaints.map(oComplaint => {
+        const sBookingID = String(oComplaint.BookingID ?? "").trim();
+        return {
+          ...oComplaint,
+          BookingStatus: sBookingID ? mBookingStatuses.get(sBookingID) || "" : ""
+        };
+      });
+    },
+
+    async _validateComplaintBookingForUpdate(oModel, vComplaintID) {
+      // The form's BookingID can change. Check the booking on the saved complaint.
+      const oComplaint = (oModel.getProperty("/complain") || []).find(oRow => oRow.ComplaintID === vComplaintID);
+      const sBookingID = String(oComplaint?.BookingID ?? "").trim();
+      let sBookingStatus = "";
+
+      if (sBookingID) {
+        const oResponse = await this.ajaxReadWithJQuery("HM_Booking", { BookingID: sBookingID }).catch(() => null);
+        const oBooking = Array.isArray(oResponse?.commentData) ? oResponse.commentData.find(
+          oRow => String(oRow?.BookingID ?? "").trim() === sBookingID
+        ) : null;
+        sBookingStatus = String(oBooking?.Status || oBooking?.BookingStatus || "").trim();
+
+        (oModel.getProperty("/complain") || []).forEach((oRow, iIndex) => {
+          if (String(oRow.BookingID ?? "").trim() === sBookingID && oRow.BookingStatus !== sBookingStatus) {
+            oModel.setProperty(`/complain/${iIndex}/BookingStatus`, sBookingStatus);
+          }
+        });
+      }
+
+      if (Formatter.canEditComplaintForBooking(sBookingStatus)) {
+        return true;
+      }
+
+      MessageToast.show(this.getI18nText(sBookingStatus ? "complaintEditCompletedBooking" : "complaintEditUnknownBookingStatus"));
+      return false;
+    },
+
     // 1. Router access - completely safe
     getRouter: function () {
       return sap.ui.core.UIComponent.getRouterFor(this);

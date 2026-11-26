@@ -3087,15 +3087,7 @@ if (sLocale) {
             try {
                 if (!bSilent) this.getBusyDialog();
 
-                const resp = await this.ajaxReadWithJQuery("HM_Complaint", {
-                    UserID: sUserID
-                });
-
-                // Normalize response shapes: {data:[...]}, {data:{...}}, or legacy keys
-                const aRaw = Array.isArray(resp?.data) ? resp.data :
-                    (resp?.data ? [resp.data] :
-                        (Array.isArray(resp?.ComplaintData) ? resp.ComplaintData :
-                            (Array.isArray(resp?.commentData) ? resp.commentData : [])));
+                const aRaw = await this._readComplaintsWithBookingStatus(sUserID);
 
                 const oBRModel = this.getOwnerComponent().getModel("sBRModel");
                 const aBranchMaster = oBRModel?.getProperty("/") || [];
@@ -3106,6 +3098,7 @@ if (sLocale) {
 
                     return {
                         BookingID: complain.BookingID || "",
+                        BookingStatus: complain.BookingStatus,
                         CustomerName: complain.CustomerName || "",
                         ComplaintID: complain.ComplaintID || complain.ComplainID || complain.ID || "",
                         ComplaintType: complain.ComplaintType || "",
@@ -4145,7 +4138,11 @@ if (sLocale) {
             this._openComplaintDialog(); // no data → create mode
         },
 
-        _openComplaintDialog: function (oComplaintData) {
+        _openComplaintDialog: async function (oComplaintData) {
+            if (this._bOpeningComplaintDialog) {
+                return;
+            }
+
             const oView = this.getView();
             const oTempModel = oView.getModel("complaintTemp");
             const oProfileModel = oView.getModel("profileData");
@@ -4326,10 +4323,6 @@ if (sLocale) {
                 }
             }
 
-            const sDialogTitle = oComplaintData ?
-                "Edit Complaint" :
-                "Raise New Complaint";
-
             const fnUpdateUI = () => {
 
                 const aBranches =
@@ -4353,30 +4346,28 @@ if (sLocale) {
                 }
             };
 
-            // Open dialog
-            if (!this._oComplaintDialog) {
+            this._bOpeningComplaintDialog = true;
+            try {
+                const oDialog = this._oComplaintDialog || await this.loadFragment({
+                    id: "complaintDialog",
+                    name: "sap.ui.com.project1.fragment.Complaint"
+                });
+                if (oView.bIsDestroyed) {
+                    return;
+                }
 
-                Fragment.load({
-                    name: "sap.ui.com.project1.fragment.Complaint",
-                    controller: this
-                }).then(function (oDialog) {
-
-                    this._oComplaintDialog = oDialog;
-
-                    oView.addDependent(oDialog);
-
-                    this._oComplaintDialog.setTitle(sDialogTitle);
-
-                    oDialog.open();
-
-                    this._resetComplaintValidationStates();
-                    fnUpdateUI();
-                }.bind(this));
-            } else {
-                this._oComplaintDialog.setTitle(sDialogTitle);
-                this._oComplaintDialog.open();
+                this._oComplaintDialog = oDialog;
+                oDialog.setTitle(this.getI18nText(oComplaintData ? "editComplaint" : "raiseNewComplaint"));
+                oDialog.open();
                 this._resetComplaintValidationStates();
                 fnUpdateUI();
+            } catch (oError) {
+                if (!oView.bIsDestroyed) {
+                    console.error("Failed to open complaint dialog:", oError);
+                    MessageToast.show(this.getI18nText("unableLoadComplaints"));
+                }
+            } finally {
+                this._bOpeningComplaintDialog = false;
             }
         },
 
@@ -4435,7 +4426,7 @@ if (sLocale) {
             this._resetComplaintValidationStates();
         },
         _getComplaintControl: function (sId) {
-            return sap.ui.getCore().byId(sId) || this.byId(sId);
+            return Fragment.byId(this.createId("complaintDialog"), sId);
         },
         _resetComplaintValidationStates: function () {
 
@@ -4610,7 +4601,7 @@ if (sLocale) {
             oTempModel.setProperty("/FileType", "");
             oTempModel.setProperty("/FileContent", "");
 
-            const oUploader = sap.ui.getCore().byId("idComplaintFileUploader");
+            const oUploader = this._getComplaintControl("idComplaintFileUploader");
             if (oUploader) {
                 oUploader.clear();
             }
@@ -4723,11 +4714,6 @@ if (sLocale) {
             const oBranchCombo = this._getComplaintControl("idBranchCombo");
             const oBookingID = this._getComplaintControl("MP_id_AddBooking");
             const oCustomerName = this._getComplaintControl("MP_id_AddCustComboBox");
-            var oComboBox = sap.ui.getCore().byId("idBranchCombo");
-
-            var sBranchName = oComboBox.getSelectedItem()?.getText();
-
-
             if (!utils._LCstrictValidationComboBox(oBranchCombo, "ID") ||
                 !utils._LCstrictValidationComboBox(oRoomNo, "ID") ||
                 !utils._LCstrictValidationComboBox(oCustomerName, "ID") ||
@@ -4745,6 +4731,7 @@ if (sLocale) {
 
             const sComplaintType = oComplaintType.getValue();
             const sBranchCode = oBranchCombo.getSelectedKey();
+            const sBranchName = oBranchCombo.getSelectedItem()?.getText();
 
             this.getBusyDialog();
 
@@ -4813,6 +4800,9 @@ if (sLocale) {
 
                 let response;
                 if (oData.ComplaintID) {
+                    if (!await this._validateComplaintBookingForUpdate(oView.getModel("profileData"), oData.ComplaintID)) {
+                        return;
+                    }
                     response = await this.ajaxUpdateWithJQuery("HM_Complaint", payload);
                 } else {
                     response = await this.ajaxCreateWithJQuery("HM_Complaint", payload);
@@ -4857,6 +4847,9 @@ if (sLocale) {
                 MessageToast.show(
                     this.i18nModel.getText("ComplaintswithstatusInProgressResolvedcannotbeedited")
                 );
+                return;
+            }
+            if (!Formatter.canEditComplaintForBooking(oComplaint.BookingStatus)) {
                 return;
             }
             this._openComplaintDialog(oComplaint);

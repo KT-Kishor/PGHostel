@@ -66,10 +66,11 @@
                                 <!-- <Text text="{BookingView>DocumentType}"  emptyIndicatorMode="On"/> -->
                                 <!-- <Text text="{BookingView>DocumentName}" /> -->
                                 <Link
-                                text="{i18n>view}"
-                                press="MS_viewimage"
-                                class="documentLink"
-                            />
+                                    text="{i18n>view}"
+                                    press="MS_viewimage"
+                                    enabled="{= !!${BookingView>MemberID} }"
+                                    class="documentLink"
+                                />
                                 <Button
                                     icon="sap-icon://edit"
                                     type="Transparent"
