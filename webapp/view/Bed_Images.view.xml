@@ -116,7 +116,7 @@
                                             id="idR"
                                             value="{BedImageModel>/NoOfPerson}"
                                             placeholder="{i18n>enterNoofPerson}"
-                                            liveChange="onNumber"
+                                            liveChange="onPositiveIntegerInputLiveChange"
                                             maxLength="2"
                                             valueStateText="{i18n>enterNoofPerson}"
                                             editable="{editable>/Edit}"
@@ -127,7 +127,8 @@
                                             id="idBedExtrabed"
                                             value="{BedImageModel>/ExtraBed}"
                                             placeholder="{i18n>enterNoofExtraBed}"
-                                            liveChange="onPriceInputLiveChange"
+                                            valueStateText="{i18n>enterNoofExtraBed}"
+                                            liveChange="onPositiveIntegerInputLiveChange"
                                             maxLength="2"
                                             editable="{editable>/Edit}"
 
@@ -141,7 +142,7 @@
                                             id="id_MaxBeds"
                                             value="{BedImageModel>/MaxBeds}"
                                             placeholder="{i18n>enterNoofRooms}"
-                                            liveChange="onNumber"
+                                            liveChange="onPositiveIntegerInputLiveChange"
                                             maxLength="3"
                                             valueStateText="{i18n>enterMaxNoofRooms}"
                                             editable="{editable>/Edit}"
@@ -171,7 +172,7 @@
                                             width="100%"
                                             change="onDepositCurrency"
                                             placeholder="{i18n>selectCurrency}"
-                                            editable="{editable>/Edit}"
+                                            editable="false"
                                             showSecondaryValues="true"
                                         >
                                             <core:ListItem

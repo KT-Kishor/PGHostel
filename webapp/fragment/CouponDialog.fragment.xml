@@ -142,6 +142,7 @@
                         valueStateText="{i18n>selectCurrency}"
                         change="onChange_Currency"
                         showSecondaryValues="true"
+                        editable="false"
                     >
                         <core:ListItem
                             key="{CountryModel>currency}"

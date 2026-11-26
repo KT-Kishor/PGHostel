@@ -207,23 +207,9 @@ sap.ui.define([
         },
 
         onFacilityTypeChange: function(oEvent) {
-            var oComboBox = oEvent.getSource();
-            utils._LCvalidateMandatoryField(oEvent);
-
-            if (!oComboBox.getValue()) {
-                oComboBox.setValueState("None");
+            if (utils._LCstrictValidationComboBox(oEvent) && oEvent.getSource().getSelectedItem()) {
+                this._syncFacilityPricingFields();
             }
-
-            var oSelectedItem = oComboBox.getSelectedItem();
-            if (!oSelectedItem) {
-                this.byId("id_SelectionMode").unbindItems();
-                return;
-            }
-
-            var sFacilityID = oSelectedItem.getKey();
-            sFacilityID = parseInt(sFacilityID, 10);
-            // this._filterSelectionModes(sFacilityID);
-            this._syncFacilityPricingFields();
         },
 
         _filterSelectionModes: function(sFacilityID) {
@@ -487,7 +473,7 @@ sap.ui.define([
             if (
                 utils._LCstrictValidationComboBox(oView.byId("FD_id_RoomType123"), "ID") &&
                 utils._LCvalidateMandatoryField(oView.byId("FD_id_FacilityName"), "ID") &&
-                utils._LCvalidateMandatoryField(oView.byId("FD_id_FacilityName1"), "ID") &&
+                utils._LCstrictValidationComboBox(oView.byId("FD_id_FacilityName1"), "ID") &&
                 utils._LCstrictValidationComboBox(sap.ui.getCore().byId(oView.createId("id_SelectionMode")), "ID") &&
                 utils._LCstrictValidationComboBox(oView.byId("FD_id_Currency"), "ID")
             ) {

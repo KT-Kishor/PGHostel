@@ -81,17 +81,17 @@
                                         />
 										<m:ComboBox
                                             id="FD_id_FacilityName1"
-                                            items="{FacilityType>/}"
+                                            items="{FacilityTypeModel>/}"
                                             placeholder="{i18n>enterType}"
                                             value="{FacilitiesModel>/Type}"
                                             change=".onFacilityTypeChange"
                                             width="100%"
-                                            valueStateText="{i18n>enterFacilityType}"
+                                            valueStateText="{i18n>selectType}"
                                             editable="{editable>/Edit}"
                                         >
 											<core:Item
-                                                key="{FacilityType>ID}"
-                                                text="{FacilityType>FacilityName}"
+                                                key="{FacilityTypeModel>ID}"
+                                                text="{FacilityTypeModel>FacilityName}"
                                             />
 										</m:ComboBox>
 										<m:Label
@@ -235,7 +235,7 @@
                                             width="100%"
                                             change=".onFacilitybranchChange"
                                             placeholder="{i18n>selectCurrency}"
-                                            editable="{editable>/Edit}"
+                                            editable="false"
                                         >
 											<c:Item
                                                 key="{CurrencyModel>currency}"

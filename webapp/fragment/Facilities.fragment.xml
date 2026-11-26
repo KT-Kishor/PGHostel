@@ -27,7 +27,7 @@
                     items="{BranchModel>/}"
                     showSecondaryValues="true"
                     change=".onFacilitybranchChange"
-                    valueStateText="{i18n>selectPropertyName}"
+                    valueStateText="{i18n>SelectPropertyName}"
                 >
 					<core:ListItem
                         key="{BranchModel>BranchID}"
@@ -56,7 +56,7 @@
                     items="{FacilityTypeModel>/}"
                     value="{FacilitiesModel>/Type}"
                     placeholder="{i18n>enterType}"
-                    valueStateText="{i18n>enterType}"
+                    valueStateText="{i18n>selectType}"
                     change="onFacilityTypeChange"
                 >
 					<core:Item
@@ -186,6 +186,7 @@
                 />
 				<ComboBox
                     id="FL_id_Currency"
+                    editable="false"
                     selectedKey="{FacilitiesModel>/Currency}"
                     items="{path:'CountryModel>/',length:1000}"
                     placeholder="{i18n>selectCurrency}"

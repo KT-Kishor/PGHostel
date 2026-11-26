@@ -10,6 +10,7 @@ sap.ui.define([
     return BaseController.extend("sap.ui.com.project1.controller.Bed_Details", {
         Formatter: Formatter,
         onInit: function() {
+            this.getView().setModel(new sap.ui.model.json.JSONModel([]), "BedTypeFilterModel");
             this.getOwnerComponent().getRouter().getRoute("RouteBedDetails").attachMatched(this._onRouteMatched, this);
         },
 
@@ -133,27 +134,7 @@ sap.ui.define([
             }
         },
 
-        onPriceInputLiveChange: function(oEvent) {
-            const oInput = oEvent.getSource();
-            let sValue = oInput.getValue();
-
-            // Allow digits and one decimal point
-            sValue = sValue.replace(/[^0-9.]/g, "");
-
-            // Allow only one decimal point
-            const aParts = sValue.split(".");
-            if (aParts.length > 2) {
-                sValue = aParts[0] + "." + aParts[1];
-            }
-
-            // Limit to 2 decimal places
-            if (aParts[1]) {
-                aParts[1] = aParts[1].substring(0, 2);
-                sValue = aParts[0] + "." + aParts[1];
-            }
-
-            oInput.setValue(sValue);
-        },
+        onPositiveIntegerInputLiveChange: utils.onPositiveIntegerInputLiveChange,
 
         HM_RoomDetails: function(oEvent) {
             if (this.ARD_Dialog) {
@@ -212,8 +193,9 @@ sap.ui.define([
                 utils._LCstrictValidationComboBox(oView.byId("BD_id_RoomType12"), "ID") &&
                 utils._LCvalidateMandatoryField(oView.byId("BD_idBedType"), "ID") &&
                 utils._LCstrictValidationComboBox(oView.byId("BD_id_Roomtype"), "ID") &&
-                utils.onNumber(oView.byId("BD_id_Person"), "ID") &&
-                utils._LCvalidateMandatoryField(oView.byId("BD_id_MaxBeds"), "ID") &&
+                utils.validatePositiveIntegerInput(oView.byId("BD_id_Person")) &&
+                utils.validatePositiveIntegerInput(oView.byId("idExtrabed"), true) &&
+                utils.validatePositiveIntegerInput(oView.byId("BD_id_MaxBeds")) &&
                 utils.onNumber(oView.byId("BD_id_DepositAmount"), "ID") &&
                 utils._LCstrictValidationComboBox(oView.byId("BD_id_DepositCurrency"), "ID") &&
                 utils._LCvalidateMandatoryField(oView.byId("BD_id_Description"), "ID")
@@ -516,15 +498,13 @@ sap.ui.define([
             const omainModel = this.getOwnerComponent().getModel("mainModel")?.getData() || [];
 
             var oView = this.getView();
-            var oTable = oView.byId("id_BedTable");
-            var oBinding = oTable.getBinding("items");
+            const oBranchCombo = oView.byId("PO_id_Branch");
 
-            var sCustomerName = oView.byId("PO_id_CustomerName").getSelectedKey() ||
+            var sBedType = oView.byId("PO_id_CustomerName").getSelectedKey() ||
                 oView.byId("PO_id_CustomerName").getValue();
-            var sCustomerID = oView.byId("PO_id_CompanyName").getSelectedKey() ||
+            var sRoomType = oView.byId("PO_id_CompanyName").getSelectedKey() ||
                 oView.byId("PO_id_CompanyName").getValue();
-            var sBranch = oView.byId("PO_id_Branch").getSelectedKey() ||
-                oView.byId("PO_id_Branch").getValue();
+            const sBranch = oBranchCombo.getSelectedKey() || oBranchCombo.getValue().split("-")[0].trim();
 
             let aBranchCodes = [];
 
@@ -551,23 +531,35 @@ sap.ui.define([
                 };
             }
 
-            if (sCustomerName) filters.Name = sCustomerName;
-            if (sCustomerID) filters.ACType = sCustomerID;
-            if (sBranch) filters.BranchCode = sBranch.split('-')[0];
+            const oSearchFilters = { ...filters };
+            if (sBedType) oSearchFilters.Name = sBedType;
+            if (sRoomType) oSearchFilters.ACType = sRoomType;
+            if (sBranch) oSearchFilters.BranchCode = sBranch;
 
             if (!bBusyAlreadyOpen) {
                 this.getBusyDialog();
             }
 
-            return this.ajaxReadWithJQuery("HM_BedType", filters)
-                .then((oData) => {
+            const pSearch = this.ajaxReadWithJQuery("HM_BedType", oSearchFilters);
+            let pAllBeds = null;
+            // Keep dropdown options independent of the filtered table results.
+            if (!sBedType && !sRoomType && !sBranch) {
+                pAllBeds = pSearch;
+            } else if (flag === "true" || !this._originalBedData) {
+                pAllBeds = this.ajaxReadWithJQuery("HM_BedType", filters);
+            }
 
-                    let response = Array.isArray(oData.data) ? oData.data : [oData.data];
+            return Promise.all([pSearch, pAllBeds])
+                .then(([oData, oAllBeds]) => {
+                    const getBeds = ({ data }) => Array.isArray(data) ? data : (data ? [data] : []);
+                    if (oAllBeds) {
+                        this._originalBedData = getBeds(oAllBeds);
+                    }
 
-                    const branchData = this.getView().getModel("BranchModel")?.getData() || [];
+                    const branchData = oView.getModel("BranchModel")?.getData() || [];
 
                     // Map BranchCode to BranchName directly in response
-                    response = response.map(bed => {
+                    const response = getBeds(oData).map(bed => {
                         const branch = branchData.find(br => br.BranchID === bed.BranchCode);
                         return {
                             ...bed,
@@ -577,32 +569,8 @@ sap.ui.define([
                         };
                     });
 
-                    if (!response || response.length === 0) {
-                        this._originalBedData = [];
-                        const emptyModel = new sap.ui.model.json.JSONModel([]);
-                        this.getView().setModel(emptyModel, "BedDetails");
-                        return;
-                    }
-
-                    if (!this._originalBedData || flag === "true" || flag === undefined || this._originalBedData.length === 0) {
-                        this._originalBedData = response;
-                    }
-
-
-                    if (Object.keys(filters).length === 0) {
-                        const model = new sap.ui.model.json.JSONModel(this._originalBedData);
-                        this.getView().setModel(model, "BedDetails");
-
-                        this._populateUniqueFilterValues(this._originalBedData);
-                        return;
-                    }
-
-                    const filteredData = response;
-
-                    const model = new sap.ui.model.json.JSONModel(filteredData);
-                    this.getView().setModel(model, "BedDetails");
-
-                    this._populateUniqueFilterValues(this._originalBedData);
+                    oView.setModel(new sap.ui.model.json.JSONModel(response), "BedDetails");
+                    this._populateBedTypeFilterValues(oBranchCombo.getSelectedKey());
                 })
                 .catch((err) => {
                     console.error("Error in search", err);
@@ -613,60 +581,21 @@ sap.ui.define([
                 });
         },
 
-        _populateUniqueFilterValues: function(data) {
-            let oView = this.getView();
+        _populateBedTypeFilterValues: function(sBranchCode) {
+            const aNames = (this._originalBedData || [])
+                .filter(bed => !sBranchCode || bed.BranchCode === sBranchCode)
+                .map(bed => bed.Name)
+                .filter(Boolean);
+            const aBedTypes = Array.from(new Set(aNames)).sort().map(Name => ({ Name }));
+            const oModel = this.getView().getModel("BedTypeFilterModel");
+            oModel.setSizeLimit(Math.max(100, aBedTypes.length));
+            oModel.setData(aBedTypes);
+        },
 
-            // ===== Customer Unique =====
-            let oCustomerCombo = oView.byId("PO_id_CustomerName");
-            oCustomerCombo.destroyItems();
-
-            let uniqueCustomers = new Set();
-
-            data.forEach(item => {
-                if (item.Name) {
-                    uniqueCustomers.add(item.Name);
-                }
-            });
-
-            Array.from(uniqueCustomers).sort().forEach(name => {
-                    oCustomerCombo.addItem(
-                        new sap.ui.core.Item({
-                            key: name,
-                            text: name
-                        })
-                    );
-                });
-
-            // ===== Branch Unique =====
-            // let oBranchCombo = oView.byId("PO_id_Branch");
-            // oBranchCombo.destroyItems();
-
-            // let uniqueBranches = new Map();
-
-            // data.forEach(item => {
-
-            //     if (item.BranchID && !uniqueBranches.has(item.BranchID)) {
-
-            //         uniqueBranches.set(item.BranchID, {
-            //             BranchID: item.BranchID,
-            //             BranchName: item.BranchName,
-            //             City: item.City
-            //         });
-
-            //     }
-            // });
-
-            // Array.from(uniqueBranches.values()).sort((a, b) => a.BranchID.localeCompare(b.BranchID)).forEach(item => {
-            //         oBranchCombo.addItem(
-            //             new sap.ui.core.ListItem({
-            //                 key: item.BranchID,
-            //                 text: item.BranchID + " - " + item.BranchName,
-            //                 additionalText: item.City
-            //             })
-            //         );
-
-            //     });
-
+        BD_onBranchSelectionChange: function(oEvent) {
+            const oSelectedItem = oEvent.getParameter("selectedItem");
+            this.byId("PO_id_CustomerName").setSelectedKey("").setValue("");
+            this._populateBedTypeFilterValues(oSelectedItem ? oSelectedItem.getKey() : "");
         },
 
         HM_onSearch: function() {
@@ -695,10 +624,10 @@ sap.ui.define([
         },
 
         PO_onPressClear: function() {
-            this.getView().byId("PO_id_CustomerName").setSelectedKey("")
-            this.getView().byId("PO_id_CompanyName").setSelectedKey("")
-            this.getView().byId("PO_id_Branch").setSelectedKey("")
-
+            this.byId("PO_id_CustomerName").setSelectedKey("").setValue("");
+            this.byId("PO_id_CompanyName").setSelectedKey("");
+            this.byId("PO_id_Branch").setSelectedKey("").setValue("");
+            this._populateBedTypeFilterValues("");
         },
 
         onbranchChange: function(oEvent) {

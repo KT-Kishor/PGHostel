@@ -1034,7 +1034,7 @@
                     <!-- Confirm -->
                     <Button
                         id="btnGenerateInvoice"
-                        text="{i18n>InvoiceAddBtn}"
+                        text="{i18n>goToInvoice}"
                         class="myUnifiedBtn"
                         press="onGenerateInvoice"
                         visible="{= ${CustomerData>/Status} === 'Assigned' &amp;&amp; !${VisibleModel>/visible}}"

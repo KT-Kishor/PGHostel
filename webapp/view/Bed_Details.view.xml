@@ -43,6 +43,7 @@
                             <ComboBox
                                 id="PO_id_Branch"
                                  items="{BranchModel>/}"
+                                selectionChange="BD_onBranchSelectionChange"
                                 showClearIcon="true"
                                 showSecondaryValues="true"
                             >
@@ -64,12 +65,12 @@
                         <fb:control>
                             <ComboBox
                                 id="PO_id_CustomerName"
-                                items="{BedDetails>/}"
+                                items="{BedTypeFilterModel>/}"
                                 showClearIcon="true"
                             >
                                 <core:Item
-                                    key="{BedDetails>Name}"
-                                    text="{BedDetails>Name}"
+                                    key="{BedTypeFilterModel>Name}"
+                                    text="{BedTypeFilterModel>Name}"
                                 />
                             </ComboBox>
                         </fb:control>
@@ -107,7 +108,7 @@
                 mode="MultiSelect"
                 width="auto"
                 busyIndicatorDelay="0"
-                items="{path: 'BedDetails>/', sorter: {path: 'BranchName',descending: false,group: true},groupHeaderFactory: '.getGroupHeader'}"
+                items="{path: 'BedDetails>/', sorter: [{path: 'BranchName', descending: false, group: true}, {path: 'Name', descending: false}], groupHeaderFactory: '.getGroupHeader'}"
             >
                 <headerToolbar>
                     <OverflowToolbar>

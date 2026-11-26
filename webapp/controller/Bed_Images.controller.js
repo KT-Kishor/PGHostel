@@ -44,6 +44,7 @@ sap.ui.define([
                     "idBedType",
                     "idRoomtype",
                     "idR",
+                    "idBedExtrabed",
                     "id_MaxBeds",
                     "id_Description"
                 ];
@@ -260,6 +261,8 @@ sap.ui.define([
             utils.onNumber(oEvent.getSource(), "ID");
         },
 
+        onPositiveIntegerInputLiveChange: utils.onPositiveIntegerInputLiveChange,
+
         BT_onsavebuttonpress: async function() {
             var oView = this.getView();
             var Payload = oView.getModel("BedImageModel").getData();
@@ -268,8 +271,9 @@ sap.ui.define([
                 utils._LCstrictValidationComboBox(oView.byId("idRoomType12"), "ID") &&
                 utils._LCvalidateMandatoryField(oView.byId("idBedType"), "ID") &&
                 utils._LCstrictValidationComboBox(oView.byId("idRoomtype"), "ID") &&
-                utils.onNumber(oView.byId("idR"), "ID") &&
-                utils._LCvalidateMandatoryField(oView.byId("id_MaxBeds"), "ID") &&
+                utils.validatePositiveIntegerInput(oView.byId("idR")) &&
+                utils.validatePositiveIntegerInput(oView.byId("idBedExtrabed"), true) &&
+                utils.validatePositiveIntegerInput(oView.byId("id_MaxBeds")) &&
                 utils.onNumber(oView.byId("id_DepositAmount"), "ID") &&
                 utils._LCstrictValidationComboBox(oView.byId("id_DepositCurrency"), "ID") &&
 
@@ -330,9 +334,9 @@ sap.ui.define([
                         BranchCode: Payload.BranchCode,
                         Name: Payload.Name.trim(),
                         ACType: Payload.ACType,
-                        NoOfPerson: Payload.NoOfPerson.trim(),
+                        NoOfPerson: String(Payload.NoOfPerson).trim(),
                         ExtraBed: Payload.ExtraBed,
-                        MaxBeds: Payload.MaxBeds.trim(),
+                        MaxBeds: String(Payload.MaxBeds).trim(),
                         Deposit: Payload.Deposit.trim(),
                         DepositCurrency: Payload.DepositCurrency,
                         Description: Payload.Description
@@ -557,28 +561,6 @@ sap.ui.define([
                     oSource.clear();
                 }
             }
-        },
-
-        onPriceInputLiveChange: function(oEvent) {
-            const oInput = oEvent.getSource();
-            let sValue = oInput.getValue();
-
-            // Allow digits and one decimal point
-            sValue = sValue.replace(/[^0-9.]/g, "");
-
-            // Allow only one decimal point
-            const aParts = sValue.split(".");
-            if (aParts.length > 2) {
-                sValue = aParts[0] + "." + aParts[1];
-            }
-
-            // Limit to 2 decimal places
-            if (aParts[1]) {
-                aParts[1] = aParts[1].substring(0, 2);
-                sValue = aParts[0] + "." + aParts[1];
-            }
-
-            oInput.setValue(sValue);
         },
 
         onImagePress: function(oEvent) {

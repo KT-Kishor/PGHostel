@@ -1,6 +1,28 @@
 sap.ui.define([], function() {
     "use strict";
+    const rPositiveInteger = /^0*[1-9]\d*$/;
+
     return {
+        onPositiveIntegerInputLiveChange: function(oEvent) {
+            const oInput = oEvent.getSource();
+            const sValue = oEvent.getParameter("value");
+
+            if (sValue !== "" && !rPositiveInteger.test(sValue)) {
+                // Restore the last accepted value instead of rewriting invalid input as a count.
+                oInput.setValue(oInput.getProperty("value"));
+                return;
+            }
+
+            oInput.setValue(sValue).setValueState("None");
+        },
+
+        validatePositiveIntegerInput: function(oInput, bOptional = false) {
+            const sValue = oInput.getValue();
+            const bValid = rPositiveInteger.test(sValue) || (bOptional && sValue === "");
+            oInput.setValueState(bValid ? "None" : "Error");
+            return bValid;
+        },
+
         // Validate mobile number
         _LCvalidateMobileNumber: function(oEvent, type) {
             var oField = type === "ID" ? oEvent : oEvent.getSource();

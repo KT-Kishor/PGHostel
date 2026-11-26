@@ -60,6 +60,7 @@
                     id="BD_id_Roomtype"
                     selectedKey="{BedModel>/ACType}"
                     change="onDepositCurrency"
+                    
                     placeholder="{i18n>selectRoomType}"
                     valueStateText="{i18n>selectRoomType}"
                 >
@@ -82,7 +83,7 @@
                     value="{BedModel>/NoOfPerson}"
                     placeholder="{i18n>enterNoofPerson}"
                     valueStateText="{i18n>enterNoofPerson}"
-                    liveChange="onNoOfPersonInputLiveChange"
+                    liveChange="onPositiveIntegerInputLiveChange"
                     maxLength="2"
                 />
 
@@ -91,7 +92,8 @@
                     id="idExtrabed"
                     value="{BedModel>/ExtraBed}"
                     placeholder="{i18n>enterNoofExtraBed}"
-                    liveChange="onPriceInputLiveChange"
+                    valueStateText="{i18n>enterNoofExtraBed}"
+                    liveChange="onPositiveIntegerInputLiveChange"
                     maxLength="2"
                 />
 
@@ -105,7 +107,7 @@
                     placeholder="{i18n>enterNoofRooms}"
                     valueStateText="{i18n>enterNoofRooms}"
                     maxLength="3"
-                    liveChange="onNoOfPersonInputLiveChange"
+                    liveChange="onPositiveIntegerInputLiveChange"
                 />
                 <Label
                     text="Deposit Amount"
@@ -126,6 +128,7 @@
                 />
                 <ComboBox
                     id="BD_id_DepositCurrency"
+                    editable="false"
                     selectedKey="{BedModel>/DepositCurrency}"
                     items="{path:'CountryModel>/',length:1000}"
                     valueStateText="{i18n>selectCurrency}"

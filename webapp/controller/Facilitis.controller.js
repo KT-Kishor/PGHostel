@@ -314,7 +314,7 @@ sap.ui.define([
             var isMandatoryValid = (
                 utils._LCstrictValidationComboBox(sap.ui.getCore().byId(oView.createId("idRoomType123")), "ID") &&
                 utils._LCvalidateMandatoryField(sap.ui.getCore().byId(oView.createId("idFacilityName")), "ID") &&
-                utils._LCvalidateMandatoryField(sap.ui.getCore().byId(oView.createId("idFacilityName1")), "ID") &&
+                utils._LCstrictValidationComboBox(sap.ui.getCore().byId(oView.createId("idFacilityName1")), "ID") &&
                 utils._LCstrictValidationComboBox(sap.ui.getCore().byId(oView.createId("idSelectionMode")), "ID") &&
                 utils._LCstrictValidationComboBox(sap.ui.getCore().byId(oView.createId("FL_id_Currency")), "ID")
             );
@@ -560,23 +560,9 @@ sap.ui.define([
         },
 
         onFacilityTypeChange: function (oEvent) {
-            var oComboBox = oEvent.getSource();
-            utils._LCvalidateMandatoryField(oEvent);
-
-            if (!oComboBox.getValue()) {
-                oComboBox.setValueState("None");
+            if (utils._LCstrictValidationComboBox(oEvent) && oEvent.getSource().getSelectedItem()) {
+                this._syncFacilityPricingFields();
             }
-
-            var oSelectedItem = oComboBox.getSelectedItem();
-            if (!oSelectedItem) {
-                this.byId("idSelectionMode").unbindItems();
-                return;
-            }
-
-            // var sFacilityID = oSelectedItem.getKey();
-            // sFacilityID = parseInt(sFacilityID, 10);
-            // this._filterSelectionModes(sFacilityID);
-            this._syncFacilityPricingFields();
         },
 
         _filterSelectionModes: function (sFacilityID) {
