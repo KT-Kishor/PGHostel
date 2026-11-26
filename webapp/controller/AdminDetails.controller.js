@@ -657,9 +657,16 @@ onChekout: function () {
                 const filteredMembers = AllMembers.filter(member =>
                     primaryMemberIDs.includes(member.MemberID)
                 );
-               const Docs = oCustomer.Documents || [];
+             const Docs = oCustomer.Documents || [];
 
-const aDocs = Docs.length > 1 ? [Docs[0]] : Docs;
+const aDocs = Docs.length > 1
+    ? Docs.filter(item =>
+        item.DocumentType?.includes("Aadhaar Card") ||
+        item.DocumentType?.includes("Driving License") ||
+        item.DocumentType?.includes("Pan Card") ||
+        item.DocumentType?.includes("Passport")        
+    )
+    : Docs;
 
 const Documents = filteredMembers.flatMap(member => {
     const memberDocs = aDocs.filter(
@@ -10942,9 +10949,9 @@ onDocumentDelete: function (oEvent) {
                 return {};
             }
 
-            if (Object.prototype.hasOwnProperty.call(this._mMemberDocumentCache, sCacheKey)) {
-                return this._mMemberDocumentCache[sCacheKey];
-            }
+            // if (Object.prototype.hasOwnProperty.call(this._mMemberDocumentCache, sCacheKey)) {
+            //     return this._mMemberDocumentCache[sCacheKey];
+            // }
 
             var oResponse = await this.ajaxReadWithJQuery("HM_Documentonly", {
                 MemberID: sCacheKey
@@ -10953,7 +10960,17 @@ onDocumentDelete: function (oEvent) {
                 (Array.isArray(oResponse?.HM_Documentonly) ? oResponse.HM_Documentonly :
                     (Array.isArray(oResponse?.Documents) ? oResponse.Documents :
                         (Array.isArray(oResponse?.data) ? oResponse.data : (oResponse?.data ? [oResponse.data] : []))));
-            var oDocument = aDocuments[0];
+                        if(aDocuments)
+
+var aDocs = aDocuments.length > 1
+    ? aDocuments.filter(item =>
+        item.DocumentType?.includes("Aadhaar Card") ||
+        item.DocumentType?.includes("Driving License") ||
+        item.DocumentType?.includes("Pan Card") ||
+        item.DocumentType?.includes("Passport")        
+    )
+    : aDocuments;
+            var oDocument = aDocs[0];
 
             if (!oDocument) {
                 this._mMemberDocumentCache[sCacheKey] = {};
