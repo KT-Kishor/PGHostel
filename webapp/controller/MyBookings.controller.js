@@ -1670,11 +1670,7 @@
                 this.getBusyDialog();
             }
             try {
-                var oResponse = await this.ajaxReadWithJQuery("HM_Complaint", { UserID: sUserID });
-                var aRaw = Array.isArray(oResponse && oResponse.data) ? oResponse.data :
-                    (oResponse && oResponse.data ? [oResponse.data] :
-                        (Array.isArray(oResponse && oResponse.ComplaintData) ? oResponse.ComplaintData :
-                            (Array.isArray(oResponse && oResponse.commentData) ? oResponse.commentData : [])));
+                var aRaw = await this._readComplaintsWithBookingStatus(sUserID);
                 var oBranchModel = this.getOwnerComponent().getModel("sBRModel");
                 var aBranches = oBranchModel ? oBranchModel.getProperty("/") || [] : [];
                 var aComplaints = aRaw.map(function (oComplaint) {
@@ -1684,6 +1680,7 @@
                     });
                     return {
                         BookingID: oComplaint.BookingID || "",
+                        BookingStatus: oComplaint.BookingStatus,
                         CustomerName: oComplaint.CustomerName || "",
                         ComplaintID: oComplaint.ComplaintID || oComplaint.ComplainID || oComplaint.ID || "",
                         ComplaintType: oComplaint.ComplaintType || "",
@@ -1854,7 +1851,7 @@
         },
 
         _getComplaintControl: function (sId) {
-            return sap.ui.getCore().byId(sId) || this.byId(sId);
+            return Fragment.byId(this.createId("complaintDialog"), sId);
         },
 
         _setComplaintRoomComboData: function (sBranchCode, sSelectedRoomNo) {
@@ -2036,7 +2033,11 @@
             this._openComplaintDialog();
         },
 
-        _openComplaintDialog: function (oComplaint) {
+        _openComplaintDialog: async function (oComplaint) {
+            if (this._bOpeningComplaintDialog) {
+                return;
+            }
+
             var oView = this.getView();
             var oModel = oView.getModel("myBookings");
             var oTempModel = oView.getModel("complaintTemp");
@@ -2068,9 +2069,26 @@
             this.BranchCode = sBranchCode;
             this._setComplaintRoomComboData(sBranchCode, oComplaint && oComplaint.RoomNo || "");
 
-            var fnOpen = function () {
-                this._oComplaintDialog.setTitle(oComplaint ? this.getView().getModel("i18n").getResourceBundle().getText("editComplaint") : this.getView().getModel("i18n").getResourceBundle().getText("raiseNewComplaint"));
-                this._oComplaintDialog.open();
+            this._bOpeningComplaintDialog = true;
+            try {
+                if (sBranchCode) {
+                    await this.onSearch().catch(function () {});
+                }
+                if (oView.bIsDestroyed) {
+                    return;
+                }
+
+                var oDialog = this._oComplaintDialog || await this.loadFragment({
+                    id: "complaintDialog",
+                    name: "sap.ui.com.project1.fragment.Complaint"
+                });
+                if (oView.bIsDestroyed) {
+                    return;
+                }
+
+                this._oComplaintDialog = oDialog;
+                oDialog.setTitle(this.getI18nText(oComplaint ? "editComplaint" : "raiseNewComplaint"));
+                oDialog.open();
                 this._resetComplaintValidationStates();
 
                 var oBranchCombo = this._getComplaintControl("idBranchCombo");
@@ -2092,23 +2110,14 @@
                 // (lock state stays as decided by the filter)
                 this._forceComplaintSelection("MP_id_AddCustComboBox", "/CustomerName", sSavedCustomer);
                 this._forceComplaintSelection("MP_id_AddBooking", "/BookingID", sSavedBookingID);
-            }.bind(this);
-
-            var pCustomerData = sBranchCode ? this.onSearch() : Promise.resolve([]);
-            pCustomerData.catch(function () {}).finally(function () {
-                if (!this._oComplaintDialog) {
-                    Fragment.load({
-                        name: "sap.ui.com.project1.fragment.Complaint",
-                        controller: this
-                    }).then(function (oDialog) {
-                        this._oComplaintDialog = oDialog;
-                        oView.addDependent(oDialog);
-                        fnOpen();
-                    }.bind(this));
-                } else {
-                    fnOpen();
+            } catch (oError) {
+                if (!oView.bIsDestroyed) {
+                    console.error("Failed to open complaint dialog:", oError);
+                    MessageToast.show(this.getI18nText("unableLoadComplaints"));
                 }
-            }.bind(this));
+            } finally {
+                this._bOpeningComplaintDialog = false;
+            }
         },
 
         // Restores a saved value on a complaint ComboBox without touching its lock state
@@ -2388,6 +2397,9 @@
             this.getBusyDialog();
             try {
                 if (oData.ComplaintID) {
+                    if (!await this._validateComplaintBookingForUpdate(this.getView().getModel("myBookings"), oData.ComplaintID)) {
+                        return;
+                    }
                     await this.ajaxUpdateWithJQuery("HM_Complaint", {
                         data: {
                             ComplaintType: oComplaintData.ComplaintType,
@@ -2429,6 +2441,9 @@
             var sStatus = String(oComplaint.ComplaintStatus || "").trim().toLowerCase();
             if (["in progress", "resolved"].indexOf(sStatus) > -1) {
                 MessageToast.show(this.getView().getModel("i18n").getResourceBundle().getText("complaintsStatusProgress"));
+                return;
+            }
+            if (!Formatter.canEditComplaintForBooking(oComplaint.BookingStatus)) {
                 return;
             }
             this._openComplaintDialog(oComplaint);

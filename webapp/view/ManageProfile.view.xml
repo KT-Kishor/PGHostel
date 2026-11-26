@@ -748,6 +748,7 @@
                             press="onPressComplaintRow"
                             tooltip="{i18n>editComplaint}"
                             visible="{path: 'profileData>ComplaintStatus', formatter: '.Formatter.canEditComplaint'}"
+                            enabled="{path: 'profileData>BookingStatus', formatter: '.Formatter.canEditComplaintForBooking'}"
                             class="myUnifiedBtn"
                         />
                     </cells>
