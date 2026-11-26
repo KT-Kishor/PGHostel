@@ -291,16 +291,7 @@
         },
 
         /**
-         * Fetches the document of a single member on demand from
-         * HM_Documentonly (filtered by MemberID). Responses are cached
-         * per MemberID so repeat views/edits do not re-download the file.
-         *
-         * Only the MemberID of the pressed row is queried. There is no
-         * UserID fallback: a member without a document must resolve to
-         * "no document", never to the logged-in user's document.
-         *
-         * @param {string} sMemberID MemberID of the row (e.g. "00008_01")
-         * @returns {Promise<object>} normalized document, or {} when none
+         * Fetches and caches the first eligible document for the pressed member.
          */
         _fetchMemberDocument: async function (sMemberID) {
             var sCacheKey = sMemberID || "";
@@ -317,20 +308,7 @@
                 return this._mMemberDocumentCache[sCacheKey];
             }
 
-            var oResponse = await this.ajaxReadWithJQuery("HM_Documentonly", {
-                MemberID: sMemberID
-            });
-
-            var aDocuments = Array.isArray(oResponse && oResponse.Documents) ?
-                oResponse.Documents :
-                (Array.isArray(oResponse && oResponse.data) ? oResponse.data : []);
-
-            // Guard against a backend that ignores/loosens the filter and
-            // returns documents belonging to another member.
-            var oDoc = (aDocuments || []).filter(function (oCandidate) {
-                return !oCandidate.MemberID ||
-                    String(oCandidate.MemberID) === String(sMemberID);
-            })[0] || null;
+            var oDoc = await this._readMemberIdentityDocument(sMemberID);
 
             if (!oDoc) {
                 // Cache the "no document" result as well so repeated clicks

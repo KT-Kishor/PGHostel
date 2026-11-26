@@ -14,18 +14,6 @@
 
     "use strict";
 
-    const BOOKING_DOCUMENT_TYPES = [
-        { key: "Aadhaar Card", textKey: "aadhaarCard" },
-        { key: "Passport", textKey: "passport" },
-        { key: "Pan Card", textKey: "panCard" },
-        { key: "Driving License", textKey: "drivingLicense" }
-    ];
-
-    function getBookingDocumentType(vDocumentType) {
-        const sType = String(vDocumentType || "").trim().replace(/\s+/g, " ").toLowerCase();
-        return BOOKING_DOCUMENT_TYPES.find(oType => oType.key.toLowerCase() === sType)?.key || "";
-    }
-
     return BaseController.extend("sap.ui.com.project1.controller.Booking", {
         Formatter: Formatter,
         onInit: function () {
@@ -316,10 +304,12 @@
                 showCustomerDocumentUpload: false,
                 maxPersons: 1,
                 originalPersonOptions: [],
-                DocumentTypeOptions: BOOKING_DOCUMENT_TYPES.map(oType => ({
-                    key: oType.key,
-                    text: oBundle.getText(oType.textKey)
-                })),
+                DocumentTypeOptions: [
+                    { key: "Aadhaar Card", text: "Aadhaar Card" },
+                    { key: "Passport", text: "Passport" },
+                    { key: "Pan Card", text: "Pan Card" },
+                    { key: "Driving License", text: "Driving License" },
+                ],
                 GenderOptions: [
                     { key: "Male", text: "Male" },
                     { key: "Female", text: "Female" },
@@ -2993,22 +2983,6 @@
             }
         },
 
-        _normalizeMemberDocument: function (oDocument) {
-            const sDocumentType = getBookingDocumentType(oDocument?.DocumentType);
-            const oAllowedDocument = sDocumentType ? oDocument : {};
-            const sFile = this._bufferToBase64(oAllowedDocument.File || oAllowedDocument.Document || oAllowedDocument.Attachment);
-
-            return {
-                DocumentID: oAllowedDocument.DocumentID || "",
-                DocumentType: sDocumentType,
-                DocumentName: oAllowedDocument.FileName || oAllowedDocument.DocumentName || "",
-                FileType: oAllowedDocument.FileType || "",
-                Document: sFile,
-                File: sFile,
-                DocumentFile: null
-            };
-        },
-
         _fetchMemberDocument: async function (sMemberID) {
             const sCacheKey = String(sMemberID || "").trim();
 
@@ -3020,64 +2994,55 @@
                 this._mMemberDocumentCache = {};
             }
 
-            const mCache = this._mMemberDocumentCache;
-            if (Object.prototype.hasOwnProperty.call(mCache, sCacheKey)) {
-                return mCache[sCacheKey];
+            if (Object.prototype.hasOwnProperty.call(this._mMemberDocumentCache, sCacheKey)) {
+                return this._mMemberDocumentCache[sCacheKey];
             }
 
-            const readDocument = async (oFilters) => {
-                const oResponse = await this.ajaxReadWithJQuery("HM_Documentonly", oFilters);
-                const aDocuments = [oResponse, oResponse?.HM_Documentonly, oResponse?.Documents, oResponse?.data]
-                    .find(Array.isArray) || (oResponse?.data ? [oResponse.data] : []);
+            const oDocument = await this._readMemberIdentityDocument(sMemberID);
 
-                for (const oCandidate of aDocuments) {
-                    if (!oCandidate || (oCandidate.MemberID && String(oCandidate.MemberID).trim() !== sCacheKey)) {
-                        continue;
-                    }
-                    const oDocument = this._normalizeMemberDocument(oCandidate);
-                    if (typeof oDocument.File === "string" && oDocument.File.trim()) {
-                        return Object.assign(oDocument, {
-                            Documents: [Object.assign({}, oCandidate, {
-                                DocumentType: oDocument.DocumentType,
-                                File: oDocument.File
-                            })]
-                        });
-                    }
-                }
-                return null;
+            if (!oDocument) {
+                this._mMemberDocumentCache[sCacheKey] = {};
+                return {};
+            }
+
+            const sFile = this._bufferToBase64(oDocument.File || "");
+            const oNormalized = {
+                DocumentID: oDocument.DocumentID || "",
+                DocumentType: oDocument.DocumentType || "",
+                DocumentName: oDocument.FileName || "",
+                FileName: oDocument.FileName || "",
+                FileType: oDocument.FileType || "",
+                MemberID: oDocument.MemberID || sMemberID,
+                UserID: oDocument.UserID || "",
+                Document: sFile,
+                File: sFile,
+                Attachment: sFile,
+                Documents: [Object.assign({}, oDocument, { File: sFile })]
             };
 
-            let oDocument;
-            try {
-                oDocument = await readDocument({
-                    MemberID: sCacheKey,
-                    DocumentType: BOOKING_DOCUMENT_TYPES.map(oType => oType.key).join(",")
-                });
-            } catch (oError) {
-                if (oError?.status === 401 || oError?.status === 403) {
-                    throw oError;
-                }
-            }
-
-            // A backend without CSV filter support may reject the request or return no match.
-            if (!oDocument) {
-                oDocument = await readDocument({ MemberID: sCacheKey });
-            }
-
-            const oResult = oDocument || Object.assign(this._normalizeMemberDocument(), { Documents: [] });
-            mCache[sCacheKey] = oResult;
-            return oResult;
+            this._mMemberDocumentCache[sCacheKey] = oNormalized;
+            return oNormalized;
         },
 
         _normalizeMemberRecord: function (oMember, iIndex) {
-            const aDocuments = (Array.isArray(oMember.Documents) ? oMember.Documents : [])
-                .filter(oDocument => getBookingDocumentType(oDocument?.DocumentType))
-                .map(oDocument => Object.assign({}, oDocument, {
-                    File: this._bufferToBase64(oDocument.File || oDocument.Document || oDocument.Attachment)
-                }));
-            const oMemberDocument = this._normalizeMemberDocument(oMember);
-            const oDocument = oMemberDocument.File || oMemberDocument.DocumentName
-                ? oMemberDocument : this._normalizeMemberDocument(aDocuments[0]);
+            const aDocuments = Array.isArray(oMember && oMember.Documents) ? oMember.Documents.map(function (oDocument) {
+                // Handle Buffer object for File field
+                const sFile = this._bufferToBase64(oDocument.File || "");
+                return Object.assign({}, oDocument, { File: sFile });
+            }.bind(this)) : [];
+
+            // Filter the document shown in the editor without dropping existing saved records.
+            const sTopLevelType = this._getAllowedMemberDocumentType(oMember.DocumentType);
+            const oTopLevelDocument = sTopLevelType ? oMember : {};
+            const oMemberDocument = aDocuments.find(oDocument => {
+                const sType = this._getAllowedMemberDocumentType(oDocument.DocumentType);
+                return sType && (!sTopLevelType || sType === sTopLevelType);
+            }) || {};
+            const sDocumentType = sTopLevelType || this._getAllowedMemberDocumentType(oMemberDocument.DocumentType);
+            const sDocumentName = oTopLevelDocument.DocumentName || oTopLevelDocument.FileName || oMemberDocument.FileName || "";
+            const sFile = this._bufferToBase64(oTopLevelDocument.File || oTopLevelDocument.Document || oMemberDocument.File || "");
+            const sFileType = oTopLevelDocument.FileType || oMemberDocument.FileType || "";
+            const sDocumentID = oTopLevelDocument.DocumentID || oMemberDocument.DocumentID || "";
 
             // Determine if this member is a Self member (case-insensitive)
             const sRelationRaw = oMember.Relation || "";
@@ -3102,7 +3067,13 @@
                 Age: oMember.Age || oMember.DateOfBirth || oMember.DateofBirth || "",
                 Gender: oMember.Gender || "",
                 Selected: !!oMember.Selected,
-                ...oDocument,
+                DocumentType: sDocumentType,
+                DocumentName: sDocumentName,
+                Document: sFile,
+                File: sFile,
+                FileType: sFileType,
+                DocumentID: sDocumentID,
+                DocumentFile: null,
                 Documents: aDocuments,
                 PendingDeletedDocumentIDs: Array.isArray(oMember.PendingDeletedDocumentIDs) ? oMember.PendingDeletedDocumentIDs.slice() : [],
                 IsPrimary: !!oMember.IsPrimary
@@ -3132,7 +3103,7 @@
 
             for (let i = 0; i < aDocumentSources.length; i += 1) {
                 let oDocument = aDocumentSources[i];
-                if (!getBookingDocumentType(oDocument?.DocumentType)) {
+                if (!this._getAllowedMemberDocumentType(oDocument?.DocumentType)) {
                     continue;
                 }
 
@@ -3186,7 +3157,7 @@
                 sAgeOrDOB = String(oHostelModel.getProperty("/DateOfBirth") || "").trim();
             }
 
-            const oPrimaryDocument = this._normalizeMemberDocument(this._getPrimaryDocumentRecord());
+            const oPrimaryDocument = this._getPrimaryDocumentRecord();
             return {
                 id: "SELF",
                 MemberID: oSelfMember && oSelfMember.MemberID || oHostelModel.getProperty("/UserID") || "",
@@ -3196,7 +3167,13 @@
                 Age: sAgeOrDOB,
                 Gender: sGender,
                 Selected: false,
-                ...oPrimaryDocument,
+                DocumentType: oPrimaryDocument.DocumentType || "",
+                DocumentName: oPrimaryDocument.DocumentName || oPrimaryDocument.FileName || "",
+                Document: oPrimaryDocument.Document || oPrimaryDocument.File || "",
+                File: oPrimaryDocument.File || oPrimaryDocument.Document || "",
+                FileType: oPrimaryDocument.FileType || "",
+                DocumentID: oPrimaryDocument.DocumentID || "",
+                DocumentFile: null,
                 IsPrimary: true
             };
         },
@@ -3601,32 +3578,24 @@
         },
         MS_viewimage: async function (oEvent) {
             const oPreviewData = oEvent.getSource().getBindingContext("BookingView")?.getObject();
-            const oBookingView = this.getView().getModel("BookingView");
 
             if (!oPreviewData || !oPreviewData.MemberID) {
                 sap.m.MessageToast.show(this.getView().getModel("i18n").getResourceBundle().getText("nodocfound"));
                 return;
             }
 
-            let oDocument;
             this.getBusyDialog();
             try {
-                oDocument = await this._fetchMemberDocument(oPreviewData.MemberID);
-                if (oDocument.File) {
-                    await this._openDocumentPreview(oDocument);
+                const oDocument = await this._fetchMemberDocument(oPreviewData.MemberID);
+                if (!oDocument.File) {
+                    MessageToast.show(this.getView().getModel("i18n").getResourceBundle().getText("nodocfound"));
                     return;
                 }
+                await this._openDocumentPreview(oDocument);
             } catch (oError) {
                 MessageToast.show(oError.message || oError.responseText || this.getView().getModel("i18n").getResourceBundle().getText("nodocfound"));
-                return;
             } finally {
                 this.closeBusyDialog();
-            }
-
-            if (oBookingView.getProperty("/editModeEnabled") === false) {
-                MessageToast.show(this.getView().getModel("i18n").getResourceBundle().getText("noDocumentUploaded"));
-            } else {
-                await this._openMemberEditor(oPreviewData, oDocument);
             }
         },
 
@@ -3815,19 +3784,17 @@
             this._attachDocumentInfoHover();
         },
 
-        onEditMemberFromDialog: function (oEvent) {
-            const oMember = oEvent.getSource().getBindingContext("BookingView")?.getObject();
-            return this._openMemberEditor(oMember);
-        },
-
-        _openMemberEditor: async function (oMember, oDocument) {
+        onEditMemberFromDialog: async function (oEvent) {
             const oBookingView = this.getView().getModel("BookingView");
+            const oContext = oEvent.getSource().getBindingContext("BookingView");
+            const oMember = oContext ? oContext.getObject() : null;
 
-            if (!oMember || oBookingView.getProperty("/editModeEnabled") === false) {
+            if (!oMember) {
                 return;
             }
 
-            if (!oDocument && oMember.MemberID) {
+            let oDocument = {};
+            if (oMember.MemberID) {
                 this.getBusyDialog();
                 try {
                     oDocument = await this._fetchMemberDocument(oMember.MemberID);
@@ -3840,12 +3807,11 @@
             }
 
             const oDialog = await this._getNewMemberDialog();
-            if (oBookingView.getProperty("/editModeEnabled") === false) {
-                return;
-            }
 
-            oBookingView.setProperty("/NewMemberDraft", Object.assign(this._normalizeMemberRecord(oMember), oDocument, {
-                IsEditMode: true
+            oBookingView.setProperty("/NewMemberDraft", Object.assign({}, this._normalizeMemberRecord(
+                Object.assign({}, oMember, oDocument)
+            ), {
+                IsEditMode: true,
             }));
             oBookingView.setProperty("/NewMemberDialogTitle", this.getView().getModel("i18n").getResourceBundle().getText("editMember"));
             oBookingView.setProperty("/NewMemberDialogSaveText", this.getView().getModel("i18n").getResourceBundle().getText("UpdateMember"));
@@ -3925,7 +3891,7 @@
             const oFile = oEvent.getParameter("files") && oEvent.getParameter("files")[0];
             if (!oFile) return;
 
-            const sDocType = getBookingDocumentType(oModel.getProperty("/NewMemberDraft/DocumentType"));
+            const sDocType = oModel.getProperty("/NewMemberDraft/DocumentType");
             if (!sDocType) {
                 MessageToast.show(this.getView().getModel("i18n").getResourceBundle().getText("pleaseSelectDocumentTypeFirst"));
                 if (oFileUploader) oFileUploader.clear();
@@ -4375,15 +4341,7 @@
                 return true;
             }
 
-            if (!utils._LCstrictValidationComboBox(oComboBox, "ID")) {
-                return false;
-            }
-
-            const oItem = oComboBox.getItems().find(oOption => oOption.getText() === sValue || oOption.getKey() === sValue);
-            if (oItem) {
-                oComboBox.setSelectedKey(oItem.getKey());
-            }
-            return true;
+            return utils._LCstrictValidationComboBox(oComboBox, "ID");
         },
 
         onSaveNewMember: async function () {
@@ -4506,7 +4464,7 @@
             oDraft.Name = String(oNameInput.getValue() || "").trim();
             oDraft.Gender = oGenderCombo.getSelectedKey() || String(oGenderCombo.getValue() || "").trim();
             oDraft.Relation = oRelationCombo.getSelectedKey() || String(oRelationCombo.getValue() || "").trim();
-            oDraft.DocumentType = getBookingDocumentType(oDocumentTypeCombo.getSelectedKey() || sDocumentTypeValue);
+            oDraft.DocumentType = oDocumentTypeCombo.getSelectedKey() || String(oDocumentTypeCombo.getValue() || "").trim();
             oDraft.Age = oDOBPicker ? oDOBPicker.getValue() || "" : "";
             oDraft.id = oDraft.id || ("FM_" + Date.now());
 
@@ -6924,11 +6882,11 @@
             ].join("/");
         },
 
-        formatDocumentFileName: function (sFileName, sFallback = "") {
+        formatDocumentFileName: function (sFileName) {
             const sName = String(sFileName || "").trim();
 
             if (sName.length <= 15) {
-                return sName || sFallback;
+                return sName;
             }
 
             return sName.slice(0, 15) + "...";

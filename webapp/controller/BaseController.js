@@ -9,6 +9,8 @@ sap.ui.define([
 ], function (Controller, JSONModel, Formatter, MessageToast) {
   "use strict";
 
+  const MEMBER_IDENTITY_DOCUMENT_TYPES = ["Aadhaar Card", "Pan Card", "Driving License", "Passport"];
+
   return Controller.extend("sap.ui.com.project1.controller.BaseController", {
     Formatter: Formatter,
     // Router Code 
@@ -29,6 +31,48 @@ sap.ui.define([
           }
         });
       });
+    },
+
+    _getAllowedMemberDocumentType(vDocumentType) {
+      const sType = String(vDocumentType || "").trim().replace(/\s+/g, " ").toLowerCase();
+      return MEMBER_IDENTITY_DOCUMENT_TYPES.find(sKey => sKey.toLowerCase() === sType) || "";
+    },
+
+    async _readMemberIdentityDocument(sMemberID) {
+      const oMemberFilter = { MemberID: sMemberID };
+      const sMemberKey = String(sMemberID).trim();
+      const fnReadDocument = async (oFilters) => {
+        const oResponse = await this.ajaxReadWithJQuery("HM_Documentonly", oFilters);
+        const aDocuments = [oResponse, oResponse?.HM_Documentonly, oResponse?.Documents, oResponse?.data]
+          .find(Array.isArray) || (oResponse?.data ? [oResponse.data] : []);
+
+        for (const oRow of aDocuments) {
+          if (!oRow || (oRow.MemberID && String(oRow.MemberID).trim() !== sMemberKey)) {
+            continue;
+          }
+
+          const sDocumentType = this._getAllowedMemberDocumentType(oRow.DocumentType);
+          if (sDocumentType) {
+            return { ...oRow, DocumentType: sDocumentType };
+          }
+        }
+        return null;
+      };
+
+      let oDocument;
+      try {
+        oDocument = await fnReadDocument({
+          ...oMemberFilter,
+          DocumentType: MEMBER_IDENTITY_DOCUMENT_TYPES.join(",")
+        });
+      } catch (oError) {
+        if (oError?.status === 401 || oError?.status === 403) {
+          throw oError;
+        }
+      }
+
+      // The backend may reject the CSV filter or treat it as a single type.
+      return oDocument || fnReadDocument(oMemberFilter);
     },
 
     async _readComplaintsWithBookingStatus(sUserID) {
