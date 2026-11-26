@@ -657,39 +657,43 @@ onChekout: function () {
                 const filteredMembers = AllMembers.filter(member =>
                     primaryMemberIDs.includes(member.MemberID)
                 );
+               const Docs = oCustomer.Documents || [];
 
+const aDocs = Docs.length > 1 ? [Docs[0]] : Docs;
 
-                const Documents = filteredMembers.flatMap(member => {
-                    const memberDocs = (oCustomer.Documents || []).filter(
-                        doc => doc.MemberID === member.MemberID
-                    );
+const Documents = filteredMembers.flatMap(member => {
+    const memberDocs = aDocs.filter(
+        doc => doc.MemberID === member.MemberID
+    );
 
-                    if (memberDocs.length > 0) {
-                        return memberDocs.map(doc => ({
-                            ...doc,
-                            MemberName: member.Name,
-                            DateOfBirth: this.Formatter.formatAgeFromDOBOrAge(member.DateOfBirth),
-                            Relation: member.Relation,
-                            Salutation: member.Salutation,
-                            Gender: member.Gender,
-                            IsPrimary: member.MemberID.trim() === primaryMemberID
-                        }));
-                    }
+    const bIsPrimary = member.MemberID.trim() === primaryMemberID;
 
-                    return [{
-                        MemberID: member.MemberID,
-                        MemberName: member.Name,
-                        DateOfBirth: member.DateOfBirth,
-                        Relation: member.Relation,
-                        Salutation: member.Salutation,
-                        Gender: member.Gender,
-                        DocumentID: "",
-                        DocumentName: "",
-                        FileName: "",
-                        FileUrl: "",
-                        IsPrimary: member.MemberID.trim() === primaryMemberID
-                    }];
-                });
+    if (memberDocs.length > 0) {
+        return memberDocs.map(doc => ({
+            ...doc,
+            MemberName: member.Name,
+            DateOfBirth: this.Formatter.formatAgeFromDOBOrAge(member.DateOfBirth),
+            Relation: member.Relation,
+            Salutation: member.Salutation,
+            Gender: member.Gender,
+            IsPrimary: bIsPrimary
+        }));
+    }
+
+    return [{
+        MemberID: member.MemberID,
+        MemberName: member.Name,
+        DateOfBirth: member.DateOfBirth,
+        Relation: member.Relation,
+        Salutation: member.Salutation,
+        Gender: member.Gender,
+        DocumentID: "",
+        DocumentName: "",
+        FileName: "",
+        FileUrl: "",
+        IsPrimary: bIsPrimary
+    }];
+});
 
                 // Final result object
                 const oData = {
