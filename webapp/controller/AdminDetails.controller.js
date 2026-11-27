@@ -10399,7 +10399,7 @@ onDocumentDelete: function (oEvent) {
             if (!oCopyData.Documents || !oCopyData.Documents.length) {
 
                 oCopyData.Documents = [{
-                    DocumentID: "",
+                    DocumentID:oDocument.DocumentID,
                     DocumentType: "",
                     FileName: "",
                     FileType: "",
@@ -10631,155 +10631,182 @@ onDocumentDelete: function (oEvent) {
             }
         },
 
-        onSaveNewMember: function () {
+       
+onSaveNewMember: async function () {
 
-            var oView = sap.ui.getCore();
+    var oMember = this.getView().getModel("BookingView")
+        .getProperty("/NewMemberDraft");
 
-            var oMember = this.getView().getModel("BookingView").getProperty("/NewMemberDraft");
+    var oDocument = oMember.Documents?.[0] || {};
+      var oView = sap.ui.getCore();
 
-            if (utils._LCstrictValidationComboBox(oView.byId("AD_idSelect"), "ID") &&
-                utils._LCvalidateMandatoryField(oView.byId("AD_id_MemberName"), "ID") &&
-                utils._LCvalidateDate(oView.byId("AD_id_MemberDOB"), "ID") &&
-                utils._LCstrictValidationComboBox(oView.byId("AD_id_MemberGenderCombo"), "ID") &&
-                (oMember.Relation === "Self" ||
-                    utils._LCstrictValidationComboBox(oView.byId("AD_id_MemberRelationCombo"), "ID")
-                )
-                //  && utils._LCstrictValidationComboBox(oView.byId("AD_id_DocumentType"), "ID")
-            ) {
+    // ================= MANDATORY VALIDATION =================
 
-                if (oMember.Documents[0].DocumentType) {
-                    if (oMember.Documents[0].File === "") {
-                        MessageToast.show(this.i18nModel.getText("Pleaseuploadadocument"))
-                        return
+    var bIsValid =
+        utils._LCstrictValidationComboBox(oView.byId("AD_idSelect"), "ID") &&
+        utils._LCvalidateMandatoryField(oView.byId("AD_id_MemberName"), "ID") &&
+        utils._LCvalidateDate(oView.byId("AD_id_MemberDOB"), "ID") &&
+        utils._LCstrictValidationComboBox(oView.byId("AD_id_MemberGenderCombo"), "ID") &&
+        (
+            oMember.Relation === "Self" ||
+            utils._LCstrictValidationComboBox(oView.byId("AD_id_MemberRelationCombo"), "ID")
+        );
+
+    if (!bIsValid) {
+        MessageToast.show(
+            this.i18nModel.getText("fillMandatoryFields")
+        );
+        return;
+    }
+
+    // ================= DOCUMENT VALIDATION =================
+
+    if (oDocument.DocumentType && !oDocument.File) {
+        MessageToast.show(
+            this.i18nModel.getText("Pleaseuploadadocument")
+        );
+        return;
+    }
+
+    try {
+
+        this.getBusyDialog();
+
+        // ================= DELETE EMPTY DOCUMENT =================
+
+        if (
+            !oDocument.File &&
+            oDocument.DocumentID
+        ) {
+            await this.ajaxDeleteWithJQuery(
+                "HM_CustomerDocument",
+                {
+                    filters: {
+                        DocumentID: oDocument.DocumentID
                     }
                 }
-                // ================= DOCUMENT VALIDATION =================
+            );
+        }
 
-                // if (
-                //     !oMember.Documents ||
-                //     !oMember.Documents[0] ||
-                //     !oMember.Documents[0].DocumentType
-                // ) {
+        // ================= MEMBER ID =================
 
-                //     sap.m.MessageToast.show(
-                //         "Please select document type"
-                //     );
+        if (this._mode === "CREATE") {
+            oMember.MemberID = this._generateMemberID();
+        }
 
-                //     return;
-                // }
+        // ================= PAYLOAD =================
 
-                // if (
-                //     (this._mode === "CREATE" || this._mode === "UPDATE") &&
-                //     !oMember.Documents[0].File
-                // ) {
+        var oMemberPayload = {
+            MemberID: oMember.MemberID || "",
+            Salutation: oMember.Salutation || "",
+            Name: oMember.Name || "",
+            Relation: oMember.Relation || "",
+            Gender: oMember.Gender || "",
+            UserID: oMember.UserID || "",
+            DateOfBirth: oMember.DateOfBirth
+                ? oMember.DateOfBirth.split("/").reverse().join("-")
+                : ""
+        };
 
-                //     sap.m.MessageToast.show(
-                //         "Please upload a document"
-                //     );
+        // Include document only when a file or document type exists
+        if (oDocument.File || oDocument.DocumentType) {
 
-                //     return;
-                // }
+            oMemberPayload.Documents = [{
+                DocumentID: this._mode === "UPDATE"
+                    ? oDocument.DocumentID || ""
+                    : "",
+                MemberID: oMember.MemberID,
+                UserID: oMember.UserID || "",
+                DocumentType: oDocument.DocumentType || "",
+                FileName: oDocument.FileName || "",
+                FileType: oDocument.FileType || "",
+                File: oDocument.File || ""
+            }];
 
-                // ================= MEMBER ID =================
+        } else {
+            oMemberPayload.Documents = [];
+        }
 
-                if (this._mode === "CREATE") {
+        var oPayload = {
+            Members: [oMemberPayload]
+        };
 
-                    oMember.MemberID =
-                        this._generateMemberID();
-                }
+        await this._uploadNewMemberDocument(oPayload);
 
-                // ================= PAYLOAD =================
+    } catch (error) {
 
-                const oPayload = {
-                    Members: [{
-                        MemberID: oMember.MemberID || "",
-                        Salutation: oMember.Salutation,
-                        Name: oMember.Name,
-                        Relation: oMember.Relation,
-                        Gender: oMember.Gender,
-                        UserID: oMember.UserID,
-                        DateOfBirth: oMember.DateOfBirth ? oMember.DateOfBirth.split("/").reverse().join("-") : "",
-                        Documents: [{
-                            DocumentID: this._mode === "UPDATE" ? oMember.Documents?.[0]?.DocumentID || "" : "",
-                            MemberID: oMember.MemberID || "",
-                            UserID: oMember.UserID || "",
-                            DocumentType: oMember.Documents?.[0]?.DocumentType || "",
-                            FileName: oMember.Documents?.[0]?.FileName || "",
-                            FileType: oMember.Documents?.[0]?.FileType || "",
-                            File: oMember.Documents?.[0]?.File || ""
-                        }]
-                    }]
-                };
+        console.error("Error saving member:", error);
 
-                this._uploadNewMemberDocument(oPayload);
+        MessageToast.show(
+            this.i18nModel.getText("Error Uploading Documents")
+        );
+
+    } finally {
+        this.closeBusyDialog();
+    }
+},
+
+
+       
+_uploadNewMemberDocument: async function (oDoc) {
+
+    var bIsCreate = this._mode === "CREATE";
+
+    var oModel = this.getView().getModel("BookingView");
+
+    var oDraft = oModel.getProperty("/NewMemberDraft");
+
+    try {
+
+        var aDocuments = oDoc.Members?.[0]?.Documents || [];
+
+        if (aDocuments.length > 0) {
+
+            if (bIsCreate) {
+
+                await this.ajaxCreateWithJQuery(
+                    "HM_MemberDocument",
+                    {
+                        data: [oDoc]
+                    }
+                );
 
             } else {
 
-                sap.m.MessageToast.show(
-                    this.i18nModel.getText(
-                        "fillMandatoryFields"
-                    )
+                await this.ajaxUpdateWithJQuery(
+                    "HM_MemberDocument",
+                    {
+                        data: [oDoc],
+                        filters: {
+                            DocumentID: oDraft.Documents?.[0]?.DocumentID
+                        }
+                    }
                 );
             }
-        },
+        }
 
-        _uploadNewMemberDocument: function (oDoc) {
+        delete this._mMemberDocumentCache[oDraft.MemberID];
 
-            this.getBusyDialog();
+        await this._refreshMemberList();
 
-            const isCreate =
-                this._mode === "CREATE";
+        this.MM_Dialog.close();
 
-            const oModel = this.getView().getModel("BookingView");
+        MessageToast.show(
+            this.i18nModel.getText("docUploadSuccess")
+        );
 
-            const oDraft = oModel.getProperty(
-                "/NewMemberDraft"
-            );
-            var DModel = new sap.ui.model.json.JSONModel(oDraft);
-            this.getView().setModel(DModel, "DraftModel");
-            const oPromise = isCreate ?
-                this.ajaxCreateWithJQuery(
-                    "HM_MemberDocument", {
-                    data: [oDoc]
-                }
-                )
+    } catch (error) {
 
-                :
-                this.ajaxUpdateWithJQuery(
-                    "HM_MemberDocument", {
-                    data: [oDoc],
-                    filters: {
-                        DocumentID: oDraft.Documents?.[0]?.DocumentID
-                    }
-                }
-                );
+        console.error("Member document upload error:", error);
 
-            oPromise.then(() => {
-                delete this._mMemberDocumentCache[oDraft.MemberID];
-                return this._refreshMemberList();
-            }).then(() => {
+        MessageToast.show(
+            this.i18nModel.getText("Error Uploading Documents")
+        );
 
-                this.MM_Dialog.close();
+        throw error;
+    }
+},
 
-                sap.m.MessageToast.show(
-                    this.i18nModel.getText(
-                        "docUploadSuccess"
-                    )
-                );
-
-            }).catch(() => {
-
-                sap.m.MessageToast.show(
-                    this.i18nModel.getText(
-                        "Error Uploading Documents"
-                    )
-                );
-
-            }).finally(() => {
-
-                this.closeBusyDialog();
-            });
-        },
 
         _generateMemberID: function () {
 
