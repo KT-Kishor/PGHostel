@@ -34,7 +34,6 @@
             // Initialize member data loading flags
             this._bMemberDataLoaded = false;
             this._bMemberDataLoading = false;
-            this._mMemberDocumentCache = {};
 
             // Resize observer to recalculate visible card count
             this._fnFacilityResizeHandler = this._onFacilityCarouselResize.bind(this);
@@ -278,7 +277,6 @@
                         const aMemberList = Array.isArray(oResponse.data) ? oResponse.data : [oResponse.data];
                         oHostelModel.setProperty("/MemberList", aMemberList)
                     }
-                    this._mMemberDocumentCache = {};
                     this._bMemberDataLoaded = true;
                     this._bMemberDataLoading = false;
                 })
@@ -408,7 +406,6 @@
             this._bFacilityCatalogReadFailed = false;
             this._aAllFacilities = [];
             this._iFacilityStartIndex = 0;
-            this._mMemberDocumentCache = {};
 
             if (oHostelModel) {
                 oHostelModel.setData({});
@@ -2983,47 +2980,6 @@
             }
         },
 
-        _fetchMemberDocument: async function (sMemberID) {
-            const sCacheKey = String(sMemberID || "").trim();
-
-            if (!sCacheKey) {
-                return {};
-            }
-
-            if (!this._mMemberDocumentCache) {
-                this._mMemberDocumentCache = {};
-            }
-
-            if (Object.prototype.hasOwnProperty.call(this._mMemberDocumentCache, sCacheKey)) {
-                return this._mMemberDocumentCache[sCacheKey];
-            }
-
-            const oDocument = await this._readMemberIdentityDocument(sMemberID);
-
-            if (!oDocument) {
-                this._mMemberDocumentCache[sCacheKey] = {};
-                return {};
-            }
-
-            const sFile = this._bufferToBase64(oDocument.File || "");
-            const oNormalized = {
-                DocumentID: oDocument.DocumentID || "",
-                DocumentType: oDocument.DocumentType || "",
-                DocumentName: oDocument.FileName || "",
-                FileName: oDocument.FileName || "",
-                FileType: oDocument.FileType || "",
-                MemberID: oDocument.MemberID || sMemberID,
-                UserID: oDocument.UserID || "",
-                Document: sFile,
-                File: sFile,
-                Attachment: sFile,
-                Documents: [Object.assign({}, oDocument, { File: sFile })]
-            };
-
-            this._mMemberDocumentCache[sCacheKey] = oNormalized;
-            return oNormalized;
-        },
-
         _normalizeMemberRecord: function (oMember, iIndex) {
             const aDocuments = Array.isArray(oMember && oMember.Documents) ? oMember.Documents.map(function (oDocument) {
                 // Handle Buffer object for File field
@@ -4345,6 +4301,7 @@
         },
 
         onSaveNewMember: async function () {
+            if (this._bSavingMember) return;
             const oBookingView = this.getView().getModel("BookingView");
             const oDraft = Object.assign({}, oBookingView.getProperty("/NewMemberDraft") || {});
             const aMasterMembers = oBookingView.getProperty("/MasterMembers") || [];
@@ -4499,7 +4456,8 @@
             // _saveMemberToBackend will fetch fresh data and update all models
 
             // Send member data to backend
-            this._saveMemberToBackend(oDraft, bIsEditMode).then(() => {
+            this._bSavingMember = true;
+            return this._saveMemberToBackend(oDraft, bIsEditMode).then(() => {
                 MessageToast.show(bIsEditMode ? this.getView().getModel("i18n").getResourceBundle().getText("memberUpdated") : this.getView().getModel("i18n").getResourceBundle().getText("memberAddedSuccessfully"));
                 this.onCloseNewMemberDialog();
                 this._syncMemberDialogSelections();
@@ -4509,7 +4467,9 @@
                 this._rebuildSelectedFacilities();
                 this._recalculateSummary();
             }).catch((oError) => {
-                MessageToast.show(this.getView().getModel("i18n").getResourceBundle().getText("failedSaveMember"), oError);
+                MessageToast.show(oError.message || oResourceBundle.getText("failedSaveMember"));
+            }).finally(() => {
+                this._bSavingMember = false;
             });
         },
 
@@ -4550,25 +4510,6 @@
 
             return sNewMemberID;
         },
-        _deletePendingMemberDocuments: async function (aDocumentIDs) {
-            const aUniqueDocumentIDs = [];
-
-            (Array.isArray(aDocumentIDs) ? aDocumentIDs : []).forEach(function (sDocumentID) {
-                sDocumentID = String(sDocumentID || "").trim();
-
-                if (sDocumentID && aUniqueDocumentIDs.indexOf(sDocumentID) < 0) {
-                    aUniqueDocumentIDs.push(sDocumentID);
-                }
-            });
-
-            for (let i = 0; i < aUniqueDocumentIDs.length; i += 1) {
-                await this.ajaxDeleteWithJQuery("HM_CustomerDocument", {
-                    filters: {
-                        DocumentID: aUniqueDocumentIDs[i]
-                    }
-                });
-            }
-        },
         _saveMemberToBackend: async function (oMember, bIsEditMode) {
             const oHostelModel = this.getView().getModel("HostelModel");
             const sUserID = oHostelModel.getProperty("/UserID") || "";
@@ -4582,10 +4523,6 @@
                 ? (oMember.MemberID || sUserID)
                 : (oMember.MemberID || oMember.id || "");
 
-            const aDeletedDocumentIDs = Array.isArray(oMember.PendingDeletedDocumentIDs)
-                ? oMember.PendingDeletedDocumentIDs.slice()
-                : [];
-
             const oMemberData = {
                 MemberID: sMemberID,
                 Salutation: oMember.Salutation || "",
@@ -4596,113 +4533,12 @@
                 UserID: sUserID
             };
 
-            const aExistingDocuments = Array.isArray(oMember.Documents)
-                ? oMember.Documents
-                : [];
-
-            // Keep existing documents except the ones user removed in edit mode
-            const aDocuments = aExistingDocuments
-                .filter(function (oDocument) {
-                    const sExistingDocumentID = String(oDocument && oDocument.DocumentID || "").trim();
-
-                    return !sExistingDocumentID || aDeletedDocumentIDs.indexOf(sExistingDocumentID) < 0;
-                })
-                .map(function (oDocument) {
-                    const oDocumentData = {
-                        DocumentType: oDocument.DocumentType || "",
-                        FileName: oDocument.FileName || oDocument.DocumentName || "",
-                        FileType: (oDocument.File || oDocument.Document) ? (oDocument.FileType || "") : "",
-                        MemberID: oDocument.MemberID || sMemberID,
-                        UserID: oDocument.UserID || sUserID,
-                        File: oDocument.File || oDocument.Document || ""
-                    };
-
-                    if (oDocument.DocumentID) {
-                        oDocumentData.DocumentID = oDocument.DocumentID;
-                    }
-
-                    return oDocumentData;
-                })
-                .filter(function (oDocument) {
-                    return !!(oDocument.File || oDocument.FileName);
-                });
-
-            // Merge the document currently shown in the dialog into the payload.
-            // If the user removed the old document and uploaded a new file,
-            // the old DocumentID will not be reused.
-            if (oMember.File || oMember.DocumentName) {
-                const oCurrentDocument = {
-                    DocumentType: oMember.DocumentType || "",
-                    FileName: oMember.DocumentName || "",
-                    FileType: (oMember.File || oMember.Document) ? (oMember.FileType || "") : "",
-                    MemberID: sMemberID,
-                    UserID: sUserID,
-                    File: oMember.File || oMember.Document || ""
-                };
-
-                if (
-                    bIsEditMode &&
-                    oMember.DocumentID &&
-                    aDeletedDocumentIDs.indexOf(String(oMember.DocumentID || "").trim()) < 0
-                ) {
-                    oCurrentDocument.DocumentID = oMember.DocumentID;
-                }
-
-                const iExistingIndex = aDocuments.findIndex(function (oDocument) {
-                    if (oCurrentDocument.DocumentID && oDocument.DocumentID) {
-                        return oDocument.DocumentID === oCurrentDocument.DocumentID;
-                    }
-
-                    return String(oDocument.DocumentType || "").trim() ===
-                        String(oCurrentDocument.DocumentType || "").trim();
-                });
-
-                if (iExistingIndex >= 0) {
-                    aDocuments[iExistingIndex] = Object.assign({}, aDocuments[iExistingIndex], oCurrentDocument);
-                } else {
-                    aDocuments.push(oCurrentDocument);
-                }
-            }
-
-            const aMembers = [];
-
-            if (oMemberData.Name) {
-                const oMemberWithDocuments = Object.assign({}, oMemberData);
-                oMemberWithDocuments.Documents = aDocuments;
-                aMembers.push(oMemberWithDocuments);
-            }
-
-            const oPayload = {
-                data: [
-                    {
-                        Members: aMembers
-                    }
-                ]
-            };
-
-            if (aMembers.length === 0) {
-                return Promise.resolve();
-            }
+            if (!oMemberData.Name) return;
 
             this.getBusyDialog();
 
             try {
-                const sEndpoint = "HM_MemberDocument";
-
-                // Important:
-                // In edit mode, delete removed backend document first,
-                // then continue with the normal update flow.
-                if (bIsEditMode && aDeletedDocumentIDs.length > 0) {
-                    await this._deletePendingMemberDocuments(aDeletedDocumentIDs);
-                }
-
-                const oResponse = bIsEditMode
-                    ? await this.ajaxUpdateWithJQuery(sEndpoint, oPayload)
-                    : await this.ajaxCreateWithJQuery(sEndpoint, oPayload);
-
-                if (this._mMemberDocumentCache) {
-                    delete this._mMemberDocumentCache[sMemberID];
-                }
+                const oResponse = await this._saveMemberWithIdentityDocument(oMemberData, oMember, !bIsEditMode);
 
                 // Refresh the lightweight member list after create/update.
                 const oMembersResponse = await this.ajaxReadWithJQuery("HM_Memberonly", {

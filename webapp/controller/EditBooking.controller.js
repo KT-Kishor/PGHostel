@@ -28,7 +28,6 @@ sap.ui.define([
             // Initialize member data loading flags
             this._bMemberDataLoaded = false;
             this._bMemberDataLoading = false;
-            this._mMemberDocumentCache = {};
 
             // Resize observer to recalculate visible card count
             this._fnFacilityResizeHandler = this._onFacilityCarouselResize.bind(this);
@@ -682,7 +681,6 @@ sap.ui.define([
             if (Array.isArray(this._aPrefetchedMemberList)) {
                 oHostelModel.setProperty("/MemberList", this._aPrefetchedMemberList);
                 this._aPrefetchedMemberList = null;
-                this._mMemberDocumentCache = {};
                 this._bMemberDataLoaded = true;
                 this._bMemberDataLoading = false;
                 return;
@@ -703,7 +701,6 @@ sap.ui.define([
                             const aMembers = Array.isArray(oResponse.data) ? oResponse.data : [oResponse.data];
                             oHostelModel.setProperty("/MemberList", aMembers);
                         }
-                        this._mMemberDocumentCache = {};
                         this._bMemberDataLoaded = true;
                         this._bMemberDataLoading = false;
                     })

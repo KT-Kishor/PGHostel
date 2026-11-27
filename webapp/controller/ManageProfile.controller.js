@@ -98,10 +98,6 @@ sap.ui.define([
                 hasAssignedBooking: false
             }), "profileData");
 
-            // Cache of member documents fetched on demand from
-            // HM_Documentonly, keyed by MemberID.
-            this._mMemberDocumentCache = {};
-
             var today = new Date();
             // var maxDate = new Date(today.getFullYear() - 18, today.getMonth(), today.getDate());
             var oDateModel = new sap.ui.model.json.JSONModel();
@@ -1270,7 +1266,8 @@ var sLanguageText = oLocaleMap[sLanguage] || "English";
             try {
                 oDoc = await this._fetchMemberDocument(oData.MemberID);
             } catch (err) {
-                // Dialog still opens; the document block is simply empty.
+                MessageToast.show(this.getI18nText("BK_unableLoadMember"));
+                return;
             } finally {
                 this.closeBusyDialog();
             }
@@ -1287,19 +1284,8 @@ var sLanguageText = oLocaleMap[sLanguage] || "English";
             const sDocFileType = bHasDocContent ? (oDoc.FileType || "") : "";
             const sDocContent = oDoc.Attachment || oDoc.File || "";
 
-            // DocumentID is kept even without content so the next save updates
-            // the existing record instead of creating a duplicate.
             this._existingFileData = {
-                DateOfBirth: sDateOfBirth || "",
-                Gender: oData.Gender || "",
-                Relation: oData.Relation || "",
-                MemberID: oData.MemberID || "",
                 UserID: sEditUserID,
-                Salutation: oData.Salutation,
-                DocumentID: oDoc.DocumentID || "",
-                FileName: sDocName,
-                FileType: sDocFileType,
-                File: sDocContent,
                 DocumentType: sDocType
             };
 
@@ -2317,32 +2303,11 @@ if (sLocale) {
                     this.getView().getModel("profileData").getProperty("/UserID") ||
                     "";
 
-                const sDocumentID = this._mode === "UPDATE" ?
-                    ((this._existingFileData && this._existingFileData.DocumentID) || "") :
-                    "";
-
-                const oPayload = {
-                    Members: [{
-                        MemberID: oMember.MemberID,
-                        Salutation: oMember.Salutation,
-                        Name: oMember.Name,
-                        Relation: oMember.Relation,
-                        Gender: oMember.Gender,
-                        UserID: sUserID,
-                        DateOfBirth: oMember.DateOfBirth ? oMember.DateOfBirth.split("/").reverse().join("-") : "",
-                        Documents: [{
-                            DocumentID: sDocumentID,
-                            MemberID: oMember.MemberID,
-                            UserID: sUserID,
-                            DocumentType: oMember.DocumentType,
-                            FileName: oMember.DocumentName,
-                            FileType: oMember.FileType,
-                            File: oMember.File
-                        }]
-                    }]
-                };
-
-                this._uploadDocument(oPayload, sDocumentID);
+                return this._uploadDocument({
+                    MemberID: oMember.MemberID, UserID: sUserID, Salutation: oMember.Salutation,
+                    Name: oMember.Name, Relation: oMember.Relation, Gender: oMember.Gender,
+                    DateOfBirth: oMember.DateOfBirth ? oMember.DateOfBirth.split("/").reverse().join("-") : ""
+                }, oMember);
 
             } else {
 
@@ -2352,44 +2317,23 @@ if (sLocale) {
             }
         },
 
-        _uploadDocument: function (oDoc, sDocumentID) {
+        _uploadDocument: async function (oMemberData, oDraft) {
+            if (this._bSavingMember) return;
+            this._bSavingMember = true;
             this.getBusyDialog();
-
-            const isCreate = this._mode === "CREATE";
-
-            // Pass the DocumentID when one exists, otherwise an empty string.
-            const sFilterDocumentID = sDocumentID ||
-                (this._existingFileData && this._existingFileData.DocumentID) ||
-                "";
-
-            const oPromise = isCreate ?
-                this.ajaxCreateWithJQuery("HM_MemberDocument", {
-                    data: [oDoc]
-                }) :
-                this.ajaxUpdateWithJQuery("HM_MemberDocument", {
-                    data: [oDoc],
-                    filters: {
-                        DocumentID: sFilterDocumentID
-                    }
-                });
-
-            oPromise.then(() => {
-                this.onTableSelect();
-
-                // The stored document changed, so drop the cached copy for
-                // this member to force a fresh HM_Documentonly fetch.
-                const sMemberID = oDoc.Members && oDoc.Members[0] && oDoc.Members[0].MemberID;
-                if (sMemberID && this._mMemberDocumentCache) {
-                    delete this._mMemberDocumentCache[sMemberID];
-                }
-
+            try {
+                await this._saveMemberWithIdentityDocument(oMemberData, oDraft, this._mode === "CREATE", this._existingFileData?.DocumentType);
                 this.UD_Dialog.close();
                 this._selectedFile = null;
                 this._existingFileData = null;
                 sap.m.MessageToast.show(this.i18nModel.getText("docUploadSuccess"));
-            }).catch(() => {
-                sap.m.MessageToast.show(this.i18nModel.getText("errorUploadingDocuments"));
-            });
+                await this.onTableSelect();
+            } catch (oError) {
+                sap.m.MessageToast.show(oError.message || this.i18nModel.getText("errorUploadingDocuments"));
+            } finally {
+                this._bSavingMember = false;
+                this.closeBusyDialog();
+            }
         },
 
         _generateMemberID: function (oBookingView) {
@@ -2902,85 +2846,12 @@ if (sLocale) {
 
                 oModel.setProperty("/Members", aMembers);
 
-                // Document attachments are now loaded on demand, so the cache
-                // is reset whenever the lightweight list is (re)loaded.
-                this._mMemberDocumentCache = {};
             } catch (err) {
                 sap.m.MessageToast.show(err.message || err.responseText || this.getView().getModel("i18n").getResourceBundle().getText("errorLoadingMembers"));
             } finally {
                 this._updateRowCount();
                 this.closeBusyDialog();
             }
-        },
-
-        /**
-         * Fetches and caches the first eligible document for the pressed member.
-         */
-        _fetchMemberDocument: async function (sMemberID) {
-            const sCacheKey = sMemberID || "";
-
-            if (!sCacheKey) {
-                return {};
-            }
-
-            if (this._mMemberDocumentCache && this._mMemberDocumentCache[sCacheKey]) {
-                return this._mMemberDocumentCache[sCacheKey];
-            }
-
-            const oDoc = await this._readMemberIdentityDocument(sMemberID);
-
-            if (!oDoc) {
-                // Cache the "no document" result as well so repeated clicks
-                // on a member without an attachment do not re-hit the backend.
-                if (this._mMemberDocumentCache) {
-                    this._mMemberDocumentCache[sCacheKey] = {};
-                }
-                return {};
-            }
-
-            const oNormalized = {
-                DocumentID: oDoc.DocumentID || "",
-                DocumentType: oDoc.DocumentType || "",
-                FileName: oDoc.FileName || "",
-                FileType: oDoc.FileType || "",
-                MemberID: oDoc.MemberID || sMemberID || "",
-                UserID: oDoc.UserID || "",
-                Attachment: this._fileToBase64(oDoc.File)
-            };
-
-            if (this._mMemberDocumentCache) {
-                this._mMemberDocumentCache[sCacheKey] = oNormalized;
-            }
-
-            return oNormalized;
-        },
-
-        /**
-         * Converts a file payload coming from the backend (Node Buffer or
-         * already base64 string) into plain base64. Uses chunked encoding so
-         * large attachments convert without freezing the UI thread.
-         */
-        _fileToBase64: function (oFile) {
-            if (!oFile) {
-                return "";
-            }
-
-            if (oFile.type === "Buffer" && Array.isArray(oFile.data)) {
-                const aBytes = new Uint8Array(oFile.data);
-                const iChunkSize = 8192;
-                let sBinary = "";
-                for (let i = 0; i < aBytes.length; i += iChunkSize) {
-                    const aChunk = aBytes.subarray(i, i + iChunkSize);
-                    sBinary += String.fromCharCode.apply(null, aChunk);
-                }
-                return btoa(sBinary);
-            }
-
-            if (typeof oFile === "string") {
-                return oFile;
-            }
-
-            return "";
         },
 
         _loadBookings: async function () {
@@ -3396,7 +3267,6 @@ if (sLocale) {
             }
 
             this._oLoggedInUser = {};
-            this._mMemberDocumentCache = {};
 
             try {
                 sessionStorage.clear();
