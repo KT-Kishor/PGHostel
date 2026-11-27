@@ -1341,12 +1341,6 @@ sap.ui.define([
         },
 
         onDailyInvoiceNumberPress: function (oEvent) {
-            const oContext = oEvent.getSource().getBindingContext("dialogData");
-
-            if (oContext?.getProperty("InvNo")) {
-                this.onCloseDailyInvoiceDialog();
-            }
-
             this.onInvoiceNumberPress(oEvent);
         },
 
