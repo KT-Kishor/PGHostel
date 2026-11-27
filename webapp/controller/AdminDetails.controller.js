@@ -9739,7 +9739,7 @@ onDocumentDelete: function (oEvent) {
             const iLeftWidth = bShowCustomerGST ? 80 : 130;
             const iRightX = 110;
 
-            let address = doc.splitTextToSize(company.Address || "MG Road", iLeftWidth);
+            let address = doc.splitTextToSize(Formatter.formatBranchAddress(company) || "MG Road", iLeftWidth);
             let custAddressLines = bShowCustomerGST
                 ? doc.splitTextToSize(`Address: ${sCustCompanyAddress || "-"}`, 80)
                 : [];

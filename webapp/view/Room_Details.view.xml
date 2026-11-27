@@ -57,9 +57,9 @@
 						<fb:control>
 							<ComboBox
                                 id="RD_id_CustomerName1"
-                                items="{RoomDetailsModel>/}"
+                                items="{RoomFilterModel>/RoomNumbers}"
                                 showClearIcon="true">
-								<core:Item key="{RoomDetailsModel>RoomNo}" text="{RoomDetailsModel>RoomNo}"/>
+								<core:Item key="{RoomFilterModel>RoomNo}" text="{RoomFilterModel>RoomNo}"/>
 							</ComboBox>
 						</fb:control>
 					</fb:FilterGroupItem>
@@ -73,9 +73,9 @@
 						<fb:control>
 							<ComboBox
                                 id="RD_id_CompanyName1"
-                                items="{RoomDetailsModel>/}"
+                                items="{RoomFilterModel>/BedTypes}"
                                 showClearIcon="true">
-								<core:ListItem key="{RoomDetailsModel>BedTypeName}" text="{RoomDetailsModel>BedTypeName}"/>
+								<core:ListItem key="{RoomFilterModel>BedTypeName}" text="{RoomFilterModel>BedTypeName}"/>
 							</ComboBox>
 						</fb:control>
 					</fb:FilterGroupItem>

@@ -10,6 +10,7 @@ sap.ui.define([
     return BaseController.extend("sap.ui.com.project1.controller.Room_Details", {
         Formatter: Formatter,
         onInit: function () {
+            this.getView().setModel(new JSONModel({ RoomNumbers: [], BedTypes: [] }), "RoomFilterModel");
             this.getOwnerComponent().getRouter().getRoute("RouteRoomDetails").attachMatched(this._onRouteMatched, this);
         },
 
@@ -36,6 +37,7 @@ sap.ui.define([
                 editable: true
             });
             this.getView().setModel(model, "RoomModel")
+            this._originalRoomdata = null;
             this.onClearAndSearch("RD_id_FilterbarEmployee");
             await this.BedTypedetails()
             await this._loadBranchCode()
@@ -193,71 +195,25 @@ sap.ui.define([
             })
         },
 
-        _populateUniqueFilterValues: function (data, bedTypeData) {
+        _populateUniqueFilterValues: function (sBranchCode) {
+            const aRooms = (this._originalRoomdata || [])
+                .filter(room => !sBranchCode || String(room.BranchCode) === sBranchCode);
+            const aRoomNumbers = [...new Set(aRooms.map(room => String(room.RoomNo ?? "")).filter(Boolean))]
+                .sort().map(RoomNo => ({ RoomNo }));
+            const aBedTypes = [...new Set(aRooms.map(room => room.BedTypeName).filter(Boolean))]
+                .sort().map(BedTypeName => ({ BedTypeName }));
+            const oModel = this.getView().getModel("RoomFilterModel");
 
-            let oView = this.getView();
-
-            // ===== Room No Unique =====
-            let oRoomCombo = oView.byId("RD_id_CustomerName1");
-            oRoomCombo.destroyItems();
-
-            let uniqueRooms = new Set();
-
-            data.forEach(item => {
-                if (item.RoomNo) {
-                    uniqueRooms.add(item.RoomNo);
-                }
-            });
-
-            Array.from(uniqueRooms)
-                .sort()
-                .forEach(room => {
-                    oRoomCombo.addItem(
-                        new sap.ui.core.Item({
-                            key: room,
-                            text: room
-                        })
-                    );
-                });
-
-            this._populateBedTypeFilterValues(bedTypeData || data);
-        },
-
-        _populateBedTypeFilterValues: function (data) {
-            const oBedTypeCombo = this.byId("RD_id_CompanyName1");
-            const uniqueBedTypes = new Set();
-
-            oBedTypeCombo.destroyItems();
-            data.forEach(item => {
-                if (item.BedTypeName) {
-                    uniqueBedTypes.add(item.BedTypeName);
-                }
-            });
-
-            Array.from(uniqueBedTypes)
-                .sort()
-                .forEach(type => {
-                    oBedTypeCombo.addItem(
-                        new sap.ui.core.Item({
-                            key: type,
-                            text: type
-                        })
-                    );
-                });
+            oModel.setSizeLimit(Math.max(100, aRoomNumbers.length, aBedTypes.length));
+            oModel.setData({ RoomNumbers: aRoomNumbers, BedTypes: aBedTypes });
         },
 
         RD_onBranchSelectionChange: function (oEvent) {
             const oSelectedItem = oEvent.getParameter("selectedItem");
-            const sBranchCode = oSelectedItem ? oSelectedItem.getKey() : "";
-            const aRoomData = this._originalRoomdata || [];
-            const aBedTypeData = sBranchCode
-                ? aRoomData.filter(room => room.BranchCode === sBranchCode)
-                : aRoomData;
-            const oBedTypeCombo = this.byId("RD_id_CompanyName1");
 
-            oBedTypeCombo.setSelectedKey("");
-            oBedTypeCombo.setValue("");
-            this._populateBedTypeFilterValues(aBedTypeData);
+            this.byId("RD_id_CustomerName1").setSelectedKey("").setValue("");
+            this.byId("RD_id_CompanyName1").setSelectedKey("").setValue("");
+            this._populateUniqueFilterValues(oSelectedItem ? oSelectedItem.getKey() : "");
         },
 
    HM_Active: function () {
@@ -1094,16 +1050,11 @@ if (Payload._isEditing) {
             const omainModel = this.getOwnerComponent().getModel("mainModel")?.getData() || [];
 
             var oView = this.getView();
-
-            var oFilterBar = oView.byId("RD_id_FilterbarEmployee");
-
-            var oTable = oView.byId("id_ARD_Table");
-            var oBinding = oTable.getBinding("items");
+            const oBranchCombo = oView.byId("PO_id_RBranch");
 
             var sRoomNo = oView.byId("RD_id_CustomerName1").getSelectedKey() || oView.byId("RD_id_CustomerName1").getValue();
-            var sbedtype = oView.byId("RD_id_CompanyName1").getSelectedKey() || oView.byId("RD_id_CompanyName1").getValue();
-            var sBranchCode = oView.byId("PO_id_RBranch").getSelectedKey() || oView.byId("PO_id_RBranch").getValue();
-
+            var sBedType = oView.byId("RD_id_CompanyName1").getSelectedKey() || oView.byId("RD_id_CompanyName1").getValue();
+            const sBranchCode = oBranchCombo.getSelectedKey() || oBranchCombo.getValue().split(" - ")[0].trim();
 
             let aBranchCodes = [];
 
@@ -1126,28 +1077,34 @@ if (Payload._isEditing) {
                 filters.BranchCode = oExistingModel.BranchCode;
             }
 
-            if (sRoomNo) {
-                filters.RoomNo = sRoomNo
-            }
-            if (sbedtype) {
-                filters.BedTypeName = sbedtype
-            }
-            if (sBranchCode) {
-                filters.BranchCode = sBranchCode.split('-')[0];
-            }
-            
+            const oSearchFilters = { ...filters };
+            if (sRoomNo) oSearchFilters.RoomNo = sRoomNo;
+            if (sBedType) oSearchFilters.BedTypeName = sBedType;
+            if (sBranchCode) oSearchFilters.BranchCode = sBranchCode;
 
             if (!bBusyAlreadyOpen) {
                 this.getBusyDialog();
             }
-            this.ajaxReadWithJQuery("HM_Rooms", filters).then((oData) => {
 
-                const roomData = Array.isArray(oData.commentData) ? oData.commentData : [];
+            const pSearch = this.ajaxReadWithJQuery("HM_Rooms", oSearchFilters);
+            let pAllRooms = null;
+            // Keep dropdown options independent of the filtered table results.
+            if (!sRoomNo && !sBedType && !sBranchCode) {
+                pAllRooms = pSearch;
+            } else if (flag === "true" || !this._originalRoomdata) {
+                pAllRooms = this.ajaxReadWithJQuery("HM_Rooms", filters);
+            }
 
-                const branchData = this.getView().getModel("BranchModel")?.getData() || [];
+            return Promise.all([pSearch, pAllRooms]).then(([oData, oAllRooms]) => {
+                const getRooms = (oResponse) => Array.isArray(oResponse.commentData) ? oResponse.commentData : [];
+                if (oAllRooms) {
+                    this._originalRoomdata = getRooms(oAllRooms);
+                }
+
+                const branchData = oView.getModel("BranchModel")?.getData() || [];
 
                 // Map BranchCode → BranchName
-                const mappedData = roomData.map(bed => {
+                const mappedData = getRooms(oData).map(bed => {
                     const branch = branchData.find(br => br.BranchID === bed.BranchCode);
                     return {
                         ...bed,
@@ -1156,19 +1113,11 @@ if (Payload._isEditing) {
                     };
                 });
 
-                if (!this._originalRoomdata || flag === "true") {
-                    this._originalRoomdata = mappedData;
-                }
-                var model = new JSONModel(mappedData);
-                this.getView().setModel(model, "RoomDetailsModel");
-                const sSelectedBranchCode = sBranchCode ? sBranchCode.split("-")[0].trim() : "";
-                const aBedTypeData = sSelectedBranchCode
-                    ? this._originalRoomdata.filter(room => room.BranchCode === sSelectedBranchCode)
-                    : this._originalRoomdata;
-
-                this._populateUniqueFilterValues(this._originalRoomdata, aBedTypeData);
-                this.closeBusyDialog()
-            })
+                oView.setModel(new JSONModel(mappedData), "RoomDetailsModel");
+                this._populateUniqueFilterValues(oBranchCombo.getSelectedKey());
+            }).catch((error) => {
+                console.error("Error while loading room details:", error);
+            }).finally(() => this.closeBusyDialog());
         },
 
         RD_onSearch: function () {
@@ -1201,12 +1150,10 @@ if (Payload._isEditing) {
         },
 
         RD_onPressClear: function () {
-            this.getView().byId("RD_id_CustomerName1").setSelectedKey("")
-            this.getView().byId("RD_id_CompanyName1").setSelectedKey("")
-            this.getView().byId("PO_id_RBranch").setSelectedKey("")
-            if (this._originalRoomdata) {
-                this._populateUniqueFilterValues(this._originalRoomdata);
-            }
+            this.byId("PO_id_RBranch").setSelectedKey("").setValue("");
+            this.byId("RD_id_CustomerName1").setSelectedKey("").setValue("");
+            this.byId("RD_id_CompanyName1").setSelectedKey("").setValue("");
+            this._populateUniqueFilterValues("");
         },
 
         onRoomNoInputLiveChange: function (oEvent) {

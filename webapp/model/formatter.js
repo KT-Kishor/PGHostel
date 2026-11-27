@@ -802,6 +802,13 @@ formatDateTime: function (sDate) {
                 .join(", ");
         },
 
+        formatBranchAddress: function (oBranch) {
+            return [oBranch.Address, oBranch.City, oBranch.Pincode, oBranch.State, oBranch.Country]
+                .map(part => String(part ?? "").trim())
+                .filter(Boolean)
+                .join(", ");
+        },
+
         formatSelectionMode: function (sValue) {
 
             if (!sValue) {

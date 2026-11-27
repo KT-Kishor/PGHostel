@@ -4829,7 +4829,10 @@ sap.ui.define([
             const iLeftWidth = bShowCustomerGST ? 80 : 130;
             const iRightX = 110;
 
-            let address = doc.splitTextToSize(company.Address || "Kalpavriksha Karekal layout, Near, Railway Bridge, Kalaburagi, Karnataka", iLeftWidth);
+            let address = doc.splitTextToSize(
+                Formatter.formatBranchAddress(company) || "Kalpavriksha Karekal layout, Near, Railway Bridge, Kalaburagi, Karnataka",
+                iLeftWidth
+            );
             let custAddressLines = bShowCustomerGST
                 ? doc.splitTextToSize(`Address: ${sCustCompanyAddress || "-"}`, 80)
                 : [];

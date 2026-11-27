@@ -189,11 +189,13 @@
                         text="{i18n>startDate}"
                     />
                     <DatePicker
-                        valueFormat="yyyy-MM-dd"
-                        displayFormat="dd/MM/yyyy"
                         placeholder="{i18n>selectStartDate}"
                         id="dpStartDate"
-                        value="{CouponView>/CurrentCoupon/StartDate}"
+                        value="{
+                            path: 'CouponView>/CurrentCoupon/StartDate',
+                            type: 'sap.ui.model.odata.type.Date',
+                            formatOptions: { pattern: 'dd/MM/yyyy' }
+                        }"
                         change="onChange_Date"
                         valueStateText="{i18n>selectStartDate}"
                     />
@@ -205,9 +207,11 @@
                     <DatePicker
                         placeholder="{i18n>selectEndDate}"
                         id="dpEndDate"
-                        value="{CouponView>/CurrentCoupon/EndDate}"
-                        valueFormat="yyyy-MM-dd"
-                        displayFormat="dd/MM/yyyy"
+                        value="{
+                            path: 'CouponView>/CurrentCoupon/EndDate',
+                            type: 'sap.ui.model.odata.type.Date',
+                            formatOptions: { pattern: 'dd/MM/yyyy' }
+                        }"
                         change="onChange_Date"
                         valueStateText="{i18n>selectEndDate}"
                     />

@@ -7851,7 +7851,7 @@
             const iLeftWidth = bShowCustomerGST ? 80 : 130;
             const iRightX = 110;
 
-            let address = doc.splitTextToSize(company.Address || "", iLeftWidth);
+            let address = doc.splitTextToSize(Formatter.formatBranchAddress(company), iLeftWidth);
             let custAddressLines = bShowCustomerGST
                 ? doc.splitTextToSize(`Address: ${sCustCompanyAddress || "-"}`, 80)
                 : [];

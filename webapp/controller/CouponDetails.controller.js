@@ -379,6 +379,13 @@ sap.ui.define([
             var oItem = aSel[0]; // safe to use
             var oCtx = oItem.getBindingContext("CouponModel");
             var oData = Object.assign({}, oCtx.getObject());
+            // Keep saved day-first dates in the ISO format expected by the picker bindings.
+            ["StartDate", "EndDate"].forEach(sField => {
+                const aParts = /^(\d{2})[-/](\d{2})[-/](\d{4})$/.exec(oData[sField]);
+                if (aParts) {
+                    oData[sField] = `${aParts[3]}-${aParts[2]}-${aParts[1]}`;
+                }
+            });
             var oViewModel = this.getView().getModel("CouponView");
             oViewModel.setProperty("/DialogMode", "Edit");
             oViewModel.setProperty("/CurrentCoupon", oData);
@@ -509,11 +516,17 @@ sap.ui.define([
 
             // 1. Load dialog once
             if (!this._oCouponDialog) {
-                this._oCouponDialog = await Fragment.load({
+                if (this._pCouponDialog) return;
+                this._pCouponDialog = Fragment.load({
                     id: oView.getId(),
                     name: "sap.ui.com.project1.fragment.CouponDialog",
                     controller: this
                 });
+                try {
+                    this._oCouponDialog = await this._pCouponDialog;
+                } finally {
+                    this._pCouponDialog = null;
+                }
 
                 oView.addDependent(this._oCouponDialog);
 

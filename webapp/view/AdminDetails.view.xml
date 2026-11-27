@@ -1045,6 +1045,7 @@
                         tooltip="{i18n>bookingHistory}"
                         press="onPressBookingHistory"
                         class="myUnifiedBtn"
+                        visible="{= !${VisibleModel>/visible} }"
                     />
 
                     <Button
