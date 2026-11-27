@@ -27,7 +27,8 @@ sap.ui.define([
             const oChartData = {
                 statusDistribution: [],
                 monthlyValue: [],
-                customerTotals: [],
+                //customerTotals: [],
+                dailyInvoiceCounts: [],
                 yearlyTrend: [],
                 paymentBreakdown: [],
                 pendingByCustomer: [],
@@ -39,6 +40,10 @@ sap.ui.define([
             this.getView().setModel(new JSONModel({ filterSuffix: "" }), "headerModel");
             // Initialize the chart type model with the default values.
             this.getView().setModel(new JSONModel(INITIAL_CHART_TYPES), "invoiceChartTypeModel");
+            this.byId("barChartCustomer").getDataset().setContext([
+                { id: "Day", showInTooltip: false },
+                { id: "Invoice Value (INR)", showInTooltip: true }
+            ]);
             this.getOwnerComponent().getRouter().getRoute("RouteHostelDashboard").attachPatternMatched(this._onObjectMatched, this);
         },
         _loadBranchCode: async function () {
@@ -355,7 +360,8 @@ sap.ui.define([
                     // 🔥 Step 3: Direct pure object ko model mein set karein
                     this.getView().getModel("headerModel").setData(oHeaderData);
 
-                    // this._aggregateAndSetAllChartData(aFilteredData, aYearlyTrendData, []);  
+                    // this._aggregateAndSetAllChartData(aFilteredData, aYearlyTrendData, []);
+                    this._aYearlyTrendData = aYearlyTrendData;  
                     this._aggregateAndSetAllChartData(aFilteredData, aYearlyTrendData);
 
 
@@ -447,15 +453,50 @@ sap.ui.define([
             //---------------------------------------------------------------------
             // 2️⃣ Customer Totals
             //---------------------------------------------------------------------
-            const customerTotals = aFilteredData.reduce((acc, item) => {
-                if (item.Currency === "INR") {
-                    var TotalAmount = parseFloat(item.TotalAmount || 0) //- parseFloat(item.CreditNotesTotal || 0);
-                } else {
-                    var TotalAmount = parseFloat(item.AmountInINR || 0);
+            const today = new Date();
+            const year = today.getFullYear();
+            const month = String(today.getMonth() + 1).padStart(2, "0");
+            const currentMonth = `${year}-${month}`;
+
+            const monthLabel = today.toLocaleDateString("en-US", {
+                month: "long",
+                year: "numeric"
+            });
+
+            this.getView().getModel("headerModel")
+                .setProperty("/dailyInvoiceMonth", monthLabel);
+            const bookingsByDay = new Map();
+
+            aYearlyTrendData.forEach(invoice =>  {
+                const bookingId = String(invoice.BookingID ?? "").trim();
+                const day = String(invoice.InvoiceDate ?? "").match(/^\d{4}-\d{2}-\d{2}/)?.[0];
+
+                //if (!bookingId || !day) return;
+                if (!bookingId || !day || !day.startsWith(`${currentMonth}-`)) return;
+
+                if (!bookingsByDay.has(day)) {
+                    bookingsByDay.set(day, new Map());
                 }
-                acc[item.CustomerName] = (acc[item.CustomerName] || 0) + TotalAmount;
-                return acc;
-            }, {});
+
+                const amountInINR = invoice.Currency === "INR"
+                    ? Number(invoice.TotalAmount || 0)
+                    : Number(invoice.AmountInINR || 0);
+
+                bookingsByDay.get(day).set(bookingId, amountInINR);
+            });
+
+          const dailyInvoiceCounts = Array.from(bookingsByDay)
+            .sort(([dayA], [dayB]) => dayA.localeCompare(dayB))
+            .map(([day, bookings]) => {
+                const [year, month, date] = day.split("-");
+
+                return {
+                    day: `${month}-${date}-${year}`,
+                    count: bookings.size,
+                    totalAmountInINR: Array.from(bookings.values())
+                        .reduce((sum, amount) => sum + amount, 0)
+                };
+            });
 
             //---------------------------------------------------------------------
             // 3️⃣ Yearly Trend (Apr–Mar)
@@ -509,44 +550,31 @@ sap.ui.define([
             //---------------------------------------------------------------------
             // 5️⃣ Status-wise totals + Grouped Invoice Container
             //---------------------------------------------------------------------
-            this._oGroupedInvoices = {};
-            const statusAmounts = AllFilteredData.reduce((acc, item) => {
-                const status = item.Status || "Unknown";
+            const bookingsByStatus = new Map();
 
-                if (!this._oGroupedInvoices[status]) this._oGroupedInvoices[status] = [];
+            aFilteredData.forEach(invoice => {
+                const bookingId = String(invoice.InvNo ?? "").trim();
+                let status = String(invoice.Status ?? "").trim();
 
-                // Calculate final amount after credit note
-                // const originalAmount = parseFloat(item.TotalAmount || 0);
-                // const creditNote = parseFloat(item.CreditNotesTotal || 0);
-                // const net = originalAmount - creditNote;
+                if (!bookingId || !status) return;
 
-                // let inrValue = net;
-                const originalAmount = parseFloat(item.TotalAmount || 0);
-
-                let inrValue = originalAmount;
-                item.OldTotalAmount = item.TotalAmount;
-
-                if (item.Currency !== "INR") {
-                    inrValue = parseFloat(item.AmountInINR || 0) || (originalAmount * parseFloat(item.ConversionRate || 1));
-                    item.AmountInINR = inrValue;
-                } else {
-                    item.TotalAmount = inrValue;
+                if (status === "Partially Paid" || status === "Partial Payment") {
+                    status = "Payment Partially";
                 }
 
-                item.OldTotalAmount = item.TotalAmount;
-
-                if (item.Currency !== "INR") {
-                    inrValue = net * parseFloat(item.ConversionRate || 1);
-                    item.AmountInINR = inrValue;
-                } else {
-                    item.TotalAmount = inrValue;
+                if (!bookingsByStatus.has(status)) {
+                    bookingsByStatus.set(status, new Map());
                 }
 
-                this._oGroupedInvoices[status].push(item);
-                acc[status] = (acc[status] || 0) + inrValue;
+                bookingsByStatus.get(status).set(bookingId, invoice);
+            });
 
-                return acc;
-            }, {});
+            this._oGroupedInvoices = Object.fromEntries(
+                Array.from(bookingsByStatus, ([status, bookings]) => [
+                    status,
+                    Array.from(bookings.values())
+                ])
+            );
 
             //---------------------------------------------------------------------
             // 6️⃣ Payment Breakdown (GST, TDS, Credit Notes)
@@ -638,9 +666,9 @@ sap.ui.define([
             //---------------------------------------------------------------------
             // 9️⃣ Customer Totals (Sorted)
             //---------------------------------------------------------------------
-            const formattedCustomerTotals = Object.entries(customerTotals)
-                .map(([name, total]) => ({ customerName: name, totalAmountInINR: total }))
-                .sort((a, b) => b.totalAmountInINR - a.totalAmountInINR);
+            // const formattedCustomerTotals = Object.entries(customerTotals)
+            //     .map(([name, total]) => ({ customerName: name, totalAmountInINR: total }))
+            //     .sort((a, b) => b.totalAmountInINR - a.totalAmountInINR);
 
             //---------------------------------------------------------------------
             // 🔟 Yearly Trend Sorted
@@ -660,11 +688,12 @@ sap.ui.define([
             //---------------------------------------------------------------------
             // 1️⃣2️⃣ Status Distribution
             //---------------------------------------------------------------------
-            const formattedStatus = Object.entries(statusAmounts)
-                .map(([status, totalInr]) => ({
+            const formattedStatus = Object.entries(this._oGroupedInvoices).map(
+                ([status, invoices]) => ({
                     status,
-                    totalAmountInINR: totalInr
-                }));
+                    count: invoices.length
+                })
+            );
 
             //---------------------------------------------------------------------
             // 1️⃣3️⃣ Payment Breakdown Final Formatting
@@ -735,7 +764,8 @@ sap.ui.define([
             this.getView().getModel("chartData").setData({
                 statusDistribution: formattedStatus,
                 monthlyValue: formattedMonthly,
-                customerTotals: formattedCustomerTotals,
+                //customerTotals: formattedCustomerTotals,
+                dailyInvoiceCounts: dailyInvoiceCounts,
                 yearlyTrend: formattedYearlyTrend,
                 paymentBreakdown: formattedPaymentBreakdown,
                 pendingByCustomer: formattedPending,
@@ -788,7 +818,9 @@ sap.ui.define([
 
                 // Set dynamic title combining i18n text and status
                 const sTitlePrefix = this.i18nModel.getText("invoiceFor");
-                oPopover.setTitle(`${sTitlePrefix} ${sStatus}`);
+                oPopover.setTitle(
+                    `${sTitlePrefix} ${sStatus} (${aInvoicesForStatus.length} transactions)`
+                );
 
                 // Open popover near the clicked element
                 oPopover.open(oEvent.getParameter("data")[0].target);
@@ -1314,7 +1346,8 @@ sap.ui.define([
             const fyEndYear = fyStartYear + 1;
             const fyLabel = `${fyStartYear}-${fyEndYear}`;
 
-            const aAllInvoices = this._aAllInvoices || this._aCurrentFilteredData || this.rawInvoiceData || [];
+            // const aAllInvoices = this._aAllInvoices || this._aCurrentFilteredData || this.rawInvoiceData || [];
+            const aAllInvoices = this._aYearlyTrendData || [];
 
             // Filter invoices inside Apr 1 (fyStartYear) – Mar 31 (fyEndYear)
             const aInvoices = aAllInvoices.filter(inv => {

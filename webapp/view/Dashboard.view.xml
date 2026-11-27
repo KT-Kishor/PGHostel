@@ -23,7 +23,7 @@
         <content>
             <VBox class=" todaySection">
                 <Title
-                    text="{i18n>dashTodayBookings}"
+                    text="{i18n>dashTodayNewBookings}"
                     class="sapUiSmallMarginBottom"
                     level="H3"
                 />

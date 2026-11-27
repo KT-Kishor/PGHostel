@@ -26,7 +26,7 @@
 										<core:Item key="{Branchmodel>BranchID}" text="{Branchmodel>Name}" />
 									</items>
 								</MultiComboBox>
-							</fb:control>	
+							</fb:control>
 						</fb:FilterGroupItem>
 						<fb:FilterGroupItem name="Customer" label="{i18n>customer}" groupName="Group1" visibleInFilterBar="true">
 							<fb:control>
@@ -68,19 +68,43 @@
 									<com:content>
 										<com:ChartContainerContent>
 											<com:content>
-												<viz:VizFrame id="donutChartStatus" vizType="{invoiceChartTypeModel>/statusType}" width="100%" vizProperties="{                                                          title: { visible: false },                                                          legend: { label: { color: '#ffffff' } },                                                          plotArea: {                                                            dataLabel: { visible: false },                                                            colorPalette: ['#4CAF50', '#007984']                                                          }                                                            }" selectData="onStatusChartSelect">
+												<viz:VizFrame id="donutChartStatus" vizType="{invoiceChartTypeModel>/statusType}" 
+												width="100%" 
+												vizProperties="{                                                          
+												title: { visible: false },                                                          
+												legend: { label: { color: '#ffffff' } },                                                          
+												plotArea: { dataLabel: { visible: false },
+												dataPointStyle: {
+													rules: [
+														{
+															dataContext: { Status: 'Submitted' },
+															displayName: 'Submitted',
+															properties: { color: '#0070F2' }
+														},
+														{
+															dataContext: { Status: 'Payment Partially' },
+															displayName: 'Payment Partially',
+															properties: { color: '#E76500' }
+														},
+														{
+															dataContext: { Status: 'Payment Received' },
+															displayName: 'Payment Received',
+															properties: { color: '#30914C' }
+														}
+													]
+												} } }" selectData="onStatusChartSelect">
 													<viz:dataset>
 														<vizData:FlattenedDataset data="{chartData>/statusDistribution}">
 															<vizData:dimensions>
 																<vizData:DimensionDefinition name="Status" value="{chartData>status}" />
 															</vizData:dimensions>
 															<vizData:measures>
-																<vizData:MeasureDefinition name="Total Amount" value="{chartData>totalAmountInINR}" />
+																<vizData:MeasureDefinition name="Transaction Count" value="{chartData>count}"  />
 															</vizData:measures>
 														</vizData:FlattenedDataset>
 													</viz:dataset>
 													<viz:feeds>
-														<vizFeeds:FeedItem uid="size" type="Measure" values="Total Amount" />
+														<vizFeeds:FeedItem uid="size" type="Measure" values="Transaction Count" />
 														<vizFeeds:FeedItem uid="color" type="Dimension" values="Status" />
 													</viz:feeds>
 												</viz:VizFrame>
@@ -132,7 +156,7 @@
 						<f:Card class="sapUiTinyMargin">
 							<f:header>
 								<Toolbar class="customdashboard">
-									<Title text="{i18n>invoiceValueByCustomer} {headerModel>/filterSuffix}" level="H5"
+									<Title text="{i18n>dailyNumberOfInvoices} ({headerModel>/dailyInvoiceMonth}){headerModel>/filterSuffix}" level="H5"
 									wrapping="false" class="Dashboardtitle automatedEllipsis" />
 									<ToolbarSpacer />
 									<Button icon="sap-icon://vertical-bar-chart" press="IN_onPressCustomerPie" tooltip="{i18n>verticalChart}" />
@@ -144,8 +168,8 @@
 									<com:content>
 										<com:ChartContainerContent>
 											<com:content>
-												<viz:VizFrame id="barChartCustomer" vizType="{invoiceChartTypeModel>/customerType}" width="100%" vizProperties="{                                                            title: { visible: false },                                                            plotArea: {                                                                colorPalette: ['#007984'],                                                                dataLabel: {                                                                    visible: false,                                                                    formatString: '#'                                                               }                                                           },                                                            interaction: {                                                                selectability: { mode: 'SINGLE' }                                                            }                                                        }" selectData="onTotalInvoiceValueSelect">
-													<viz:dataset>
+												<viz:VizFrame id="barChartCustomer" vizType="{invoiceChartTypeModel>/customerType}" width="100%" vizProperties="{                                                            title: { visible: false },                                                            plotArea: {                                                                colorPalette: ['#007984'],                                                                dataLabel: {                                                                    visible: false,                                                                    formatString: '#'                                                               }                                                           },                                                            interaction: {                                                                selectability: { mode: 'SINGLE' }                                                            }                                                        }" >
+													<!-- <viz:dataset>
 														<vizData:FlattenedDataset data="{chartData>/customerTotals}">
 															<vizData:dimensions>
 																<vizData:DimensionDefinition name="Customer" value="{chartData>customerName}" />
@@ -158,7 +182,36 @@
 													<viz:feeds>
 														<vizFeeds:FeedItem uid="valueAxis" type="Measure" values="Total Value (INR)" />
 														<vizFeeds:FeedItem uid="categoryAxis" type="Dimension" values="Customer" />
-													</viz:feeds>
+													</viz:feeds> -->
+													<viz:dataset>
+													<vizData:FlattenedDataset data="{chartData>/dailyInvoiceCounts}">
+														<vizData:dimensions>
+															<vizData:DimensionDefinition
+																name="Day"
+																value="{chartData>day}" />
+															<vizData:DimensionDefinition
+																name="Invoice Value (INR)"
+																value="{
+																	path: 'chartData>totalAmountInINR',
+																	type: 'sap.ui.model.type.Float',
+																	formatOptions: {
+																		groupingEnabled: true,
+																		minFractionDigits: 2,
+																		maxFractionDigits: 2
+																	}
+																}" />
+														</vizData:dimensions>
+														<vizData:measures>
+															<vizData:MeasureDefinition
+																name="Invoice Count"
+																value="{chartData>count}" />
+														</vizData:measures>
+													</vizData:FlattenedDataset>
+												</viz:dataset>
+												<viz:feeds>
+													<vizFeeds:FeedItem uid="valueAxis" type="Measure" values="Invoice Count" />
+													<vizFeeds:FeedItem uid="categoryAxis" type="Dimension" values="Day" />
+												</viz:feeds>
 												</viz:VizFrame>
 											</com:content>
 										</com:ChartContainerContent>
@@ -209,10 +262,10 @@
 					</layout:content>
 				</layout:Grid>
 				<!-- Grid for Full Width Charts -->
-				<layout:Grid defaultSpan="XL12 L12 M12 S12" class="sapUiResponsiveMargin">
-					<layout:content>
+				<!-- <layout:Grid defaultSpan="XL12 L12 M12 S12" class="sapUiResponsiveMargin">
+					<layout:content> -->
 						<!-- 5. Payment Breakdown (Stacked Bar Chart) -->
-						<f:Card class="sapUiTinyMargin">
+						<!-- <f:Card class="sapUiTinyMargin">
 							<f:header>
 								<Toolbar class="customdashboard">
 									<Title 
@@ -238,7 +291,6 @@
 															<vizData:measures>
 																<vizData:MeasureDefinition name="Taxable Amount" value="{chartData>taxableAmount}" />
 																<vizData:MeasureDefinition name="GST Amount" value="{chartData>gstAmount}" />
-																<!-- Credit Notes Amount has been removed -->
 															</vizData:measures>
 														</vizData:FlattenedDataset>
 													</viz:dataset>
@@ -252,15 +304,15 @@
 									</com:content>
 								</com:ChartContainer>
 							</f:content>
-						</f:Card>
+						</f:Card> -->
 						<!-- 6. Pending Payments by Customer -->
 						<!-- <f:Card class="sapUiTinyMargin"><f:header><Toolbar class="customdashboard"><Title text="Pending Payments by Customer" level="H5" wrapping="true" class="Dashboardtitle" /><ToolbarSpacer /><Button icon="sap-icon://vertical-bar-chart" press="onPressPendingColumn" tooltip="Column Chart" /><Button icon="sap-icon://horizontal-bar-chart" press="onPressPendingBar" tooltip="Bar Chart" /></Toolbar></f:header><f:content><com:ChartContainer showFullScreen="true" showPersonalization="false" autoAdjustHeight="false"><com:content><com:ChartContainerContent><com:content><viz:VizFrame id="barChartPending" vizType="{invoiceChartTypeModel>/pendingByCustomerType}" width="100%" vizProperties="{
                                                         title: { visible: false },
                                                         plotArea: { dataLabel: { visible: false, formatString: '#' } },
                                                         interaction: { selectability: { mode: 'SINGLE' } }
                                                     }" selectData="onPendingCustomerSelect"><viz:dataset><vizData:FlattenedDataset data="{chartData>/pendingByCustomer}"><vizData:dimensions><vizData:DimensionDefinition name="Customer" value="{chartData>customerName}" /></vizData:dimensions><vizData:measures><vizData:MeasureDefinition name="Pending Amount (INR)" value="{chartData>pendingAmountInINR}" /></vizData:measures></vizData:FlattenedDataset></viz:dataset><viz:feeds><vizFeeds:FeedItem uid="valueAxis" type="Measure" values="Pending Amount (INR)" /><vizFeeds:FeedItem uid="categoryAxis" type="Dimension" values="Customer" /></viz:feeds></viz:VizFrame></com:content></com:ChartContainerContent></com:content></com:ChartContainer></f:content></f:Card> -->
-					</layout:content>
-				</layout:Grid>
+					<!-- </layout:content>
+				</layout:Grid> -->
 			</VBox>
 		</content>
 		<footer>
