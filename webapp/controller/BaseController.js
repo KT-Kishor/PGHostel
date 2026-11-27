@@ -16,12 +16,13 @@ sap.ui.define([
     // Router Code 
 
     //Common read call for all the app
-    async ajaxReadWithJQuery(sUrl, filter) {
+    async ajaxReadWithJQuery(sUrl, filter, bCache) {
       const queryString = new URLSearchParams(filter).toString();
       return new Promise((resolve, reject) => {
         $.ajax({
           url: this.getOwnerComponent().getModel("LoginModel").getData().url + sUrl + "?" + queryString,
           method: "GET",
+          cache: bCache,
           headers: this.getOwnerComponent().getModel("LoginModel").getData().headers,
           success: (data) => {
             resolve(data);
@@ -38,41 +39,115 @@ sap.ui.define([
       return MEMBER_IDENTITY_DOCUMENT_TYPES.find(sKey => sKey.toLowerCase() === sType) || "";
     },
 
-    async _readMemberIdentityDocument(sMemberID) {
-      const oMemberFilter = { MemberID: sMemberID };
-      const sMemberKey = String(sMemberID).trim();
-      const fnReadDocument = async (oFilters) => {
-        const oResponse = await this.ajaxReadWithJQuery("HM_Documentonly", oFilters);
-        const aDocuments = [oResponse, oResponse?.HM_Documentonly, oResponse?.Documents, oResponse?.data]
-          .find(Array.isArray) || (oResponse?.data ? [oResponse.data] : []);
+    async _readMemberIdentityDocuments(sMemberID, bFilterByType = false) {
+      const sKey = String(sMemberID ?? "").trim();
+      if (!sKey) return [];
+      const oFilters = { MemberID: sKey };
+      if (bFilterByType) oFilters.DocumentType = MEMBER_IDENTITY_DOCUMENT_TYPES.join(",");
+      const oResponse = await this.ajaxReadWithJQuery("HM_Documentonly", oFilters, false);
+      const aLists = [oResponse?.HM_Documentonly, oResponse?.Documents, oResponse?.data];
+      const oSingle = [oResponse, ...aLists].find(v => v && typeof v === "object" && ("DocumentType" in v || "DocumentID" in v));
+      const aRows = Array.isArray(oResponse) ? oResponse :
+        (aLists.find(Array.isArray) || (oSingle ? [oSingle] : (aLists.includes(null) ? [] : null)));
+      if (!aRows || oResponse?.success === false || oResponse?.error) {
+        throw new Error(this.getI18nText("BK_unableLoadMember"));
+      }
 
-        for (const oRow of aDocuments) {
-          if (!oRow || (oRow.MemberID && String(oRow.MemberID).trim() !== sMemberKey)) {
-            continue;
-          }
+      // A member-scoped response may omit MemberID. Do not infer it if the response mixes members.
+      const bMixedMembers = aRows.some(oRow => oRow?.MemberID && String(oRow.MemberID).trim() !== sKey);
+      const aDocuments = [];
+      for (const oRow of aRows) {
+        const sType = this._getAllowedMemberDocumentType(oRow?.DocumentType);
+        if (!sType || (oRow.MemberID && String(oRow.MemberID).trim() !== sKey)) continue;
+        const vFile = [oRow.File, oRow.Attachment, oRow.Document].find(v => typeof v === "string"
+          ? v.trim().replace(/^data:[^,]*;base64,/i, "").trim()
+          : v?.type === "Buffer" && Array.isArray(v.data) && v.data.length);
+        aDocuments.push({ ...oRow, MemberID: oRow.MemberID || (bMixedMembers ? "" : sKey), DocumentType: sType, File: vFile || "" });
+      }
+      return aDocuments;
+    },
 
-          const sDocumentType = this._getAllowedMemberDocumentType(oRow.DocumentType);
-          if (sDocumentType) {
-            return { ...oRow, DocumentType: sDocumentType };
-          }
-        }
-        return null;
-      };
-
+    async _fetchMemberDocument(sMemberID) {
+      const hasFile = oRow => oRow.MemberID && oRow.File;
       let oDocument;
       try {
-        oDocument = await fnReadDocument({
-          ...oMemberFilter,
-          DocumentType: MEMBER_IDENTITY_DOCUMENT_TYPES.join(",")
-        });
+        oDocument = (await this._readMemberIdentityDocuments(sMemberID, true)).find(hasFile);
       } catch (oError) {
         if (oError?.status === 401 || oError?.status === 403) {
           throw oError;
         }
       }
+      if (!oDocument) {
+        oDocument = (await this._readMemberIdentityDocuments(sMemberID)).find(hasFile);
+      }
+      const sFile = this._fileToBase64(oDocument?.File).trim().replace(/^data:[^,]*;base64,/i, "");
+      const sName = String(oDocument?.FileName || oDocument?.DocumentName || "").trim() || oDocument?.DocumentType || "";
+      return {
+        DocumentID: oDocument?.DocumentID || "", DocumentType: oDocument?.DocumentType || "",
+        FileName: sName, DocumentName: sName, FileType: oDocument?.FileType || "",
+        File: sFile, Document: sFile, Attachment: sFile,
+        Documents: oDocument ? [{ ...oDocument, File: sFile }] : []
+      };
+    },
 
-      // The backend may reject the CSV filter or treat it as a single type.
-      return oDocument || fnReadDocument(oMemberFilter);
+    _fileToBase64(vFile) {
+      if (typeof vFile === "string") return vFile;
+      if (vFile?.type !== "Buffer" || !Array.isArray(vFile.data)) return "";
+      let sBinary = "";
+      for (let i = 0; i < vFile.data.length; i += 8192) {
+        sBinary += String.fromCharCode(...vFile.data.slice(i, i + 8192));
+      }
+      return btoa(sBinary);
+    },
+
+    async _saveMemberWithIdentityDocument(oMember, oDraft, bCreate, sPreviousType) {
+      const sType = this._getAllowedMemberDocumentType(oDraft.DocumentType);
+      const sFile = this._fileToBase64(oDraft.File || oDraft.Document).trim();
+      const bUpload = !!oDraft.DocumentFile || (bCreate && !!sFile);
+      const aRemoved = oDraft.PendingDeletedDocumentIDs || [];
+      if (oDraft.ProcessingActive) throw new Error(this.getI18nText("Pleasewaitimagesarestillbeingprocessed"));
+      if (!oMember.MemberID || !oMember.UserID || (bUpload && (!sType || !sFile))) {
+        throw new Error(this.getI18nText("failedSaveMember"));
+      }
+      if (!bUpload && sPreviousType && sType && sPreviousType !== sType) {
+        throw new Error(this.getI18nText("pleaseUploadFileForDocumentType", [sType]));
+      }
+
+      let bDeleted = false;
+      if (!bCreate && (bUpload || aRemoved.length)) {
+        // Read all four types for this member, not just the single file shown in the dialog.
+        const aExisting = await this._readMemberIdentityDocuments(oMember.MemberID);
+        const aDelete = aExisting.filter(oRow => bUpload || aRemoved.includes(String(oRow.DocumentID ?? "").trim()));
+        if (aDelete.some(oRow => !String(oRow.DocumentID ?? "").trim() ||
+          String(oRow.MemberID ?? "").trim() !== String(oMember.MemberID).trim() ||
+          (oRow.UserID && String(oRow.UserID).trim() !== String(oMember.UserID).trim()))) {
+          throw new Error(this.getI18nText("failedDeleteDocumentfromServer"));
+        }
+        for (const sID of new Set(aDelete.map(oRow => String(oRow.DocumentID).trim()))) {
+          const oResult = await this.ajaxDeleteWithJQuery("HM_CustomerDocument", { filters: { DocumentID: sID } });
+          if (oResult?.success === false || oResult?.error) throw new Error(this.getI18nText("failedDeleteDocumentfromServer"));
+          bDeleted = true;
+        }
+      }
+
+      // No old DocumentID and no old files: this is a new attachment, not an update of the deleted row.
+      const oEntry = { ...oMember };
+      if (bUpload) {
+        oEntry.Documents = [{ MemberID: oMember.MemberID, UserID: oMember.UserID, DocumentType: sType,
+          FileName: oDraft.DocumentName, FileType: oDraft.FileType, File: sFile }];
+      } else if (bCreate) {
+        oEntry.Documents = [];
+      }
+      const oPayload = { data: [{ Members: [oEntry] }] };
+      try {
+        const oResult = bCreate ? await this.ajaxCreateWithJQuery("HM_MemberDocument", oPayload) :
+          await this.ajaxUpdateWithJQuery("HM_MemberDocument", oPayload);
+        if (oResult?.success === false || oResult?.error) throw new Error(this.getI18nText("failedSaveMember"));
+        return oResult;
+      } catch (oError) {
+        if (bUpload && bDeleted) throw new Error(this.getI18nText("memberReplacementUploadFailed"));
+        throw oError;
+      }
     },
 
     async _readComplaintsWithBookingStatus(sUserID) {

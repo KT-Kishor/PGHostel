@@ -28,10 +28,6 @@
                 maxdate: new Date()
             }), "controller");
 
-            // Cache of member documents fetched on demand from
-            // HM_Documentonly, keyed by MemberID.
-            this._mMemberDocumentCache = {};
-
             this.getOwnerComponent().getRouter().getRoute("RouteMyBookings").attachMatched(this._onRouteMatched, this);
         },
 
@@ -169,9 +165,6 @@
                 oModel.setProperty("/Members", aMembers);
                 oModel.setProperty("/memberCount", aMembers.length);
 
-                // Document attachments are now loaded on demand, so the cache
-                // is reset whenever the lightweight list is (re)loaded.
-                this._mMemberDocumentCache = {};
             } catch (err) {
                 var aSelfMember = this._createSelfMemberRow(null);
                 oModel.setProperty("/Members", aSelfMember ? [aSelfMember] : []);
@@ -288,68 +281,6 @@
                 MemberID: oUser.MemberID || sUserID,
                 UserID: sUserID
             };
-        },
-
-        /**
-         * Fetches and caches the first eligible document for the pressed member.
-         */
-        _fetchMemberDocument: async function (sMemberID) {
-            var sCacheKey = sMemberID || "";
-
-            if (!sCacheKey) {
-                return {};
-            }
-
-            if (!this._mMemberDocumentCache) {
-                this._mMemberDocumentCache = {};
-            }
-
-            if (this._mMemberDocumentCache[sCacheKey]) {
-                return this._mMemberDocumentCache[sCacheKey];
-            }
-
-            var oDoc = await this._readMemberIdentityDocument(sMemberID);
-
-            if (!oDoc) {
-                // Cache the "no document" result as well so repeated clicks
-                // on a member without an attachment do not re-hit the backend.
-                this._mMemberDocumentCache[sCacheKey] = {};
-                return {};
-            }
-
-            var oNormalized = {
-                DocumentID: oDoc.DocumentID || "",
-                DocumentType: oDoc.DocumentType || "",
-                FileName: oDoc.FileName || "",
-                FileType: oDoc.FileType || "",
-                MemberID: oDoc.MemberID || sMemberID || "",
-                UserID: oDoc.UserID || "",
-                Attachment: this._fileToBase64(oDoc.File)
-            };
-
-            this._mMemberDocumentCache[sCacheKey] = oNormalized;
-
-            return oNormalized;
-        },
-
-        /**
-         * Converts a file payload coming from the backend (Node Buffer or
-         * already base64 string) into plain base64.
-         */
-        _fileToBase64: function (oFile) {
-            if (!oFile) {
-                return "";
-            }
-
-            if (oFile.type === "Buffer" && Array.isArray(oFile.data)) {
-                return this._bufferToBase64(oFile.data);
-            }
-
-            if (typeof oFile === "string") {
-                return oFile;
-            }
-
-            return "";
         },
 
         _bufferToBase64: function (aBytes) {
@@ -794,7 +725,8 @@
             try {
                 oDoc = await this._fetchMemberDocument(oData.MemberID);
             } catch (err) {
-                // Dialog still opens; the document block is simply empty.
+                MessageToast.show(this.getI18nText("BK_unableLoadMember"));
+                return;
             } finally {
                 this.closeBusyDialog();
             }
@@ -809,15 +741,8 @@
             var sDocFileType = bHasDocContent ? (oDoc.FileType || "") : "";
             var sDocContent = oDoc.Attachment || oDoc.File || "";
 
-            // DocumentID is kept even without content so the next save updates
-            // the existing record instead of creating a duplicate.
             this._existingFileData = {
-                DocumentID: oDoc.DocumentID || "",
-                MemberID: oData.MemberID || "",
                 UserID: sEditUserID,
-                FileName: sDocName,
-                FileType: sDocFileType,
-                File: sDocContent,
                 DocumentType: sDocType
             };
 
@@ -1124,6 +1049,7 @@
                 return;
             }
 
+            oModel.setProperty("/ProcessingActive", true);
             var oReader = new FileReader();
             oReader.onload = function () {
                 var sBase64 = String(oReader.result || "").split(",")[1] || "";
@@ -1278,62 +1204,22 @@
                 this._getLoggedInUserId() ||
                 "";
 
-            var sDocumentID = this._mode === "UPDATE" ?
-                ((this._existingFileData && this._existingFileData.DocumentID) || "") :
-                "";
-
-            this._uploadDocument({
-                Members: [{
-                    MemberID: oMember.MemberID,
-                    Salutation: oMember.Salutation,
-                    Name: oMember.Name,
-                    Relation: oMember.Relation,
-                    Gender: oMember.Gender,
-                    UserID: sUserID,
-                    DateOfBirth: oMember.DateOfBirth ? oMember.DateOfBirth.split("/").reverse().join("-") : "",
-                    Documents: [{
-                        DocumentID: sDocumentID,
-                        MemberID: oMember.MemberID,
-                        UserID: sUserID,
-                        DocumentType: oMember.DocumentType,
-                        FileName: oMember.DocumentName,
-                        FileType: oMember.FileType,
-                        File: oMember.File
-                    }]
-                }]
-            }, sDocumentID);
+            return this._uploadDocument({
+                MemberID: oMember.MemberID, UserID: sUserID, Salutation: oMember.Salutation,
+                Name: oMember.Name, Relation: oMember.Relation, Gender: oMember.Gender,
+                DateOfBirth: oMember.DateOfBirth ? oMember.DateOfBirth.split("/").reverse().join("-") : ""
+            }, oMember);
         },
 
-        _uploadDocument: async function (oDoc, sDocumentID) {
-            var bCreate = this._mode === "CREATE";
-
-            // Pass the DocumentID when one exists, otherwise an empty string.
-            var sFilterDocumentID = sDocumentID ||
-                (this._existingFileData && this._existingFileData.DocumentID) ||
-                "";
-
+        _uploadDocument: async function (oMemberData, oDraft) {
+            if (this._bSavingMember) return;
+            this._bSavingMember = true;
             this.getBusyDialog();
             try {
-                if (bCreate) {
-                    await this.ajaxCreateWithJQuery("HM_MemberDocument", { data: [oDoc] });
-                } else {
-                    await this.ajaxUpdateWithJQuery("HM_MemberDocument", {
-                        data: [oDoc],
-                        filters: {
-                            DocumentID: sFilterDocumentID
-                        }
-                    });
-                }
+                await this._saveMemberWithIdentityDocument(oMemberData, oDraft, this._mode === "CREATE", this._existingFileData?.DocumentType);
 
                 if (this.UD_Dialog) {
                     this.UD_Dialog.close();
-                }
-
-                // The stored document changed, so drop the cached copy for
-                // this member to force a fresh HM_Documentonly fetch.
-                var sMemberID = oDoc.Members && oDoc.Members[0] && oDoc.Members[0].MemberID;
-                if (sMemberID && this._mMemberDocumentCache) {
-                    delete this._mMemberDocumentCache[sMemberID];
                 }
 
                 this._selectedFile = null;
@@ -1343,6 +1229,7 @@
             } catch (oError) {
                 MessageToast.show(oError.message || oError.responseText || this.getView().getModel("i18n").getResourceBundle().getText("MB_errorUploadingDocum"));
             } finally {
+                this._bSavingMember = false;
                 this.closeBusyDialog();
             }
         },
