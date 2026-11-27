@@ -71,20 +71,20 @@
                     <!-- <Column hAlign="End" demandPopin="true" minScreenWidth="Desktop">
 						<Text text="{i18n>creditNotesAmount}" />
 					</Column> -->
-                    <Column
+                    <!-- <Column
                         hAlign="End"
                         demandPopin="true"
                         minScreenWidth="Desktop"
                     >
-                        <Text text="{i18n>exchRate}" />
+                    <Text text="{i18n>exchRate}" />
                     </Column>
                     <Column
                         hAlign="End"
                         demandPopin="true"
                         minScreenWidth="Desktop"
                     >
-                        <Text text="{i18n>totalAmount}" />
-                    </Column>
+                    <Text text="{i18n>totalAmount}" />
+                    </Column> -->
                 </columns>
                 <items>
                     <ColumnListItem
@@ -106,13 +106,13 @@
 								<Link wrapping="true" class="creditLinkStyle" press="onInvoiceCreditNotesPress" text="{parts: [{ path: 'popoverData>CreditNotesTotal' },{ path: 'popoverData>Currency' }], formatter: '.Formatter.formatAmountWithCurrency'}" />
 								<Link wrapping="true" visible="{= ${popoverData>Currency} !== 'INR' }" class="creditLinkStyle" press="onInvoiceCreditNotesPress" text="{parts: [{ path: 'popoverData>CreditNotesTotalInINR' },{ value: 'INR' }], formatter: '.Formatter.formatAmountWithCurrency'}" />
 							</layout:VerticalLayout> -->
-                            <ObjectIdentifier
+                            <!-- <ObjectIdentifier
                                 title="{path:'popoverData>ConversionRate', formatter: '.Formatter.fromatNumber'}"
                             />
                             <ObjectNumber
                                 number="{parts: [{ path: 'popoverData>Currency' },{ path: 'popoverData>TotalAmount' },{ path: 'popoverData>AmountInINR' }], formatter: '.Formatter.fromatNumber'}"
                                 unit="INR"
-                            />
+                            /> -->
                         </cells>
                     </ColumnListItem>
                 </items>

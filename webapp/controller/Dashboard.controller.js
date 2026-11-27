@@ -239,7 +239,7 @@ sap.ui.define([
 
         onNavBack: function () {
             var oRouter = this.getOwnerComponent().getRouter();
-            oRouter.navTo("TilePage");
+            oRouter.navTo("TilePage", {}, true);
         },
 
         _bindMonthlyChart: function () {

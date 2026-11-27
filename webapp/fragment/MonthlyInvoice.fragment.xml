@@ -70,7 +70,7 @@
                     >
                         <Text text="{i18n>creditNotesAmount}" />
                     </Column> -->
-                    <Column
+                    <!-- <Column
                         hAlign="End"
                         demandPopin="true"
                         minScreenWidth="Desktop"
@@ -83,12 +83,12 @@
                         minScreenWidth="Desktop"
                     >
                         <Text text="{i18n>totalAmount}" />
-                    </Column>
+                    </Column> -->
                     <Column
                         demandPopin="true"
                         hAlign="Left"
                     >
-                        <Text text="{i18n>status}" />
+                    <Text text="{i18n>status}" />
                     </Column>
                 </columns>
                 <items>
@@ -122,14 +122,17 @@
                                     text="{parts: [{ path: 'dialogData>CreditNotesTotalInINR' },{ value: 'INR' }], formatter: '.Formatter.formatAmountWithCurrency'}"
                                 />
                             </layout:VerticalLayout> -->
-                            <ObjectIdentifier
+                            <!-- <ObjectIdentifier
                                 title="{path:'dialogData>ConversionRate', formatter: '.Formatter.fromatNumber'}"
                             />
                             <ObjectNumber
                                 number="{parts: [{ path: 'dialogData>Currency' },{ path: 'dialogData>TotalAmount' },{ path: 'dialogData>AmountInINR' }], formatter: '.Formatter.fromatNumber'}"
                                 unit="INR"
+                            /> -->
+                            <ObjectStatus text="{dialogData>Status}" inverted="false"
+                            state="{= ${dialogData>Status} === 'Submitted' ? 'Information' : ${dialogData>Status} === 'Payment Partially' ? 'Warning' : ${dialogData>Status} === 'Payment Received' ? 'Success' : 'None' }"
                             />
-                            <Text text="{dialogData>Status}" />
+                            <!-- <Text text="{dialogData>Status}" /> -->
                         </cells>
                     </ColumnListItem>
                 </items>
@@ -143,6 +146,11 @@
                     number="{parts: [{ path: 'dialogData>/AllTotalAmount' }], formatter: '.Formatter.fromatNumber'}"
                     unit="INR"
                 />
+                <ToolbarSeparator />
+                <Text text="{i18n>totalGstAmount}" />
+                <ObjectNumber
+                    number="{parts: [{ path: 'dialogData>/gstAmountInINR' }], formatter: '.Formatter.fromatNumber'}"
+                    unit="INR" />
             </Toolbar>
         </footer>
     </Dialog>

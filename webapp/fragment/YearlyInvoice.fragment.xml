@@ -70,7 +70,7 @@
                     <!-- <Column hAlign="End" demandPopin="true" minScreenWidth="Desktop">
 						<Text text="{i18n>creditNotesAmount}" />
 					</Column> -->
-                    <Column
+                    <!-- <Column
                         hAlign="End"
                         demandPopin="true"
                         minScreenWidth="Desktop"
@@ -83,7 +83,7 @@
                         minScreenWidth="Desktop"
                     >
                         <Text text="{i18n>totalAmount}" />
-                    </Column>
+                    </Column> -->
                     <!-- <Column demandPopin="true" hAlign="Left">
 						<Text text="{i18n>status}" />
 					</Column> -->
@@ -108,13 +108,13 @@
 								<Link wrapping="true" class="creditLinkStyle" press="onInvoiceCreditNotesPress" text="{parts: [{ path: 'dialogData>CreditNotesTotal' },{ path: 'dialogData>Currency' }], formatter: '.Formatter.formatAmountWithCurrency'}" />
 								<Link wrapping="true" visible="{= ${dialogData>Currency} !== 'INR' }" class="creditLinkStyle" press="onInvoiceCreditNotesPress" text="{parts: [{ path: 'dialogData>CreditNotesTotalInINR' },{ value: 'INR' }], formatter: '.Formatter.formatAmountWithCurrency'}" />
 							</layout:VerticalLayout> -->
-                            <ObjectIdentifier
+                            <!-- <ObjectIdentifier
                                 title="{path:'dialogData>ConversionRate', formatter: '.Formatter.fromatNumber'}"
                             />
                             <ObjectNumber
                                 number="{parts: [{ path: 'dialogData>Currency' },{ path: 'dialogData>TotalAmount' },{ path: 'dialogData>AmountInINR' }], formatter: '.Formatter.fromatNumber'}"
                                 unit="INR"
-                            />
+                            /> -->
                             <!-- <ObjectStatus text="{dialogData>Status}" state="{path: 'dialogData>Status', formatter: '.Formatter.invoiceStatusState'}" /> -->
                         </cells>
                     </ColumnListItem>

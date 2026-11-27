@@ -59,7 +59,7 @@
 									<Title text="{i18n>invoiceStatus_Pay} {headerModel>/filterSuffix}" level="H5" wrapping="false" class="Dashboardtitle automatedEllipsis"/>
 									<ToolbarSpacer />
 									<Button icon="sap-icon://pie-chart" press="IN_onPressStatusPie" tooltip="{i18n>pieChart}" />
-									<Button icon="sap-icon://bar-chart" press="IN_onPressStatusBar" tooltip="{i18n>barChart}" />
+									<Button icon="sap-icon://horizontal-bar-chart-2" press="IN_onPressStatusBar" tooltip="{i18n>barChart}" />
 									<Button icon="sap-icon://donut-chart" press="IN_onPressStatusDonut" tooltip="{i18n>donutChart}" />
 								</Toolbar>
 							</f:header>
@@ -120,8 +120,8 @@
 								<Toolbar class="customdashboard">
 									<Title text="{i18n>monthlyInvoiceTrend} {headerModel>/filterSuffix}" level="H5" wrapping="false" class="Dashboardtitle automatedEllipsis" />
 									<ToolbarSpacer />
-									<Button icon="sap-icon://vertical-bar-chart" press="IN_onPressMonthlyPie" tooltip="{i18n>verticalChart}" />
-									<Button icon="sap-icon://bar-chart" press="IN_onPressMonthlyBar" tooltip="{i18n>barChart}" />
+									<Button icon="sap-icon://vertical-stacked-chart" press="IN_onPressMonthlyPie" tooltip="{i18n>stackedHorizontal}" />
+									<Button icon="sap-icon://horizontal-bar-chart-2" press="IN_onPressMonthlyBar" tooltip="{i18n>barChart}" />
 									<Button icon="sap-icon://line-chart" press="IN_onPressMonthlyLine" tooltip="{i18n>lineChart}" />
 								</Toolbar>
 							</f:header>
@@ -130,19 +130,29 @@
 									<com:content>
 										<com:ChartContainerContent>
 											<com:content>
-												<viz:VizFrame id="lineChartMonthly" vizType="{invoiceChartTypeModel>/monthlyType}" width="100%" vizProperties="{                                                                                                               title: { visible: false },                                                                                                               plotArea: {                                                                                                                   colorPalette: ['#007984'],                                                                                                                   dataLabel: {                                                                                                                       visible: false,                                                                                                                        formatString: '#'                                                                                                                    }                                                                                                                },                                                                                                                interaction: {                                                                                                                    selectability: { mode: 'SINGLE' }                                                                                                               }                                                                                                            }" selectData="onMonthlyInvoiceSelect">
+												<viz:VizFrame id="lineChartMonthly" vizType="{invoiceChartTypeModel>/monthlyType}" width="100%" vizProperties="{                                                                                                               title: { visible: false },                                                                                                               plotArea: {                                                                                                                  colorPalette: ['#E76500', '#007984'],                                                                                                                   dataLabel: {                                                                                                                       visible: false,                                                                                                                        formatString: '#'                                                                                                                    }                                                                                                                },                                                                                                                interaction: {                                                                                                                    selectability: { mode: 'SINGLE' }                                                                                                               }                                                                                                            }" selectData="onMonthlyInvoiceSelect">
 													<viz:dataset>
 														<vizData:FlattenedDataset data="{chartData>/monthlyValue}">
 															<vizData:dimensions>
-																<vizData:DimensionDefinition name="Month" value="{chartData>month}" />
+																<vizData:DimensionDefinition
+																	name="Month"
+																	value="{chartData>month}" />
 															</vizData:dimensions>
 															<vizData:measures>
-																<vizData:MeasureDefinition name="Total Value (INR)" value="{chartData>totalAmountInINR}" />
+																<vizData:MeasureDefinition
+																	name="Total Value (INR)"
+																	value="{chartData>totalAmountInINR}" />
+																<vizData:MeasureDefinition
+																	name="GST (INR)"
+																	value="{chartData>gstAmountInINR}" />
 															</vizData:measures>
 														</vizData:FlattenedDataset>
 													</viz:dataset>
 													<viz:feeds>
-														<vizFeeds:FeedItem uid="valueAxis" type="Measure" values="Total Value (INR)" />
+														<vizFeeds:FeedItem
+															uid="valueAxis"
+															type="Measure"
+															values="{= ['GST (INR)', 'Total Value (INR)'] }" />
 														<vizFeeds:FeedItem uid="categoryAxis" type="Dimension" values="Month" />
 													</viz:feeds>
 												</viz:VizFrame>
@@ -159,8 +169,8 @@
 									<Title text="{i18n>dailyNumberOfInvoices} ({headerModel>/dailyInvoiceMonth}){headerModel>/filterSuffix}" level="H5"
 									wrapping="false" class="Dashboardtitle automatedEllipsis" />
 									<ToolbarSpacer />
-									<Button icon="sap-icon://vertical-bar-chart" press="IN_onPressCustomerPie" tooltip="{i18n>verticalChart}" />
-									<Button icon="sap-icon://bar-chart" press="IN_onPressCustomerBar" tooltip="{i18n>barChart}" />
+									<Button icon="sap-icon://line-chart" press="IN_onPressCustomerPie" tooltip="{i18n>lineChart}" />
+									<Button icon="sap-icon://horizontal-bar-chart-2" press="IN_onPressCustomerBar" tooltip="{i18n>barChart}" />
 								</Toolbar>
 							</f:header>
 							<f:content>
@@ -168,7 +178,7 @@
 									<com:content>
 										<com:ChartContainerContent>
 											<com:content>
-												<viz:VizFrame id="barChartCustomer" vizType="{invoiceChartTypeModel>/customerType}" width="100%" vizProperties="{                                                            title: { visible: false },                                                            plotArea: {                                                                colorPalette: ['#007984'],                                                                dataLabel: {                                                                    visible: false,                                                                    formatString: '#'                                                               }                                                           },                                                            interaction: {                                                                selectability: { mode: 'SINGLE' }                                                            }                                                        }" >
+												<viz:VizFrame id="barChartCustomer" selectData="onDailyInvoiceSelect"  vizType="{invoiceChartTypeModel>/customerType}" width="100%" vizProperties="{                                                            title: { visible: false },                                                            plotArea: {                                                                colorPalette: ['#007984'],                                                                dataLabel: {                                                                    visible: false,                                                                    formatString: '#'                                                               }                                                           },                                                            interaction: {                                                                selectability: { mode: 'SINGLE' }                                                            }                                                        }" >
 													<!-- <viz:dataset>
 														<vizData:FlattenedDataset data="{chartData>/customerTotals}">
 															<vizData:dimensions>
@@ -186,9 +196,7 @@
 													<viz:dataset>
 													<vizData:FlattenedDataset data="{chartData>/dailyInvoiceCounts}">
 														<vizData:dimensions>
-															<vizData:DimensionDefinition
-																name="Day"
-																value="{chartData>day}" />
+															<vizData:DimensionDefinition name="Day" value="{chartData>day}" />
 															<vizData:DimensionDefinition
 																name="Invoice Value (INR)"
 																value="{
@@ -200,17 +208,19 @@
 																		maxFractionDigits: 2
 																	}
 																}" />
+
+															<vizData:DimensionDefinition
+																name="GST (INR)"
+																value="{chartData>gstAmountDisplay}" />
 														</vizData:dimensions>
 														<vizData:measures>
-															<vizData:MeasureDefinition
-																name="Invoice Count"
-																value="{chartData>count}" />
+															<vizData:MeasureDefinition name="Invoice Count" value="{chartData>count}" />
 														</vizData:measures>
 													</vizData:FlattenedDataset>
 												</viz:dataset>
 												<viz:feeds>
-													<vizFeeds:FeedItem uid="valueAxis" type="Measure" values="Invoice Count" />
 													<vizFeeds:FeedItem uid="categoryAxis" type="Dimension" values="Day" />
+													<vizFeeds:FeedItem uid="valueAxis" type="Measure" values="Invoice Count" />
 												</viz:feeds>
 												</viz:VizFrame>
 											</com:content>
@@ -226,7 +236,7 @@
 									<Title text="{i18n>yearlyInvoiceTrend} {headerModel>/filterSuffix}" 
 									level="H5" wrapping="false" class="Dashboardtitle automatedEllipsis" />
 									<ToolbarSpacer />
-									<Button icon="sap-icon://bar-chart" press="IN_onPressYearlyBar" tooltip="{i18n>barChart}" />
+									<Button icon="sap-icon://horizontal-bar-chart-2" press="IN_onPressYearlyBar" tooltip="{i18n>barChart}" />
 									<Button icon="sap-icon://line-chart" press="IN_onPressYearlyLine" tooltip="{i18n>lineChart}" />
 								</Toolbar>
 							</f:header>

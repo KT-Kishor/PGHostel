@@ -19,6 +19,7 @@ sap.ui.define([
         _oGroupedInvoices: {},
         _aCurrentFilteredData: [],
         onInit: function () {
+            this.getOwnerComponent().getRouter().getRoute("RouteComplainDashboard").attachMatched(this._onRouteMatched, this);
             const oChartData = {
                 statusDistribution: [],
                 monthlyValue: [],
@@ -28,7 +29,6 @@ sap.ui.define([
             };
             this.getView().setModel(new JSONModel(oChartData), "chartData");
             this.getView().setModel(new JSONModel(INITIAL_CHART_TYPES), "ComplaintChartModel");
-            this.getOwnerComponent().getRouter().getRoute("RouteComplainDashboard").attachMatched(this._onRouteMatched, this);
         },
         onNavBack: function () {
             if (this.sPath === "Complaindetails") {
@@ -36,7 +36,7 @@ sap.ui.define([
                 oRouter.navTo("RouteComplaintDetails");
             } else {
                 var oRouter = this.getOwnerComponent().getRouter();
-                oRouter.navTo("TilePage");
+                oRouter.navTo("TilePage", {}, true);
             }
         },
 

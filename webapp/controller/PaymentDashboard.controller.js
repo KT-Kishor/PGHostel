@@ -41,8 +41,8 @@ sap.ui.define([
             // Initialize the chart type model with the default values.
             this.getView().setModel(new JSONModel(INITIAL_CHART_TYPES), "invoiceChartTypeModel");
             this.byId("barChartCustomer").getDataset().setContext([
-                { id: "Day", showInTooltip: false },
-                { id: "Invoice Value (INR)", showInTooltip: true }
+                "Invoice Value (INR)",
+                "GST (INR)"
             ]);
             this.getOwnerComponent().getRouter().getRoute("RouteHostelDashboard").attachPatternMatched(this._onObjectMatched, this);
         },
@@ -437,16 +437,25 @@ sap.ui.define([
             // 1️⃣ Monthly Values (Apr–Mar Financial Year)
             //---------------------------------------------------------------------
             const monthlyValue = aFilteredData.reduce((acc, item) => {
-                const d = new Date(item.InvoiceDate);
-                if (isNaN(d.getTime())) return acc;
+                if (!item.InvoiceDate) return acc;
 
-                const month = d.getMonth();
-                if (item.Currency === "INR") {
-                    var TotalAmount = parseFloat(item.TotalAmount || 0)// - parseFloat(item.CreditNotesTotal || 0);
-                } else {
-                    var TotalAmount = parseFloat(item.AmountInINR || 0);
+                const date = new Date(item.InvoiceDate);
+                if (Number.isNaN(date.getTime())) return acc;
+
+                const key = `${date.getFullYear()}-${date.getMonth()}`;
+
+                if (!acc[key]) {
+                    acc[key] = { totalAmountInINR: 0, gstAmountInINR: 0 };
                 }
-                acc[month] = (acc[month] || 0) + TotalAmount;
+
+                acc[key].totalAmountInINR += item.Currency === "INR"
+                    ? Number(item.TotalAmount || 0)
+                    : Number(item.AmountInINR || 0);
+
+                acc[key].gstAmountInINR += this._convertToInr(item.CGST, item)
+                    + this._convertToInr(item.SGST, item)
+                    + this._convertToInr(item.IGST, item);
+
                 return acc;
             }, {});
 
@@ -482,7 +491,15 @@ sap.ui.define([
                     ? Number(invoice.TotalAmount || 0)
                     : Number(invoice.AmountInINR || 0);
 
-                bookingsByDay.get(day).set(bookingId, amountInINR);
+                const gstInINR = this._convertToInr(invoice.CGST, invoice)
+                    + this._convertToInr(invoice.SGST, invoice)
+                    + this._convertToInr(invoice.IGST, invoice);
+
+                bookingsByDay.get(day).set(bookingId, {
+                    invoice,
+                    amountInINR,
+                    gstInINR
+                });
             });
 
           const dailyInvoiceCounts = Array.from(bookingsByDay)
@@ -490,11 +507,25 @@ sap.ui.define([
             .map(([day, bookings]) => {
                 const [year, month, date] = day.split("-");
 
+                const dailyInvoices = Array.from(bookings.values());
+                const gstAmountInINR = dailyInvoices.reduce(
+                    (sum, invoice) => sum + invoice.gstInINR,
+                    0
+                );
+                
+
                 return {
                     day: `${month}-${date}-${year}`,
-                    count: bookings.size,
-                    totalAmountInINR: Array.from(bookings.values())
-                        .reduce((sum, amount) => sum + amount, 0)
+                    count: dailyInvoices.length,
+                    totalAmountInINR: dailyInvoices.reduce(
+                        (sum, invoice) => sum + invoice.amountInINR, 0
+                    ),
+                    invoices: dailyInvoices.map(({ invoice }) => invoice),
+                    gstAmountInINR,
+                    gstAmountDisplay: gstAmountInINR.toLocaleString("en-IN", {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2
+                    })
                 };
             });
 
@@ -657,9 +688,12 @@ sap.ui.define([
                 const realMonth = (idx + 3) % 12;
                 const year = realMonth >= 3 ? fyStartYear : fyStartYear + 1;
 
+                const totals = monthlyValue[`${year}-${realMonth}`];
+
                 return {
                     month: `${name}-${year}`,
-                    totalAmountInINR: monthlyValue[realMonth] || 0
+                    totalAmountInINR: totals?.totalAmountInINR ?? 0,
+                    gstAmountInINR: totals?.gstAmountInINR ?? 0
                 };
             });
 
@@ -1073,10 +1107,10 @@ sap.ui.define([
         IN_onPressStatusPie: function () { this.getView().getModel("invoiceChartTypeModel").setProperty("/statusType", "pie"); },
         IN_onPressStatusBar: function () { this.getView().getModel("invoiceChartTypeModel").setProperty("/statusType", "bar"); },
         IN_onPressStatusDonut: function () { this.getView().getModel("invoiceChartTypeModel").setProperty("/statusType", "donut"); },
-        IN_onPressMonthlyPie: function () { this.getView().getModel("invoiceChartTypeModel").setProperty("/monthlyType", "waterfall"); },
+        IN_onPressMonthlyPie: function () { this.getView().getModel("invoiceChartTypeModel").setProperty("/monthlyType", "stacked_column"); },
         IN_onPressMonthlyBar: function () { this.getView().getModel("invoiceChartTypeModel").setProperty("/monthlyType", "bar"); },
         IN_onPressMonthlyLine: function () { this.getView().getModel("invoiceChartTypeModel").setProperty("/monthlyType", "line"); },
-        IN_onPressCustomerPie: function () { this.getView().getModel("invoiceChartTypeModel").setProperty("/customerType", "waterfall"); },
+        IN_onPressCustomerPie: function () { this.getView().getModel("invoiceChartTypeModel").setProperty("/customerType", "line"); },
         IN_onPressCustomerBar: function () { this.getView().getModel("invoiceChartTypeModel").setProperty("/customerType", "bar"); },
         IN_onPressYearlyBar: function () { this.getView().getModel("invoiceChartTypeModel").setProperty("/yearlyType", "bar"); },
         IN_onPressYearlyLine: function () { this.getView().getModel("invoiceChartTypeModel").setProperty("/yearlyType", "line"); },
@@ -1227,6 +1261,13 @@ sap.ui.define([
                 return sum + (isNaN(amount) ? 0 : amount);
             }, 0);
 
+            const gstAmountInINR = aInvoices.reduce((sum, inv) =>
+                sum + this._convertToInr(inv.CGST, inv)
+                    + this._convertToInr(inv.SGST, inv)
+                    + this._convertToInr(inv.IGST, inv),
+                0
+            );
+
             // Update selected data with total
             aData[0].data["Total Value (INR)"] = AllTotalAmount;
 
@@ -1246,13 +1287,67 @@ sap.ui.define([
                     month: `${sMonth}-${iYear}`,
                     invoices: aInvoices,
                     totalValue: totalValue,
-                    AllTotalAmount: AllTotalAmount
+                    AllTotalAmount: AllTotalAmount,
+                    gstAmountInINR: gstAmountInINR
                 }), "dialogData");
 
                 oDialog.setTitle(sTitle);
                 this.getView().addDependent(oDialog);
                 oDialog.open();
             });
+        },
+        onDailyInvoiceSelect: async function (oEvent) {
+            const sDay = oEvent.getParameter("data")?.[0]?.data?.Day;
+            if (!sDay) return;
+
+            const aDays = this.getView().getModel("chartData")
+                .getProperty("/dailyInvoiceCounts") || [];
+            const oDay = aDays.find(day => day.day === sDay);
+            if (!oDay) return;
+
+            if (!this.pDailyInvoicesDialog) {
+                const oView = this.getView();
+
+                this.pDailyInvoicesDialog = Fragment.load({
+                    id: oView.getId(),
+                    name: "sap.ui.com.project1.fragment.DailyInvoice",
+                    controller: this
+                }).then(oDialog => {
+                    oView.addDependent(oDialog);
+                    return oDialog;
+                }).catch(error => {
+                    this.pDailyInvoicesDialog = null;
+                    throw error;
+                });
+            }
+
+            try {
+                const oDialog = await this.pDailyInvoicesDialog;
+
+                oDialog.setModel(new JSONModel({
+                    title: `Invoices for ${sDay}`,
+                    invoices: oDay.invoices,
+                    AllTotalAmount: oDay.totalAmountInINR
+                }), "dialogData");
+
+                oDialog.open();
+            } catch (error) {
+                MessageToast.show(this.i18nModel.getText("commonErrorMessage"));
+            }
+        },
+
+        onCloseDailyInvoiceDialog: function (oEvent) {
+            oEvent.getSource().getParent().getParent().close();
+        },
+
+        onDailyInvoiceNumberPress: function (oEvent) {
+            const oContext = oEvent.getSource().getBindingContext("dialogData");
+
+            if (oContext?.getProperty("InvNo")) {
+                this.onCloseDailyInvoiceDialog();
+            }
+
+            this.onInvoiceNumberPress(oEvent);
         },
 
        /*  onMonthlyInvoiceSelectCreditNote: function (oEvent) {
