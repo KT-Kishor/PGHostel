@@ -99,7 +99,7 @@
                             <Text text="{popoverData>CustomerName}" />
                             <Text text="{popoverData>BookingID}" />
                             <ObjectNumber
-                                number="{parts: [{ path: 'popoverData>OldTotalAmount' }], formatter: '.Formatter.fromatNumber'}"
+                                number="{parts: [{ path: 'popoverData>TotalAmount' }], formatter: '.Formatter.fromatNumber'}"
                                 unit="{popoverData>Currency}"
                             />
                             <!-- <layout:VerticalLayout>

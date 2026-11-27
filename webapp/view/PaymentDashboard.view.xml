@@ -166,7 +166,7 @@
 						<f:Card class="sapUiTinyMargin">
 							<f:header>
 								<Toolbar class="customdashboard">
-									<Title text="{i18n>dailyNumberOfInvoices} ({headerModel>/dailyInvoiceMonth}){headerModel>/filterSuffix}" level="H5"
+									<Title text="{i18n>dailyNumberOfInvoices} ({i18n>currentMonth}{headerModel>/dailyInvoiceMonth}){headerModel>/filterSuffix}" level="H5"
 									wrapping="false" class="Dashboardtitle automatedEllipsis" />
 									<ToolbarSpacer />
 									<Button icon="sap-icon://line-chart" press="IN_onPressCustomerPie" tooltip="{i18n>lineChart}" />
@@ -196,7 +196,7 @@
 													<viz:dataset>
 													<vizData:FlattenedDataset data="{chartData>/dailyInvoiceCounts}">
 														<vizData:dimensions>
-															<vizData:DimensionDefinition name="Day" value="{chartData>day}" />
+															<vizData:DimensionDefinition name="Day" value="{chartData>dayLabel}" />
 															<vizData:DimensionDefinition
 																name="Invoice Value (INR)"
 																value="{

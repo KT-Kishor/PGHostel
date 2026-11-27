@@ -506,6 +506,13 @@ sap.ui.define([
             .sort(([dayA], [dayB]) => dayA.localeCompare(dayB))
             .map(([day, bookings]) => {
                 const [year, month, date] = day.split("-");
+                const dayNumber = Number(date);
+                const suffix = dayNumber >= 11 && dayNumber <= 13
+                    ? "th"
+                    : ({ 1: "st", 2: "nd", 3: "rd" }[dayNumber % 10] || "th");
+
+                const monthShort = new Date(Number(year), Number(month) - 1, 1)
+                    .toLocaleDateString("en-US", { month: "short" });
 
                 const dailyInvoices = Array.from(bookings.values());
                 const gstAmountInINR = dailyInvoices.reduce(
@@ -516,6 +523,7 @@ sap.ui.define([
 
                 return {
                     day: `${month}-${date}-${year}`,
+                    dayLabel: `${monthShort} ${dayNumber}${suffix}`,
                     count: dailyInvoices.length,
                     totalAmountInINR: dailyInvoices.reduce(
                         (sum, invoice) => sum + invoice.amountInINR, 0
@@ -818,8 +826,8 @@ sap.ui.define([
             const sStatus = oSelectedData.Status;
             let aInvoicesForStatus = this._oGroupedInvoices[sStatus] || [];
             aInvoicesForStatus = aInvoicesForStatus.slice().sort((a, b) => {
-                const dA = new Date(a.InvoiceDate);
-                const dB = new Date(b.InvoiceDate);
+                const dA = new Date(b.InvoiceDate);
+                const dB = new Date(a.InvoiceDate);
                 return dB - dA; // latest first
             });
 
@@ -1242,16 +1250,21 @@ sap.ui.define([
                     invDate.getMonth() === monthIndex &&
                     invDate.getFullYear() === iYear;
             });
+            aInvoices.sort((a, b) => new Date(a.InvoiceDate) - new Date(b.InvoiceDate));
 
             // Convert each invoice to INR
             aInvoices.forEach(inv => {
                 const rawValue = this._getInrValue(inv);
                 const numValue = Number(String(rawValue).replace(/[^0-9.-]+/g, ""));
                 inv.totalAmountInINR = isNaN(numValue) ? 0 : numValue;
+                inv.gstAmountInINR = this._convertToInr(inv.CGST, inv)
+                + this._convertToInr(inv.SGST, inv)
+                + this._convertToInr(inv.IGST, inv);
             });
 
             // Total value in INR
             const totalValue = aInvoices.reduce((sum, inv) => sum + (inv.totalAmountInINR || 0), 0);
+            
 
             // Total considering currency
             const AllTotalAmount = aInvoices.reduce((sum, inv) => {
@@ -1261,10 +1274,8 @@ sap.ui.define([
                 return sum + (isNaN(amount) ? 0 : amount);
             }, 0);
 
-            const gstAmountInINR = aInvoices.reduce((sum, inv) =>
-                sum + this._convertToInr(inv.CGST, inv)
-                    + this._convertToInr(inv.SGST, inv)
-                    + this._convertToInr(inv.IGST, inv),
+            const gstAmountInINR = aInvoices.reduce(
+                (sum, inv) => sum + inv.gstAmountInINR,
                 0
             );
 
@@ -1302,7 +1313,7 @@ sap.ui.define([
 
             const aDays = this.getView().getModel("chartData")
                 .getProperty("/dailyInvoiceCounts") || [];
-            const oDay = aDays.find(day => day.day === sDay);
+            const oDay = aDays.find(day => day.dayLabel === sDay);
             if (!oDay) return;
 
             if (!this.pDailyInvoicesDialog) {
@@ -1458,7 +1469,7 @@ sap.ui.define([
             });
 
             // Sort latest first
-            aInvoices.sort((a, b) => new Date(b.InvoiceDate) - new Date(a.InvoiceDate));
+            aInvoices.sort((a, b) => new Date(a.InvoiceDate) - new Date(b.InvoiceDate));
 
             // Compute FY total
             const totalValue = aInvoices.reduce((sum, inv) => sum + (inv.totalAmountInINR || 0), 0);

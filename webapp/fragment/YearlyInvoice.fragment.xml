@@ -101,7 +101,7 @@
                             <Text text="{dialogData>CustomerName}" />
                             <Text text="{dialogData>BookingID}" />
                             <ObjectNumber
-                                number="{parts: [{ path: 'dialogData>OldTotalAmount' }], formatter: '.Formatter.fromatNumber'}"
+                                number="{parts: [{ path: 'dialogData>TotalAmount' }], formatter: '.Formatter.fromatNumber'}"
                                 unit="{dialogData>Currency}"
                             />
                             <!-- <layout:VerticalLayout>

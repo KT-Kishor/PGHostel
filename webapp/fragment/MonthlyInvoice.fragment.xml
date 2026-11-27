@@ -84,6 +84,9 @@
                     >
                         <Text text="{i18n>totalAmount}" />
                     </Column> -->
+                    <Column demandPopin="true" hAlign="End" minScreenWidth="Desktop">
+                        <Text text="{i18n>gstAmount}" />
+                    </Column>
                     <Column
                         demandPopin="true"
                         hAlign="Left"
@@ -104,9 +107,12 @@
                             <Text text="{dialogData>CustomerName}" />
                             <Text text="{dialogData>BookingID}" />
                             <ObjectNumber
-                                number="{parts: [{ path: 'dialogData>OldTotalAmount' }], formatter: '.Formatter.fromatNumber'}"
+                                number="{parts: [{ path: 'dialogData>TotalAmount' }], formatter: '.Formatter.fromatNumber'}"
                                 unit="{dialogData>Currency}"
                             />
+                            <ObjectNumber
+                            number="{parts: [{ path: 'dialogData>gstAmountInINR' }], formatter: '.Formatter.fromatNumber'}"
+                            unit="INR" />
                             <!-- <layout:VerticalLayout>
                                 <Link
                                     wrapping="true"
