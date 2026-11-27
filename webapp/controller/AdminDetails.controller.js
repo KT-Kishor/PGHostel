@@ -659,14 +659,14 @@ onChekout: function () {
                 );
              const Docs = oCustomer.Documents || [];
 
-const aDocs = Docs.length > 1
-    ? Docs.filter(item =>
+const aDocs = 
+     Docs.filter(item =>
         item.DocumentType?.includes("Aadhaar Card") ||
         item.DocumentType?.includes("Driving License") ||
         item.DocumentType?.includes("Pan Card") ||
         item.DocumentType?.includes("Passport")        
     )
-    : Docs;
+
 
 const Documents = filteredMembers.flatMap(member => {
     const memberDocs = aDocs.filter(
@@ -10989,14 +10989,13 @@ _uploadNewMemberDocument: async function (oDoc) {
                         (Array.isArray(oResponse?.data) ? oResponse.data : (oResponse?.data ? [oResponse.data] : []))));
                         if(aDocuments)
 
-var aDocs = aDocuments.length > 1
-    ? aDocuments.filter(item =>
+var aDocs = 
+     aDocuments.filter(item =>
         item.DocumentType?.includes("Aadhaar Card") ||
         item.DocumentType?.includes("Driving License") ||
         item.DocumentType?.includes("Pan Card") ||
         item.DocumentType?.includes("Passport")        
     )
-    : aDocuments;
             var oDocument = aDocs[0];
 
             if (!oDocument) {
